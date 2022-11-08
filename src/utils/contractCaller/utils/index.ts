@@ -12,7 +12,7 @@ export async function multicall(
     'function aggregate(tuple(address target, bytes callData)[] calls) view returns (uint256 blockNumber, bytes[] returnData)',
   ];
   const multi = new Contract(
-    // networks[network].multicall,
+    networks[network].multicall,
     multicallAbi,
     provider
   );
