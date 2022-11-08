@@ -1,10 +1,43 @@
-export const sum = (a: number, b: number) => {
-  if ('development' === process.env.NODE_ENV) {
-    console.log('boop');
-  }
-  return a + b;
-};
+import { StaticJsonRpcProvider } from '@ethersproject/providers';
 
-export default {
-  sum,
-};
+export default class Multicaller {
+  public network: string;
+  public provider: StaticJsonRpcProvider;
+  public abi: any[];
+  public options: any = {};
+  public calls: any[] = [];
+  public paths: any[] = [];
+
+  constructor(
+    network: string,
+    provider: StaticJsonRpcProvider,
+    abi: any[],
+    options?: {}
+  ) {
+    this.network = network;
+    this.provider = provider;
+    this.abi = abi;
+    this.options = options || {};
+  }
+
+  call(path: any, address: any, fn: any, params?: any): Multicaller {
+    this.calls.push([address, fn, params]);
+    this.paths.push(path);
+    return this;
+  }
+
+  async execute(from?: any): Promise<any> {
+    const obj = from || {};
+    // const result = await multicall(
+    //   this.network,
+    //   this.provider,
+    //   this.abi,
+    //   this.calls,
+    //   this.options
+    // );
+
+    this.calls = [];
+    this.paths = [];
+    return obj;
+  }
+}
