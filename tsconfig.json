@@ -4,6 +4,7 @@
   "compilerOptions": {
     "module": "esnext",
     "lib": ["dom", "esnext"],
+    "target": "ES2018",
     "importHelpers": true,
     // output .d.ts declaration files for consumers
     "declaration": true,
@@ -36,7 +37,9 @@
     // these options are overrides used only by ts-node
     // same as our --compilerOptions flag and our TS_NODE_COMPILER_OPTIONS environment variable
     "compilerOptions": {
-      "module": "commonjs"
+      "module": "commonjs",
+      "resolveJsonModule": true,
+      "esModuleInterop": true
     }
   }
 }
