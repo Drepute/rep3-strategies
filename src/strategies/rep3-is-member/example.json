@@ -1,0 +1,8 @@
+{
+  "strategy": "rep3-is-member",
+  "contractAddress": "0x9e00c9a53e71073cee827d54db9e32005d1b95ac",
+  "eoa": "0x280a53cbf252f1b5f6bde7471299c94ec566a7c8",
+  "options": {
+    "network": "main"
+  }
+}

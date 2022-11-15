@@ -3,8 +3,8 @@ import { jsonToGraphQLQuery } from 'json-to-graphql-query';
 
 export async function subgraphRequest(
   url: string,
-  query: {},
-  options: any = {}
+  query: object,
+  options: object | any = {}
 ) {
   const res = await fetch(url, {
     method: 'POST',
@@ -13,7 +13,9 @@ export async function subgraphRequest(
       'Content-Type': 'application/json',
       ...options?.headers,
     },
-    body: JSON.stringify({ query: jsonToGraphQLQuery({ query }) }),
+    body: JSON.stringify({
+      query: jsonToGraphQLQuery({ query }, { pretty: true }),
+    }),
   });
   const responseData = await res.json();
   if (responseData.errors) {
@@ -26,7 +28,3 @@ export async function subgraphRequest(
   const { data } = responseData;
   return data || {};
 }
-
-export default {
-  subgraphRequest,
-};
