@@ -1,7 +1,7 @@
-import contractCaller from './contractCaller';
+import ContractCaller from './contract';
 import * as subgraph from './subgraph';
 
 export default {
-  contractCaller,
+  ContractCaller,
   subgraph,
 };
