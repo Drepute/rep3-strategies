@@ -14,7 +14,7 @@ export async function strategy({ eoa, options }: StrategyParamsType) {
   ]);
   contract.contractSetup();
   const result = await contract.executeFunctionCall('erc20', 'balanceOf', eoa);
-  if (result.toString() > 0) {
+  if (result.toString() === 0) {
     const actions = new ActionCaller(
       options.contractAddress,
       ActionOnType.membership,

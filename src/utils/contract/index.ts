@@ -31,7 +31,6 @@ export default class ContractCaller {
     ...args: any
   ) => {
     if (this.contractInstances) {
-      console.log('Contract Instance');
       try {
         const res = await this.contractInstances[contractName][functionName](
           ...args
