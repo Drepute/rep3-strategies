@@ -23,6 +23,8 @@ export async function strategy({ eoa, options }: StrategyParamsType) {
       { changingLevel: 2 }
     );
     const final = await actions.calculateActionParams();
-    console.log('results', final);
+    return final;
+  } else {
+    return false;
   }
 }

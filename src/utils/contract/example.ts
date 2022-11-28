@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-
 import ContractCaller from './index';
 import { abi } from './utils/abis/erc20Abi';
 (async () => {
