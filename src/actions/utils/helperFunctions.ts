@@ -1,5 +1,5 @@
 import { getRep3MembershipDetails } from '../../utils/subgraph/helperFunction';
-import { MembershipActions } from './type';
+import { BadgeActions, MembershipActions } from './type';
 
 export const createOrUpdateMembership = async (
   contractAddress: string,
@@ -12,7 +12,7 @@ export const createOrUpdateMembership = async (
     eao,
     networkId
   );
-  console.log(membershipDetailsForEOA);
+
   if (membershipDetailsForEOA && upgradeTier) {
     return {
       params: { ...membershipDetailsForEOA, upgradeTier },
@@ -26,5 +26,31 @@ export const createOrUpdateMembership = async (
       params: { ...membershipDetailsForEOA, upgradeTier },
       action: MembershipActions.createMembershipVoucher,
     };
+  }
+};
+
+export const createBadgVoucherOrMint = async (
+  contractAddress: string,
+  eao: string,
+  networkId: number,
+  badgeType: number,
+  badgActionType: BadgeActions
+) => {
+  const membershipDetailsForEOA = await getRep3MembershipDetails(
+    contractAddress,
+    eao,
+    networkId
+  );
+  if (membershipDetailsForEOA) {
+    return {
+      params: {
+        level: membershipDetailsForEOA.level,
+        type: badgeType,
+        memberTokenId: membershipDetailsForEOA.tokenID,
+      },
+      action: badgActionType,
+    };
+  } else {
+    return false;
   }
 };

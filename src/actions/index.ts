@@ -1,5 +1,8 @@
-import { createOrUpdateMembership } from './utils/helperFunctions';
-import { ActionOnType } from './utils/type';
+import {
+  createBadgVoucherOrMint,
+  createOrUpdateMembership,
+} from './utils/helperFunctions';
+import { ActionOnType, BadgeActions } from './utils/type';
 
 export default class ActionCaller {
   public contractAddress: string;
@@ -7,13 +10,15 @@ export default class ActionCaller {
   public eoa: string;
   public network: number;
   public membershipOptions?: { changingLevel: number } | any;
-  public badgeOptions?: { badgeType: number } | any;
+  public badgeOptions?: { badgeType: number; actionType: BadgeActions } | any;
   constructor(
     contractAddress: string,
     actionType: ActionOnType,
     eoa: string,
     network: number,
-    options: { changingLevel: number } | { badgeType: number }
+    options:
+      | { changingLevel: number }
+      | { badgeType: number; actionType: BadgeActions }
   ) {
     this.contractAddress = contractAddress;
     this.actionType = actionType;
@@ -35,6 +40,18 @@ export default class ActionCaller {
             this.eoa,
             this.network,
             this?.membershipOptions?.changingLevel
+          );
+        } catch (error) {
+          return error;
+        }
+      case ActionOnType.badge:
+        try {
+          return await createBadgVoucherOrMint(
+            this.contractAddress,
+            this.eoa,
+            this.network,
+            this.badgeOptions.badgeType,
+            this.badgeOptions.actionType
           );
         } catch (error) {
           return error;

@@ -3,6 +3,7 @@
   "eoa": "0x280a53cbf252f1b5f6bde7471299c94ec566a7c8",
   "options": {
     "network": 1,
-    "contractAddress": "0x9e00c9a53e71073cee827d54db9e32005d1b95ac"
+    "contractAddress": "0x9e00c9a53e71073cee827d54db9e32005d1b95ac",
+    "erc20Address": "0x9e00c9a53e71073cee827d54db9e32005d1b95ac"
   }
 }

@@ -8,3 +8,8 @@ export enum MembershipActions {
   upgradeMembershipNFT = 'upgradeMembershipNFT',
   downgradeMembershipNFT = 'downgradeMembershipNFT',
 }
+
+export enum BadgeActions {
+  createBadgeVoucher = 'createBadgeVoucher',
+  directMint = 'directMint',
+}
