@@ -1,6 +1,7 @@
 import { Contract } from '@ethersproject/contracts';
 import { ContractObj } from './utils/types';
 import { ethers } from 'ethers';
+import { network } from './network';
 
 export default class ContractCaller {
   public contractInfo: ContractObj[];
@@ -15,7 +16,8 @@ export default class ContractCaller {
     this.contractInfo.forEach(contractObj => {
       instances[contractObj.name] = new ethers.Contract(
         contractObj.address,
-        contractObj.abi
+        contractObj.abi,
+        new ethers.providers.JsonRpcProvider(network[contractObj.network].rpc)
       );
     });
     this.contractInstances = instances;

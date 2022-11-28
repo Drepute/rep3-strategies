@@ -4,3 +4,14 @@ export interface ContractObj {
   name: string;
   network: number;
 }
+
+interface NetworkInfos {
+  name: string;
+  chainId: number;
+  network: string;
+  rpc: string;
+}
+
+export interface NetwrokObj {
+  [key: string]: NetworkInfos;
+}
