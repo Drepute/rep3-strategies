@@ -10,6 +10,7 @@ interface NetworkInfos {
   chainId: number;
   network: string;
   rpc: string;
+  subgraph: string;
 }
 
 export interface NetwrokObj {
