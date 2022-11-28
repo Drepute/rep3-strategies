@@ -29,7 +29,6 @@ export const getRep3MembershipDetails = async (
   };
   try {
     const responseData = await subgraphRequest(URL, QUERY);
-
     if (responseData['membershipNFTs'].length > 0) {
       return responseData['membershipNFTs'][0];
     } else {
