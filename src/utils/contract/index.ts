@@ -17,7 +17,9 @@ export default class ContractCaller {
       instances[contractObj.name] = new ethers.Contract(
         contractObj.address,
         contractObj.abi,
-        new ethers.providers.JsonRpcProvider(network[contractObj.network].rpc)
+        new ethers.providers.JsonRpcProvider(
+          network[contractObj.network.toString()].rpc
+        )
       );
     });
     this.contractInstances = instances;
@@ -26,16 +28,18 @@ export default class ContractCaller {
   executeFunctionCall = async (
     contractName: string,
     functionName: string,
-    args: any[]
+    ...args: any
   ) => {
     if (this.contractInstances) {
-      const encodedResult: string = this.contractInstances[
-        contractName
-      ].interface.encodeFunctionResult(functionName, args);
-      const decoded: ethers.utils.Result = this.contractInstances[
-        contractName
-      ].interface.decodeFunctionResult(functionName, encodedResult);
-      return decoded;
+      console.log('Contract Instance');
+      try {
+        const res = await this.contractInstances[contractName][functionName](
+          ...args
+        );
+        return res;
+      } catch (error) {
+        console.log('error', error);
+      }
     } else {
       throw 'Contract not initiated';
     }

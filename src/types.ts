@@ -1,5 +1,5 @@
 export interface StrategyParamsType {
-  contractAddress: string;
+  // contractAddress: string;
   eoa: string;
   options: object | any;
 }

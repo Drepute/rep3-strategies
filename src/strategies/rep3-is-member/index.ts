@@ -6,16 +6,12 @@ const SUBGRAPH_URLS = {
   test: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-mumbai',
 };
 
-export async function strategy({
-  contractAddress,
-  eoa,
-  options,
-}: StrategyParamsType) {
+export async function strategy({ eoa, options }: StrategyParamsType) {
   const QUERY = {
     membershipNFTs: {
       __args: {
         where: {
-          contractAddress: contractAddress,
+          contractAddress: options.contractAddress,
           claimer: eoa,
         },
       },
