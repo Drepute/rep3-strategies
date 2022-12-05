@@ -37,13 +37,10 @@ jobs:
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2
         with:
-          node-version: ${{ matrix.node-version }}
-      name: Install dependencies
-      run: yarn install
-      - name: Run audit
-            run: yarn audit
-      - name: Run build
-            run: yarn build
+          node-version: ${{ matrix.node-version }} 
+      - run: yarn install
+      - run: yarn audit
+      - run: yarn build
       - run: npm run semantic-release 
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
