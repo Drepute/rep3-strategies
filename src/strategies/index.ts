@@ -3,11 +3,9 @@ import path from 'path';
 
 import { StrategyType } from '../types';
 import * as rep3IsMember from './rep3-is-member';
-import * as erc20BalanceOf from './erc20-balance-of';
 
 const strategies: Record<string, StrategyType> = {
   'rep3-is-member': rep3IsMember,
-  'erc-20-balance-of': erc20BalanceOf,
 };
 
 Object.keys(strategies).forEach(function(strategyName) {
