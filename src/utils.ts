@@ -9,6 +9,7 @@ async function callStrategy({
   eoa,
   options,
 }: CallStrategyParamsType) {
+  console.log(_strategies, strategy, contractAddress, eoa, options);
   const res: boolean = await _strategies[strategy].strategy({
     contractAddress,
     eoa,
