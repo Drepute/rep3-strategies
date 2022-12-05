@@ -39,7 +39,6 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - run: yarn install --frozen-lockfile
       - run: yarn install
-      - run: yarn audit
       - run: yarn build
       - run: npm run semantic-release
         env:
