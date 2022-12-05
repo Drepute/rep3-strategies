@@ -17,8 +17,6 @@
     "lint": "tsdx lint",
     "commit": "git-cz",
     "prepare": "tsdx build",
-    "size": "size-limit",
-    "analyze": "size-limit --why",
     "semantic-release": "semantic-release"
   },
   "husky": {
@@ -35,16 +33,6 @@
   "name": "rep3-strategies",
   "author": "Jashan Shetty",
   "module": "dist/rep3-strategies.esm.js",
-  "size-limit": [
-    {
-      "path": "dist/rep3-strategies.cjs.production.min.js",
-      "limit": "10 KB"
-    },
-    {
-      "path": "dist/rep3-strategies.esm.js",
-      "limit": "10 KB"
-    }
-  ],
   "devDependencies": {
     "@size-limit/preset-small-lib": "^8.1.0",
     "@typescript-eslint/eslint-plugin": "^5.42.1",
