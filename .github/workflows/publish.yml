@@ -25,8 +25,7 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
-      - run: npm ci
-      # - run: npm test
+      - run: yarn install --frozen-lockfile
 
   publish:
     runs-on: ubuntu-latest
@@ -37,11 +36,12 @@ jobs:
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2
         with:
-          node-version: ${{ matrix.node-version }} 
+          node-version: ${{ matrix.node-version }}
+      - run: yarn install --frozen-lockfile
       - run: yarn install
       - run: yarn audit
       - run: yarn build
-      - run: npm run semantic-release 
+      - run: npm run semantic-release
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
