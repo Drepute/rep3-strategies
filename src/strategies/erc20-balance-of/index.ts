@@ -3,11 +3,7 @@ import { ActionOnType } from '../../actions/utils/type';
 import { StrategyParamsType } from '../../types';
 import ContractCaller from '../../utils/contract';
 
-export async function strategy({
-  contractAddress,
-  eoa,
-  options,
-}: StrategyParamsType) {
+export async function strategy({ eoa, options }: StrategyParamsType) {
   const contract = new ContractCaller([
     {
       address: options.erc20Address,
@@ -20,7 +16,7 @@ export async function strategy({
   const result = await contract.executeFunctionCall('erc20', 'balanceOf', eoa);
   if (result.toString() === 0) {
     const actions = new ActionCaller(
-      contractAddress,
+      options.contractAddress,
       ActionOnType.membership,
       eoa,
       options.network,

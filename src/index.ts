@@ -1,5 +1,7 @@
 import strategies from './strategies';
-import Whitelist from './utils';
+import utils from './utils';
 
-export default Whitelist;
-export { strategies };
+export default {
+  strategies,
+  utils,
+};
