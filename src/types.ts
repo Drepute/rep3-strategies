@@ -1,5 +1,5 @@
 export interface StrategyParamsType {
-  // contractAddress: string;
+  contractAddress: string;
   eoa: string;
   options: object | any;
 }
@@ -9,7 +9,7 @@ export interface CallStrategyParamsType extends StrategyParamsType {
 }
 
 export interface StrategyType {
-  strategy: ({ ...args }: StrategyParamsType) => Promise<boolean>;
+  strategy: ({ ...args }: StrategyParamsType) => Promise<any>;
   example?: CallStrategyParamsType | null;
   about?: string;
 }

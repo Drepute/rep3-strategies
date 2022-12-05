@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0",
+  "version": "0.0.0-development",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -15,9 +15,11 @@
     "build": "tsdx build",
     "test": "tsdx test",
     "lint": "tsdx lint",
+    "commit": "git-cz",
     "prepare": "tsdx build",
     "size": "size-limit",
-    "analyze": "size-limit --why"
+    "analyze": "size-limit --why",
+    "semantic-release": "semantic-release"
   },
   "husky": {
     "hooks": {
@@ -47,8 +49,10 @@
     "@size-limit/preset-small-lib": "^8.1.0",
     "@typescript-eslint/eslint-plugin": "^5.42.1",
     "@typescript-eslint/parser": "^5.42.1",
+    "cz-conventional-changelog": "^3.3.0",
     "eslint": "^8.27.0",
     "husky": "^8.0.1",
+    "semantic-release": "^19.0.5",
     "size-limit": "^8.1.0",
     "ts-node": "^10.9.1",
     "tsdx": "^0.14.1",
@@ -61,5 +65,14 @@
     "ethers": "^5.7.2",
     "json-to-graphql-query": "^2.2.4",
     "twitter-api-sdk": "^1.2.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Drepute/rep3-whitelister.git"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }
