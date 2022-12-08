@@ -7,7 +7,7 @@ export const getRep3MembershipDetails = async (
   networkId: number
 ) => {
   const URL = network[networkId].subgraph;
-  console.log(URL);
+
   const QUERY = {
     membershipNFTs: {
       __args: {

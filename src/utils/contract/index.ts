@@ -37,7 +37,7 @@ export default class ContractCaller {
         );
         return res;
       } catch (error) {
-        console.log('error', error);
+        return error;
       }
     } else {
       throw 'Contract not initiated';
