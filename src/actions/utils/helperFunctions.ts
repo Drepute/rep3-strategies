@@ -16,10 +16,7 @@ export const createOrUpdateMembership = async (
   if (membershipDetailsForEOA && upgradeTier) {
     return {
       params: { ...membershipDetailsForEOA, upgradeTier },
-      action:
-        membershipDetailsForEOA.level > upgradeTier
-          ? MembershipActions.downgradeMembershipNFT
-          : MembershipActions.upgradeMembershipNFT,
+      action: MembershipActions.upgradeMembershipNFT,
     };
   } else {
     return {
@@ -29,12 +26,12 @@ export const createOrUpdateMembership = async (
   }
 };
 
-export const createBadgVoucherOrMint = async (
+export const createBadgeVoucherOrMint = async (
   contractAddress: string,
   eao: string,
   networkId: number,
   badgeType: number,
-  badgActionType: BadgeActions
+  badgeActionType: BadgeActions
 ) => {
   const membershipDetailsForEOA = await getRep3MembershipDetails(
     contractAddress,
@@ -48,7 +45,7 @@ export const createBadgVoucherOrMint = async (
         type: badgeType,
         memberTokenId: membershipDetailsForEOA.tokenID,
       },
-      action: badgActionType,
+      action: badgeActionType,
     };
   } else {
     return false;

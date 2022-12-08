@@ -5,11 +5,11 @@ export enum ActionOnType {
 
 export enum MembershipActions {
   createMembershipVoucher = 'createMembershipVoucher',
-  upgradeMembershipNFT = 'upgradeMembershipNFT',
-  downgradeMembershipNFT = 'downgradeMembershipNFT',
+  upgradeMembershipNFT = 'updateMembership',
+  downgradeMembershipNFT = 'updateMembership',
 }
 
 export enum BadgeActions {
   createBadgeVoucher = 'createBadgeVoucher',
-  directMint = 'directMint',
+  directMint = 'batchIssueBadge',
 }

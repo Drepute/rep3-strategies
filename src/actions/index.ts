@@ -1,5 +1,5 @@
 import {
-  createBadgVoucherOrMint,
+  createBadgeVoucherOrMint,
   createOrUpdateMembership,
 } from './utils/helperFunctions';
 import { ActionOnType, BadgeActions } from './utils/type';
@@ -46,7 +46,7 @@ export default class ActionCaller {
         }
       case ActionOnType.badge:
         try {
-          return await createBadgVoucherOrMint(
+          return await createBadgeVoucherOrMint(
             this.contractAddress,
             this.eoa,
             this.network,
