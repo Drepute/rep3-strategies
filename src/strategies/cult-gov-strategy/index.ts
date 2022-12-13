@@ -71,7 +71,7 @@ export async function strategy({
   const SUBGRAPH_URLS =
     'https://api.thegraph.com/subgraphs/name/eth-jashan/cult-governance';
   const QUERY = {
-    membershipNFTs: {
+    voters: {
       __args: {
         where: {
           id: eoa,
@@ -80,7 +80,11 @@ export async function strategy({
       proposals: true,
     },
   };
+  console.log(options);
   const responseData = await subgraph.subgraphRequest(SUBGRAPH_URLS, QUERY);
-
-  await calculateActionParams(responseData, contractAddress, eoa);
+  return await calculateActionParams(
+    responseData.voters[0].proposals,
+    contractAddress,
+    eoa
+  );
 }
