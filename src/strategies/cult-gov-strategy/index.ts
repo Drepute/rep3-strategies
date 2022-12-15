@@ -13,15 +13,6 @@ const initializeActionClass = (
   });
 };
 
-// lvl-1: = 0 proposal votes
-// lvl-2: = 1 proposal votes
-// lvl-3: = 3 proposal votes
-// lvl-4: = 5 proposal votes
-// lvl-5: = 7 proposal votes
-// lvl-6: = 9 proposal votes
-// lvl-7: = 11 proposal votes
-// lvl-8: >= 13 proposal votes
-
 const calculateActionParams = async (
   proposals: number,
   contractAddress: string,
