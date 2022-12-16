@@ -4,7 +4,7 @@ import path from 'path';
 import { StrategyType } from '../types';
 import * as rep3IsMember from './rep3-is-member';
 import * as erc20BalanceOf from './erc20-balance-of';
-import * as cultGov from './cult-gov-strategy';
+import * as cultGov from './cult-strategy';
 
 const strategies: Record<string, StrategyType> = {
   'rep3-is-member': rep3IsMember,
