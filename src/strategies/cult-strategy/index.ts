@@ -179,10 +179,15 @@ export async function strategy({
   eoa,
 }: // options,
 StrategyParamsType) {
+  // const SUBGRAPH_URLS = {
+  //   proposal:
+  //     'https://api.thegraph.com/subgraphs/name/eth-jashan/cult-governance',
+  //   staking: 'https://api.thegraph.com/subgraphs/name/eth-jashan/cult-staking',
+  // };
   const SUBGRAPH_URLS = {
     proposal:
-      'https://api.thegraph.com/subgraphs/name/eth-jashan/cult-governance',
-    staking: 'https://api.thegraph.com/subgraphs/name/eth-jashan/cult-staking',
+      'https://api.thegraph.com/subgraphs/name/eth-jashan/test-governance',
+    staking: 'https://api.thegraph.com/subgraphs/name/eth-jashan/test-staking',
   };
   const QUERY_PROPOSALS = {
     voters: {
