@@ -8,7 +8,6 @@ function getTimestampInSeconds() {
 }
 
 function timeDifference(date1: number, date2: number) {
-  console.log(date1, date2);
   const difference = date1 - date2;
 
   return (difference * 1000) / (86400000 * 30);
@@ -19,7 +18,6 @@ const calculateMonthsOnStaking = (
   startTime: number,
   endTime: number
 ) => {
-  console.log(amount, startTime, endTime);
   if (parseInt(amount) === 0) {
     // If money is not in LP
     return timeDifference(endTime, startTime);
@@ -104,15 +102,92 @@ const calculateLevelBasedOnProposals = (proposals: number) => {
   }
 };
 
+const calculateLevelBasedOnProposalsMissed = (
+  currentLevel: number,
+  proposalMissed: number
+) => {
+  switch (proposalMissed >= 0) {
+    case proposalMissed === 0: {
+      // const action = initializeActionClass(contractAddress, eoa, 1);
+      return currentLevel - 1;
+    }
+    case proposalMissed <= 2: {
+      //const action = initializeActionClass(contractAddress, eoa, 2);
+      return currentLevel - 2;
+    }
+    case proposalMissed <= 4: {
+      // const action = initializeActionClass(contractAddress, eoa, 3);
+      return currentLevel - 3;
+    }
+    case proposalMissed <= 6: {
+      // const action = initializeActionClass(contractAddress, eoa, 4);
+      return currentLevel - 4;
+    }
+    case proposalMissed <= 8: {
+      // const action = initializeActionClass(contractAddress, eoa, 4);
+      return currentLevel - 5;
+    }
+    case proposalMissed <= 10: {
+      // const action = initializeActionClass(contractAddress, eoa, 4);
+      return currentLevel - 6;
+    }
+    case proposalMissed <= 12: {
+      // const action = initializeActionClass(contractAddress, eoa, 4);
+      return currentLevel - 7;
+    }
+    case proposalMissed >= 13: {
+      // const action = initializeActionClass(contractAddress, eoa, 4);
+      return currentLevel - 8;
+    }
+    default:
+      return currentLevel - 1;
+  }
+};
+
+const getAllProposals = async (
+  url: string,
+  page = 0,
+  allProposals: any[] = []
+) => {
+  // const allProposals: any[] = [];
+  const proposals = await subgraph.subgraphRequest(url, {
+    proposals: {
+      __args: {
+        orderBy: 'id',
+        orderDirection: 'asc',
+        skip: page * 100,
+      },
+      id: true,
+      proposer: true,
+      status: true,
+      values: true,
+    },
+  });
+  const all = allProposals.concat(proposals.proposals);
+
+  if (proposals.proposals.length === 100) {
+    page = page + 1;
+    const res: any[] = await getAllProposals(url, page, all);
+    return res;
+  } else {
+    return all;
+  }
+};
+
 export async function strategy({
   contractAddress,
   eoa,
 }: // options,
 StrategyParamsType) {
+  // const SUBGRAPH_URLS = {
+  //   proposal:
+  //     'https://api.thegraph.com/subgraphs/name/eth-jashan/cult-governance',
+  //   staking: 'https://api.thegraph.com/subgraphs/name/eth-jashan/cult-staking',
+  // };
   const SUBGRAPH_URLS = {
     proposal:
-      'https://api.thegraph.com/subgraphs/name/eth-jashan/cult-governance',
-    staking: 'https://api.thegraph.com/subgraphs/name/eth-jashan/cult-staking',
+      'https://api.thegraph.com/subgraphs/name/eth-jashan/test-governance',
+    staking: 'https://api.thegraph.com/subgraphs/name/eth-jashan/test-staking',
   };
   const QUERY_PROPOSALS = {
     voters: {
@@ -156,19 +231,32 @@ StrategyParamsType) {
     );
     months = monthsOfStaking;
   }
-  if (responseProposalData.voters.length > 0) {
+  let proposalLevel = 1;
+  if (
+    responseProposalData.voters.length > 0 &&
+    responseStakeData.users.length > 0
+  ) {
     const proposalsLevel = calculateLevelBasedOnProposals(
       responseProposalData.voters[0].proposals
     );
     proposals = proposalsLevel;
+    const allProposals = await getAllProposals(SUBGRAPH_URLS['proposal']);
+
+    if (allProposals.length - responseProposalData.voters[0].proposals <= 13) {
+      proposalLevel = calculateLevelBasedOnProposalsMissed(
+        proposals,
+        allProposals.length - responseProposalData.voters[0].proposals
+      );
+    }
   }
+
   const actions = new ActionCaller(
     contractAddress,
     ActionOnType.membership,
     eoa,
     1,
     {
-      changingLevel: proposals * months,
+      changingLevel: proposalLevel * months,
     }
   );
 
