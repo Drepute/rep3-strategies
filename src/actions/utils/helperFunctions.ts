@@ -13,7 +13,9 @@ export const createOrUpdateMembership = async (
     networkId
   );
 
-  if (membershipDetailsForEOA && upgradeTier) {
+  console.log(membershipDetailsForEOA, upgradeTier);
+
+  if (membershipDetailsForEOA) {
     return {
       params: { ...membershipDetailsForEOA, upgradeTier },
       action: MembershipActions.upgradeMembershipNFT,
