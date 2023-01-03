@@ -255,9 +255,11 @@ StrategyParamsType) {
       allProposals.length,
       responseProposalData.voters[0]
     );
+
     if (allProposals.length - responseProposalData.voters[0].proposals === 0) {
       proposalLevel = proposals;
     }
+
   }
 
   const actions = new ActionCaller(
