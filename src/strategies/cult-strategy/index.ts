@@ -107,7 +107,7 @@ const calculateLevelBasedOnProposalsMissed = (
   proposalMissed: number
 ) => {
   switch (proposalMissed >= 0) {
-    case proposalMissed === 0: {
+    case proposalMissed === 1: {
       // const action = initializeActionClass(contractAddress, eoa, 1);
       return currentLevel - 1;
     }
@@ -248,6 +248,13 @@ StrategyParamsType) {
         allProposals.length - responseProposalData.voters[0].proposals
       );
     }
+    console.log(
+      'levels example',
+      proposalLevel,
+      months,
+      allProposals.length,
+      responseProposalData.voters[0]
+    );
   }
 
   const actions = new ActionCaller(
@@ -256,7 +263,7 @@ StrategyParamsType) {
     eoa,
     1,
     {
-      changingLevel: proposalLevel * months,
+      changingLevel: proposalLevel === 0 ? 1 : proposalLevel * months,
     }
   );
 

@@ -13,6 +13,8 @@ export const createOrUpdateMembership = async (
     networkId
   );
 
+  console.log(membershipDetailsForEOA, upgradeTier);
+
   if (membershipDetailsForEOA && upgradeTier) {
     return {
       params: { ...membershipDetailsForEOA, upgradeTier },
