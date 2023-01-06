@@ -16,14 +16,30 @@ export const createOrUpdateMembership = async (
   console.log(membershipDetailsForEOA, upgradeTier);
 
   if (membershipDetailsForEOA) {
-    return {
-      params: { ...membershipDetailsForEOA, upgradeTier },
-      action: MembershipActions.upgradeMembershipNFT,
-    };
+    console.log(
+      'membership',
+      membershipDetailsForEOA.level === upgradeTier?.toString(),
+      membershipDetailsForEOA.level,
+      upgradeTier?.toString()
+    );
+    if (membershipDetailsForEOA.level === upgradeTier?.toString()) {
+      return {
+        params: { ...membershipDetailsForEOA, upgradeTier },
+        action: MembershipActions.noChange,
+        eao,
+      };
+    } else {
+      return {
+        params: { ...membershipDetailsForEOA, upgradeTier },
+        action: MembershipActions.upgradeMembershipNFT,
+        eao,
+      };
+    }
   } else {
     return {
       params: { ...membershipDetailsForEOA, upgradeTier },
       action: MembershipActions.createMembershipVoucher,
+      eao,
     };
   }
 };

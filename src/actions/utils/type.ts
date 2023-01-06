@@ -7,6 +7,7 @@ export enum MembershipActions {
   createMembershipVoucher = 'createMembershipVoucher',
   upgradeMembershipNFT = 'updateMembership',
   downgradeMembershipNFT = 'updateMembership',
+  noChange = 'false',
 }
 
 export enum BadgeActions {
