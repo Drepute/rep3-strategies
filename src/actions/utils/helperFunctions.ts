@@ -16,16 +16,10 @@ export const createOrUpdateMembership = async (
   console.log(membershipDetailsForEOA, upgradeTier);
 
   if (membershipDetailsForEOA) {
-    console.log(
-      'membership',
-      membershipDetailsForEOA.level === upgradeTier?.toString(),
-      membershipDetailsForEOA.level,
-      upgradeTier?.toString()
-    );
     if (membershipDetailsForEOA.level === upgradeTier?.toString()) {
       return {
         params: { ...membershipDetailsForEOA, upgradeTier },
-        action: MembershipActions.noChange,
+        action: false,
         eao,
       };
     } else {

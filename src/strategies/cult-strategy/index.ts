@@ -174,6 +174,29 @@ const getAllProposals = async (
   }
 };
 
+const getAllVoters = async (url: string, page = 0, allVoters: any[] = []) => {
+  // const allProposals: any[] = [];
+  const voters = await subgraph.subgraphRequest(url, {
+    voters: {
+      __args: {
+        orderBy: 'id',
+        orderDirection: 'asc',
+        skip: page * 100,
+      },
+      id: true,
+    },
+  });
+  const all = allVoters.concat(voters.voters);
+
+  if (voters.proposals.length === 100) {
+    page = page + 1;
+    const res: any[] = await getAllVoters(url, page, all);
+    return res;
+  } else {
+    return all;
+  }
+};
+
 const getAllVotersOfProposals = async (url: string, id: any) => {
   const proposals = await subgraph.subgraphRequest(url, {
     proposals: {
@@ -229,6 +252,7 @@ const getActionOnEOA = async (
   let months: number, proposals: number;
   months = 1;
   proposals = 1;
+  console.log(responseStakeData, responseProposalData);
   if (responseStakeData.users.length > 0) {
     const monthsOfStaking = calculateLevelBasedOnMonths(
       responseStakeData.users[0].amount,
@@ -236,47 +260,49 @@ const getActionOnEOA = async (
       responseStakeData.users[0].endTime
     );
     months = monthsOfStaking;
-  }
-  let proposalLevel = 1;
-  if (
-    responseProposalData.voters.length > 0 &&
-    responseStakeData.users.length > 0
-  ) {
-    const proposalsLevel = calculateLevelBasedOnProposals(
-      responseProposalData.voters[0].proposals
-    );
-    proposals = proposalsLevel;
-    const allProposals = await getAllProposals(subgraphUrls['proposal']);
 
-    if (allProposals.length - responseProposalData.voters[0].proposals <= 13) {
-      proposalLevel = calculateLevelBasedOnProposalsMissed(
-        proposals,
-        allProposals.length - responseProposalData.voters[0].proposals
+    let proposalLevel = 1;
+    if (
+      responseProposalData.voters.length > 0 &&
+      responseStakeData.users.length > 0
+    ) {
+      const proposalsLevel = calculateLevelBasedOnProposals(
+        responseProposalData.voters[0].proposals
       );
+      proposals = proposalsLevel;
+      const allProposals = await getAllProposals(subgraphUrls['proposal']);
+
+      if (
+        allProposals.length - responseProposalData.voters[0].proposals <=
+        13
+      ) {
+        proposalLevel = calculateLevelBasedOnProposalsMissed(
+          proposals,
+          allProposals.length - responseProposalData.voters[0].proposals
+        );
+      }
+
+      if (
+        allProposals.length - responseProposalData.voters[0].proposals ===
+        0
+      ) {
+        proposalLevel = proposals;
+      }
     }
-    console.log(
-      'levels example',
-      proposalLevel,
-      months,
-      allProposals.length,
-      responseProposalData.voters[0]
+
+    const actions = new ActionCaller(
+      contractAddress,
+      ActionOnType.membership,
+      eoa,
+      1,
+      {
+        changingLevel: proposalLevel === 0 ? 1 : proposalLevel * months,
+      }
     );
-
-    if (allProposals.length - responseProposalData.voters[0].proposals === 0) {
-      proposalLevel = proposals;
-    }
+    return await actions.calculateActionParams();
+  } else {
+    return { action: false };
   }
-
-  const actions = new ActionCaller(
-    contractAddress,
-    ActionOnType.membership,
-    eoa,
-    1,
-    {
-      changingLevel: proposalLevel === 0 ? 1 : proposalLevel * months,
-    }
-  );
-  return await actions.calculateActionParams();
 };
 
 export async function strategy({
@@ -296,10 +322,11 @@ export async function strategy({
   };
 
   let targetAddress: [string];
+  //change switch case
+  console.log(eoa);
   if (eoa.length > 0) {
     targetAddress = eoa;
   } else {
-    console.log('events', options.events);
     targetAddress = await getAllVotersOfProposals(
       SUBGRAPH_URLS['proposal'],
       options.events[0]
@@ -314,6 +341,6 @@ export async function strategy({
     );
     return results;
   } else {
-    return false;
+    return [{ action: false }];
   }
 }
