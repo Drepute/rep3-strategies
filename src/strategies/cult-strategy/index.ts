@@ -188,30 +188,30 @@ const getAllVoters = async (url: string, page = 0, allVoters: any[] = []) => {
   });
   const all = allVoters.concat(voters.voters);
 
-  if (voters.proposals.length === 100) {
+  if (voters.voters.length === 100) {
     page = page + 1;
     const res: any[] = await getAllVoters(url, page, all);
-    return res;
+    return res.map((x: { id: string }) => x.id);
   } else {
-    return all;
+    return all.map((x: { id: string }) => x.id);
   }
 };
 
-const getAllVotersOfProposals = async (url: string, id: any) => {
-  const proposals = await subgraph.subgraphRequest(url, {
-    proposals: {
-      __args: {
-        where: {
-          id: id,
-        },
-      },
-      voters: {
-        id: true,
-      },
-    },
-  });
-  return proposals.proposals[0].voters.map((x: { id: string }) => x.id);
-};
+// const getAllVotersOfProposals = async (url: string, id: any) => {
+//   const proposals = await subgraph.subgraphRequest(url, {
+//     proposals: {
+//       __args: {
+//         where: {
+//           id: id,
+//         },
+//       },
+//       voters: {
+//         id: true,
+//       },
+//     },
+//   });
+//   return proposals.proposals[0].voters.map((x: { id: string }) => x.id);
+// };
 
 const getActionOnEOA = async (
   eoa: string,
@@ -321,16 +321,20 @@ export async function strategy({
     staking: 'https://api.thegraph.com/subgraphs/name/eth-jashan/test-staking',
   };
 
-  let targetAddress: [string];
-  //change switch case
-  console.log(eoa);
+  let targetAddress: string[] = [];
+
   if (eoa.length > 0) {
     targetAddress = eoa;
   } else {
-    targetAddress = await getAllVotersOfProposals(
-      SUBGRAPH_URLS['proposal'],
-      options.events[0]
-    );
+    console.log(options);
+    if (
+      options.events.event === 'ProposalExecuted' ||
+      options.events.event === 'ProposalCanceled'
+    ) {
+      targetAddress = await getAllVoters(SUBGRAPH_URLS['proposal'], 0);
+    } else {
+      targetAddress = [options.events.args[0]];
+    }
   }
 
   if (targetAddress.length > 0) {
