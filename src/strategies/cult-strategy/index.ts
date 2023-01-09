@@ -326,7 +326,6 @@ export async function strategy({
   if (eoa.length > 0) {
     targetAddress = eoa;
   } else {
-    console.log(options);
     if (
       options.event.event === 'ProposalExecuted' ||
       options.event.event === 'ProposalCanceled'

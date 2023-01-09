@@ -3,13 +3,13 @@ import { BadgeActions, MembershipActions } from './type';
 
 export const createOrUpdateMembership = async (
   contractAddress: string,
-  eao: string,
+  eoa: string,
   networkId: number,
   upgradeTier: number | undefined
 ) => {
   const membershipDetailsForEOA = await getRep3MembershipDetails(
     contractAddress,
-    eao,
+    eoa,
     networkId
   );
 
@@ -20,34 +20,34 @@ export const createOrUpdateMembership = async (
       return {
         params: { ...membershipDetailsForEOA, upgradeTier },
         action: false,
-        eao,
+        eoa,
       };
     } else {
       return {
         params: { ...membershipDetailsForEOA, upgradeTier },
         action: MembershipActions.upgradeMembershipNFT,
-        eao,
+        eoa,
       };
     }
   } else {
     return {
       params: { ...membershipDetailsForEOA, upgradeTier },
       action: MembershipActions.createMembershipVoucher,
-      eao,
+      eoa,
     };
   }
 };
 
 export const createBadgeVoucherOrMint = async (
   contractAddress: string,
-  eao: string,
+  eoa: string,
   networkId: number,
   badgeType: number,
   badgeActionType: BadgeActions
 ) => {
   const membershipDetailsForEOA = await getRep3MembershipDetails(
     contractAddress,
-    eao,
+    eoa,
     networkId
   );
   if (membershipDetailsForEOA) {
