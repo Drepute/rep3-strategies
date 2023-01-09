@@ -328,8 +328,8 @@ export async function strategy({
   } else {
     console.log(options);
     if (
-      options.events.event === 'ProposalExecuted' ||
-      options.events.event === 'ProposalCanceled'
+      options.event.event === 'ProposalExecuted' ||
+      options.event.event === 'ProposalCanceled'
     ) {
       targetAddress = await getAllVoters(SUBGRAPH_URLS['proposal'], 0);
     } else {
