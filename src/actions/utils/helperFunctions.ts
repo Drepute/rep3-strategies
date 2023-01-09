@@ -60,6 +60,10 @@ export const createBadgeVoucherOrMint = async (
       action: badgeActionType,
     };
   } else {
-    return false;
+    return {
+      params: {},
+      action: false,
+      eoa,
+    };
   }
 };

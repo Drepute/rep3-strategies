@@ -301,7 +301,11 @@ const getActionOnEOA = async (
     );
     return await actions.calculateActionParams();
   } else {
-    return { action: false };
+    return {
+      params: {},
+      action: false,
+      eoa,
+    };
   }
 };
 
@@ -344,6 +348,8 @@ export async function strategy({
     );
     return results;
   } else {
-    return [{ action: false }];
+    return eoa.map((x: string) => {
+      return { eao: x, action: false };
+    });
   }
 }
