@@ -174,21 +174,50 @@ const getAllProposals = async (
   }
 };
 
-export async function strategy({
-  contractAddress,
-  eoa,
-}: // options,
-StrategyParamsType) {
-  // const SUBGRAPH_URLS = {
-  //   proposal:
-  //     'https://api.thegraph.com/subgraphs/name/eth-jashan/cult-governance',
-  //   staking: 'https://api.thegraph.com/subgraphs/name/eth-jashan/cult-staking',
-  // };
-  const SUBGRAPH_URLS = {
-    proposal:
-      'https://api.thegraph.com/subgraphs/name/eth-jashan/test-governance',
-    staking: 'https://api.thegraph.com/subgraphs/name/eth-jashan/test-staking',
-  };
+const getAllVoters = async (url: string, page = 0, allVoters: any[] = []) => {
+  // const allProposals: any[] = [];
+  const voters = await subgraph.subgraphRequest(url, {
+    voters: {
+      __args: {
+        orderBy: 'id',
+        orderDirection: 'asc',
+        skip: page * 100,
+      },
+      id: true,
+    },
+  });
+  const all = allVoters.concat(voters.voters);
+
+  if (voters.voters.length === 100) {
+    page = page + 1;
+    const res: any[] = await getAllVoters(url, page, all);
+    return res.map((x: { id: string }) => x.id);
+  } else {
+    return all.map((x: { id: string }) => x.id);
+  }
+};
+
+// const getAllVotersOfProposals = async (url: string, id: any) => {
+//   const proposals = await subgraph.subgraphRequest(url, {
+//     proposals: {
+//       __args: {
+//         where: {
+//           id: id,
+//         },
+//       },
+//       voters: {
+//         id: true,
+//       },
+//     },
+//   });
+//   return proposals.proposals[0].voters.map((x: { id: string }) => x.id);
+// };
+
+const getActionOnEOA = async (
+  eoa: string,
+  subgraphUrls: any,
+  contractAddress: string
+) => {
   const QUERY_PROPOSALS = {
     voters: {
       __args: {
@@ -213,16 +242,17 @@ StrategyParamsType) {
   };
 
   const responseProposalData = await subgraph.subgraphRequest(
-    SUBGRAPH_URLS['proposal'],
+    subgraphUrls['proposal'],
     QUERY_PROPOSALS
   );
   const responseStakeData = await subgraph.subgraphRequest(
-    SUBGRAPH_URLS['staking'],
+    subgraphUrls['staking'],
     QUERY_STAKING
   );
   let months: number, proposals: number;
   months = 1;
   proposals = 1;
+  console.log(responseStakeData, responseProposalData);
   if (responseStakeData.users.length > 0) {
     const monthsOfStaking = calculateLevelBasedOnMonths(
       responseStakeData.users[0].amount,
@@ -230,47 +260,96 @@ StrategyParamsType) {
       responseStakeData.users[0].endTime
     );
     months = monthsOfStaking;
-  }
-  let proposalLevel = 1;
-  if (
-    responseProposalData.voters.length > 0 &&
-    responseStakeData.users.length > 0
-  ) {
-    const proposalsLevel = calculateLevelBasedOnProposals(
-      responseProposalData.voters[0].proposals
-    );
-    proposals = proposalsLevel;
-    const allProposals = await getAllProposals(SUBGRAPH_URLS['proposal']);
 
-    if (allProposals.length - responseProposalData.voters[0].proposals <= 13) {
-      proposalLevel = calculateLevelBasedOnProposalsMissed(
-        proposals,
-        allProposals.length - responseProposalData.voters[0].proposals
+    let proposalLevel = 1;
+    if (
+      responseProposalData.voters.length > 0 &&
+      responseStakeData.users.length > 0
+    ) {
+      const proposalsLevel = calculateLevelBasedOnProposals(
+        responseProposalData.voters[0].proposals
       );
+      proposals = proposalsLevel;
+      const allProposals = await getAllProposals(subgraphUrls['proposal']);
+
+      if (
+        allProposals.length - responseProposalData.voters[0].proposals <=
+        13
+      ) {
+        proposalLevel = calculateLevelBasedOnProposalsMissed(
+          proposals,
+          allProposals.length - responseProposalData.voters[0].proposals
+        );
+      }
+
+      if (
+        allProposals.length - responseProposalData.voters[0].proposals ===
+        0
+      ) {
+        proposalLevel = proposals;
+      }
     }
-    console.log(
-      'levels example',
-      proposalLevel,
-      months,
-      allProposals.length,
-      responseProposalData.voters[0]
+
+    const actions = new ActionCaller(
+      contractAddress,
+      ActionOnType.membership,
+      eoa,
+      1,
+      {
+        changingLevel: proposalLevel === 0 ? 1 : proposalLevel * months,
+      }
     );
+    return await actions.calculateActionParams();
+  } else {
+    return {
+      params: {},
+      action: false,
+      eoa,
+    };
+  }
+};
 
-    if (allProposals.length - responseProposalData.voters[0].proposals === 0) {
-      proposalLevel = proposals;
+export async function strategy({
+  contractAddress,
+  eoa,
+  options,
+}: StrategyParamsType) {
+  // const SUBGRAPH_URLS = {
+  //   proposal:
+  //     'https://api.thegraph.com/subgraphs/name/eth-jashan/cult-governance',
+  //   staking: 'https://api.thegraph.com/subgraphs/name/eth-jashan/cult-staking',
+  // };
+  const SUBGRAPH_URLS = {
+    proposal:
+      'https://api.thegraph.com/subgraphs/name/eth-jashan/test-governance',
+    staking: 'https://api.thegraph.com/subgraphs/name/eth-jashan/test-staking',
+  };
+
+  let targetAddress: string[] = [];
+
+  if (eoa.length > 0) {
+    targetAddress = eoa;
+  } else {
+    if (
+      options.event.event === 'ProposalExecuted' ||
+      options.event.event === 'ProposalCanceled'
+    ) {
+      targetAddress = await getAllVoters(SUBGRAPH_URLS['proposal'], 0);
+    } else {
+      targetAddress = [options.events.args[0]];
     }
-
   }
 
-  const actions = new ActionCaller(
-    contractAddress,
-    ActionOnType.membership,
-    eoa,
-    1,
-    {
-      changingLevel: proposalLevel === 0 ? 1 : proposalLevel * months,
-    }
-  );
-
-  return await actions.calculateActionParams();
+  if (targetAddress.length > 0) {
+    const results = await Promise.all(
+      targetAddress.map(async (x: string) => {
+        return await getActionOnEOA(x, SUBGRAPH_URLS, contractAddress);
+      })
+    );
+    return results;
+  } else {
+    return eoa.map((x: string) => {
+      return { eao: x, action: false };
+    });
+  }
 }

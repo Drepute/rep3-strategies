@@ -3,41 +3,51 @@ import { BadgeActions, MembershipActions } from './type';
 
 export const createOrUpdateMembership = async (
   contractAddress: string,
-  eao: string,
+  eoa: string,
   networkId: number,
   upgradeTier: number | undefined
 ) => {
   const membershipDetailsForEOA = await getRep3MembershipDetails(
     contractAddress,
-    eao,
+    eoa,
     networkId
   );
 
   console.log(membershipDetailsForEOA, upgradeTier);
 
   if (membershipDetailsForEOA) {
-    return {
-      params: { ...membershipDetailsForEOA, upgradeTier },
-      action: MembershipActions.upgradeMembershipNFT,
-    };
+    if (membershipDetailsForEOA.level === upgradeTier?.toString()) {
+      return {
+        params: { ...membershipDetailsForEOA, upgradeTier },
+        action: false,
+        eoa,
+      };
+    } else {
+      return {
+        params: { ...membershipDetailsForEOA, upgradeTier },
+        action: MembershipActions.upgradeMembershipNFT,
+        eoa,
+      };
+    }
   } else {
     return {
       params: { ...membershipDetailsForEOA, upgradeTier },
       action: MembershipActions.createMembershipVoucher,
+      eoa,
     };
   }
 };
 
 export const createBadgeVoucherOrMint = async (
   contractAddress: string,
-  eao: string,
+  eoa: string,
   networkId: number,
   badgeType: number,
   badgeActionType: BadgeActions
 ) => {
   const membershipDetailsForEOA = await getRep3MembershipDetails(
     contractAddress,
-    eao,
+    eoa,
     networkId
   );
   if (membershipDetailsForEOA) {
@@ -50,6 +60,10 @@ export const createBadgeVoucherOrMint = async (
       action: badgeActionType,
     };
   } else {
-    return false;
+    return {
+      params: {},
+      action: false,
+      eoa,
+    };
   }
 };

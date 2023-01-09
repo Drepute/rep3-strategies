@@ -1,6 +1,6 @@
 export interface StrategyParamsType {
   contractAddress: string;
-  eoa: string;
+  eoa: [string];
   options: object | any;
 }
 
