@@ -66,35 +66,27 @@ const calculateLevelBasedOnMonths = (
 const calculateLevelBasedOnProposals = (proposals: number) => {
   switch (proposals >= 0) {
     case proposals === 0: {
-      // const action = initializeActionClass(contractAddress, eoa, 1);
       return 1;
     }
     case proposals <= 2: {
-      //const action = initializeActionClass(contractAddress, eoa, 2);
       return 2;
     }
     case proposals <= 4: {
-      // const action = initializeActionClass(contractAddress, eoa, 3);
       return 3;
     }
     case proposals <= 6: {
-      // const action = initializeActionClass(contractAddress, eoa, 4);
       return 4;
     }
     case proposals <= 8: {
-      // const action = initializeActionClass(contractAddress, eoa, 4);
       return 5;
     }
     case proposals <= 10: {
-      // const action = initializeActionClass(contractAddress, eoa, 4);
       return 6;
     }
     case proposals <= 12: {
-      // const action = initializeActionClass(contractAddress, eoa, 4);
       return 7;
     }
     case proposals >= 13: {
-      // const action = initializeActionClass(contractAddress, eoa, 4);
       return 8;
     }
     default:
@@ -102,65 +94,66 @@ const calculateLevelBasedOnProposals = (proposals: number) => {
   }
 };
 
-const calculateLevelBasedOnProposalsMissed = (
-  currentLevel: number,
-  proposalMissed: number
-) => {
-  switch (proposalMissed >= 0) {
-    case proposalMissed === 1: {
-      // const action = initializeActionClass(contractAddress, eoa, 1);
-      return currentLevel - 1;
-    }
-    case proposalMissed <= 2: {
-      //const action = initializeActionClass(contractAddress, eoa, 2);
-      return currentLevel - 2;
-    }
-    case proposalMissed <= 4: {
-      // const action = initializeActionClass(contractAddress, eoa, 3);
-      return currentLevel - 3;
-    }
-    case proposalMissed <= 6: {
-      // const action = initializeActionClass(contractAddress, eoa, 4);
-      return currentLevel - 4;
-    }
-    case proposalMissed <= 8: {
-      // const action = initializeActionClass(contractAddress, eoa, 4);
-      return currentLevel - 5;
-    }
-    case proposalMissed <= 10: {
-      // const action = initializeActionClass(contractAddress, eoa, 4);
-      return currentLevel - 6;
-    }
-    case proposalMissed <= 12: {
-      // const action = initializeActionClass(contractAddress, eoa, 4);
-      return currentLevel - 7;
-    }
-    case proposalMissed >= 13: {
-      // const action = initializeActionClass(contractAddress, eoa, 4);
-      return currentLevel - 8;
-    }
-    default:
-      return currentLevel - 1;
-  }
-};
+// const calculateLevelBasedOnProposalsMissed = (
+//   currentLevel: number,
+//   proposalMissed: number
+// ) => {
+//   switch (proposalMissed >= 0) {
+//     case proposalMissed === 1: {
+//       // const action = initializeActionClass(contractAddress, eoa, 1);
+//       return currentLevel - 1;
+//     }
+//     case proposalMissed <= 2: {
+//       //const action = initializeActionClass(contractAddress, eoa, 2);
+//       return currentLevel - 2;
+//     }
+//     case proposalMissed <= 4: {
+//       // const action = initializeActionClass(contractAddress, eoa, 3);
+//       return currentLevel - 3;
+//     }
+//     case proposalMissed <= 6: {
+//       // const action = initializeActionClass(contractAddress, eoa, 4);
+//       return currentLevel - 4;
+//     }
+//     case proposalMissed <= 8: {
+//       // const action = initializeActionClass(contractAddress, eoa, 4);
+//       return currentLevel - 5;
+//     }
+//     case proposalMissed <= 10: {
+//       // const action = initializeActionClass(contractAddress, eoa, 4);
+//       return currentLevel - 6;
+//     }
+//     case proposalMissed <= 12: {
+//       // const action = initializeActionClass(contractAddress, eoa, 4);
+//       return currentLevel - 7;
+//     }
+//     case proposalMissed >= 13: {
+//       // const action = initializeActionClass(contractAddress, eoa, 4);
+//       return currentLevel - 8;
+//     }
+//     default:
+//       return currentLevel - 1;
+//   }
+// };
 
 const getAllProposals = async (
   url: string,
   page = 0,
   allProposals: any[] = []
 ) => {
-  // const allProposals: any[] = [];
   const proposals = await subgraph.subgraphRequest(url, {
     proposals: {
       __args: {
-        orderBy: 'id',
+        orderBy: 'blockTimestamp',
         orderDirection: 'asc',
         skip: page * 100,
       },
       id: true,
+      voters: true,
       proposer: true,
       status: true,
-      values: true,
+      blockTimestamp: true,
+      blockNumber: true,
     },
   });
   const all = allProposals.concat(proposals.proposals);
@@ -197,22 +190,6 @@ const getAllVoters = async (url: string, page = 0, allVoters: any[] = []) => {
   }
 };
 
-// const getAllVotersOfProposals = async (url: string, id: any) => {
-//   const proposals = await subgraph.subgraphRequest(url, {
-//     proposals: {
-//       __args: {
-//         where: {
-//           id: id,
-//         },
-//       },
-//       voters: {
-//         id: true,
-//       },
-//     },
-//   });
-//   return proposals.proposals[0].voters.map((x: { id: string }) => x.id);
-// };
-
 const getActionOnEOA = async (
   eoa: string,
   subgraphUrls: any,
@@ -241,19 +218,22 @@ const getActionOnEOA = async (
     },
   };
 
-  const responseProposalData = await subgraph.subgraphRequest(
-    subgraphUrls['proposal'],
-    QUERY_PROPOSALS
-  );
   const responseStakeData = await subgraph.subgraphRequest(
     subgraphUrls['staking'],
     QUERY_STAKING
   );
+  const responseProposalData = await subgraph.subgraphRequest(
+    subgraphUrls['proposal'],
+    QUERY_PROPOSALS
+  );
+
   let months: number, proposals: number;
   months = 1;
   proposals = 1;
-  console.log(responseStakeData, responseProposalData);
-  if (responseStakeData.users.length > 0) {
+  if (
+    responseStakeData.users.length > 0 &&
+    responseStakeData.users[0].amount !== '0'
+  ) {
     const monthsOfStaking = calculateLevelBasedOnMonths(
       responseStakeData.users[0].amount,
       responseStakeData.users[0].startTime,
@@ -261,42 +241,63 @@ const getActionOnEOA = async (
     );
     months = monthsOfStaking;
 
-    let proposalLevel = 1;
     if (
       responseProposalData.voters.length > 0 &&
       responseStakeData.users.length > 0
     ) {
-      const proposalsLevel = calculateLevelBasedOnProposals(
-        responseProposalData.voters[0].proposals
-      );
-      proposals = proposalsLevel;
       const allProposals = await getAllProposals(subgraphUrls['proposal']);
-
-      if (
-        allProposals.length - responseProposalData.voters[0].proposals <=
-        13
-      ) {
-        proposalLevel = calculateLevelBasedOnProposalsMissed(
-          proposals,
-          allProposals.length - responseProposalData.voters[0].proposals
-        );
-      }
-
-      if (
-        allProposals.length - responseProposalData.voters[0].proposals ===
-        0
-      ) {
-        proposalLevel = proposals;
-      }
+      let proposalStreak = 0;
+      allProposals.forEach(
+        (x: {
+          id: string;
+          voters: [string];
+          proposer: string;
+          status: string;
+          blockTimestamp: number;
+          blockNumber: number;
+        }) => {
+          if (x.voters.includes(eoa)) {
+            proposalStreak = proposalStreak + 1;
+            console.log('voted points', proposalStreak);
+          } else {
+            if (proposalStreak !== 0) {
+              proposalStreak = proposalStreak - 1;
+              console.log('missed points', proposalStreak);
+            } else {
+              console.log('already minimum points', proposalStreak);
+            }
+          }
+        }
+      );
+      proposals = calculateLevelBasedOnProposals(proposalStreak);
+      console.log(
+        'all proposals',
+        allProposals.length,
+        'proposal',
+        proposalStreak,
+        'level based on proposal',
+        proposals
+      );
     }
-
+    console.log(months, proposals);
     const actions = new ActionCaller(
       contractAddress,
       ActionOnType.membership,
       eoa,
       1,
       {
-        changingLevel: proposalLevel === 0 ? 1 : proposalLevel * months,
+        changingLevel: 8 * months + proposals - 8,
+      }
+    );
+    return await actions.calculateActionParams();
+  } else if (responseStakeData.users[0].amount === '0') {
+    const actions = new ActionCaller(
+      contractAddress,
+      ActionOnType.membership,
+      eoa,
+      1,
+      {
+        changingLevel: 0,
       }
     );
     return await actions.calculateActionParams();
@@ -335,7 +336,7 @@ export async function strategy({
       options.event.event === 'ProposalCanceled'
     ) {
       targetAddress = await getAllVoters(SUBGRAPH_URLS['proposal'], 0);
-    } else {
+    } else if (options.event.event === 'VoteCast') {
       targetAddress = [options.events.args[0]];
     }
   }
