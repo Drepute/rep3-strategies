@@ -138,12 +138,16 @@ const calculateLevelBasedOnProposals = (proposals: number) => {
 
 const getAllProposals = async (
   url: string,
+  blockNumber: number,
   page = 0,
   allProposals: any[] = []
 ) => {
   const proposals = await subgraph.subgraphRequest(url, {
     proposals: {
       __args: {
+        where: {
+          blockNumber_gte: blockNumber.toString(),
+        },
         orderBy: 'blockTimestamp',
         orderDirection: 'asc',
         skip: page * 100,
@@ -160,14 +164,19 @@ const getAllProposals = async (
 
   if (proposals.proposals.length === 100) {
     page = page + 1;
-    const res: any[] = await getAllProposals(url, page, all);
+    const res: any[] = await getAllProposals(url, page, blockNumber, all);
     return res;
   } else {
     return all;
   }
 };
 
-const getAllVoters = async (url: string, page = 0, allVoters: any[] = []) => {
+const getAllVoters = async (
+  url: string,
+  blockNumber: number,
+  page = 0,
+  allVoters: any[] = []
+) => {
   // const allProposals: any[] = [];
   const voters = await subgraph.subgraphRequest(url, {
     voters: {
@@ -175,6 +184,9 @@ const getAllVoters = async (url: string, page = 0, allVoters: any[] = []) => {
         orderBy: 'id',
         orderDirection: 'asc',
         skip: page * 100,
+        where: {
+          // blockNumber_gte: blockNumber.toString(),
+        },
       },
       id: true,
     },
@@ -183,7 +195,7 @@ const getAllVoters = async (url: string, page = 0, allVoters: any[] = []) => {
 
   if (voters.voters.length === 100) {
     page = page + 1;
-    const res: any[] = await getAllVoters(url, page, all);
+    const res: any[] = await getAllVoters(url, page, blockNumber, all);
     return res.map((x: { id: string }) => x.id);
   } else {
     return all.map((x: { id: string }) => x.id);
@@ -193,7 +205,8 @@ const getAllVoters = async (url: string, page = 0, allVoters: any[] = []) => {
 const getActionOnEOA = async (
   eoa: string,
   subgraphUrls: any,
-  contractAddress: string
+  contractAddress: string,
+  blockNumber: number
 ) => {
   const QUERY_PROPOSALS = {
     voters: {
@@ -245,7 +258,10 @@ const getActionOnEOA = async (
       responseProposalData.voters.length > 0 &&
       responseStakeData.users.length > 0
     ) {
-      const allProposals = await getAllProposals(subgraphUrls['proposal']);
+      const allProposals = await getAllProposals(
+        subgraphUrls['proposal'],
+        blockNumber
+      );
       let proposalStreak = 0;
       allProposals.forEach(
         (x: {
@@ -335,7 +351,11 @@ export async function strategy({
       options.event.event === 'ProposalExecuted' ||
       options.event.event === 'ProposalCanceled'
     ) {
-      targetAddress = await getAllVoters(SUBGRAPH_URLS['proposal'], 0);
+      targetAddress = await getAllVoters(
+        SUBGRAPH_URLS['proposal'],
+        options.blockNumber,
+        0
+      );
     } else if (options.event.event === 'VoteCast') {
       targetAddress = [options.events.args[0]];
     }
@@ -344,7 +364,12 @@ export async function strategy({
   if (targetAddress.length > 0) {
     const results = await Promise.all(
       targetAddress.map(async (x: string) => {
-        return await getActionOnEOA(x, SUBGRAPH_URLS, contractAddress);
+        return await getActionOnEOA(
+          x,
+          SUBGRAPH_URLS,
+          contractAddress,
+          options.blockNumber
+        );
       })
     );
     return results;
