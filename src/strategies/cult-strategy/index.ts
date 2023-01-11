@@ -23,7 +23,7 @@ const calculateMonthsOnStaking = (
     return timeDifference(endTime, startTime);
   } else {
     // If money is still staked
-    return timeDifference(getTimestampInSeconds(), startTime);
+    return Math.floor(timeDifference(getTimestampInSeconds(), startTime));
   }
 };
 
@@ -33,6 +33,7 @@ const calculateLevelBasedOnMonths = (
   endTime: number
 ) => {
   const months = calculateMonthsOnStaking(amount, startTime, endTime);
+
   switch (months >= 0) {
     case months === 0: {
       return 1;
@@ -184,9 +185,6 @@ const getAllVoters = async (
         orderBy: 'id',
         orderDirection: 'asc',
         skip: page * 100,
-        where: {
-          // blockNumber_gte: blockNumber.toString(),
-        },
       },
       id: true,
     },
@@ -272,6 +270,7 @@ const getActionOnEOA = async (
           blockTimestamp: number;
           blockNumber: number;
         }) => {
+          console.log(x.voters);
           if (x.voters.includes(eoa)) {
             proposalStreak = proposalStreak + 1;
             console.log('voted points', proposalStreak);
@@ -288,7 +287,7 @@ const getActionOnEOA = async (
       proposals = calculateLevelBasedOnProposals(proposalStreak);
       console.log(
         'all proposals',
-        allProposals.length,
+        allProposals,
         'proposal',
         proposalStreak,
         'level based on proposal',
@@ -306,7 +305,10 @@ const getActionOnEOA = async (
       }
     );
     return await actions.calculateActionParams();
-  } else if (responseStakeData.users[0].amount === '0') {
+  } else if (
+    responseStakeData.users.length > 0 &&
+    responseStakeData.users[0].amount === '0'
+  ) {
     const actions = new ActionCaller(
       contractAddress,
       ActionOnType.membership,
@@ -356,6 +358,7 @@ export async function strategy({
         options.blockNumber,
         0
       );
+      console.log('target address', targetAddress);
     } else if (options.event.event === 'VoteCast') {
       targetAddress = [options.events.args[0]];
     }
