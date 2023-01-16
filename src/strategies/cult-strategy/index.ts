@@ -95,48 +95,6 @@ const calculateLevelBasedOnProposals = (proposals: number) => {
   }
 };
 
-// const calculateLevelBasedOnProposalsMissed = (
-//   currentLevel: number,
-//   proposalMissed: number
-// ) => {
-//   switch (proposalMissed >= 0) {
-//     case proposalMissed === 1: {
-//       // const action = initializeActionClass(contractAddress, eoa, 1);
-//       return currentLevel - 1;
-//     }
-//     case proposalMissed <= 2: {
-//       //const action = initializeActionClass(contractAddress, eoa, 2);
-//       return currentLevel - 2;
-//     }
-//     case proposalMissed <= 4: {
-//       // const action = initializeActionClass(contractAddress, eoa, 3);
-//       return currentLevel - 3;
-//     }
-//     case proposalMissed <= 6: {
-//       // const action = initializeActionClass(contractAddress, eoa, 4);
-//       return currentLevel - 4;
-//     }
-//     case proposalMissed <= 8: {
-//       // const action = initializeActionClass(contractAddress, eoa, 4);
-//       return currentLevel - 5;
-//     }
-//     case proposalMissed <= 10: {
-//       // const action = initializeActionClass(contractAddress, eoa, 4);
-//       return currentLevel - 6;
-//     }
-//     case proposalMissed <= 12: {
-//       // const action = initializeActionClass(contractAddress, eoa, 4);
-//       return currentLevel - 7;
-//     }
-//     case proposalMissed >= 13: {
-//       // const action = initializeActionClass(contractAddress, eoa, 4);
-//       return currentLevel - 8;
-//     }
-//     default:
-//       return currentLevel - 1;
-//   }
-// };
-
 const getAllProposals = async (
   url: string,
   blockNumber: number,
