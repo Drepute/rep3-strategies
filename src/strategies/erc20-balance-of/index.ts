@@ -22,7 +22,7 @@ export async function strategy({
     const actions = new ActionCaller(
       contractAddress,
       ActionOnType.membership,
-      eoa,
+      eoa[0],
       options.network,
       { changingLevel: 2 }
     );
