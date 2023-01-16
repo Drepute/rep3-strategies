@@ -44,7 +44,8 @@
 #       - run: npm publish --access public
 #         env:
 #           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+# GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+# 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
 
 name: main
 
@@ -77,3 +78,4 @@ jobs:
         name: Publish
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
