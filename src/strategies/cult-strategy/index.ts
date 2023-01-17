@@ -317,8 +317,11 @@ export async function strategy({
         0
       );
       console.log('target address', targetAddress);
-    } else if (options.event.event === 'VoteCast') {
-      targetAddress = [options.events.args[0]];
+    } else if (
+      options.event.event === 'VoteCast' ||
+      options.event.event === 'Withdraw'
+    ) {
+      targetAddress = [options.event.args[0]];
     }
   }
 
