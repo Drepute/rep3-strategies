@@ -1,52 +1,3 @@
-# # This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
-
-# name: Node.js CI
-
-# on:
-#   push:
-#     branches: [main]
-#   pull_request:
-#     branches: '*'
-
-# jobs:
-#   quality:
-#     runs-on: ${{ matrix.os }}
-
-#     strategy:
-#       matrix:
-#         node-version: [16.x, 18.x]
-#         os: [ubuntu-latest]
-#         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
-#     steps:
-#       - uses: actions/checkout@v2
-#       - name: Use Node.js ${{ matrix.node-version }}
-#         uses: actions/setup-node@v2
-#         with:
-#           node-version: ${{ matrix.node-version }}
-#       - run: yarn install --frozen-lockfile
-
-#   publish:
-#     runs-on: ubuntu-latest
-#     if: ${{ github.ref == 'refs/heads/main' }}
-#     needs: [quality]
-#     steps:
-#       - uses: actions/checkout@v2
-#       - name: Use Node.js ${{ matrix.node-version }}
-#         uses: actions/setup-node@v2
-#         with:
-#           node-version: ${{ matrix.node-version }}
-#       - run: yarn install --frozen-lockfile
-#       - run: yarn install
-#       - run: yarn build
-#       - run: npm run semantic-release
-#       - run: npm publish --access public
-#         env:
-#           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-# GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-# 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
-
 name: main
 
 on: [push]
@@ -58,7 +9,7 @@ jobs:
     environment: NPM_TOKEN
     strategy:
       matrix:
-        node-version: [16.x]
+        node-version: [16.x, 18.x]
     steps:
       - uses: actions/checkout@v2
       - name: Build on Node.js ${{ matrix.node-version }}
