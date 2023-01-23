@@ -228,31 +228,18 @@ const getActionOnEOA = async (
           blockTimestamp: number;
           blockNumber: number;
         }) => {
-          console.log(x.voters);
           if (x.voters.includes(eoa)) {
             proposalStreak = proposalStreak + 1;
-            console.log('voted points', proposalStreak);
           } else {
             if (proposalStreak !== 0) {
               proposalStreak = proposalStreak - 1;
-              console.log('missed points', proposalStreak);
-            } else {
-              console.log('already minimum points', proposalStreak);
             }
           }
         }
       );
       proposals = calculateLevelBasedOnProposals(proposalStreak);
-      console.log(
-        'all proposals',
-        allProposals,
-        'proposal',
-        proposalStreak,
-        'level based on proposal',
-        proposals
-      );
     }
-    console.log(months, proposals);
+
     const actions = new ActionCaller(
       contractAddress,
       ActionOnType.membership,
@@ -316,10 +303,10 @@ export async function strategy({
         options.blockNumber,
         0
       );
-      console.log('target address', targetAddress);
     } else if (
       options.event.event === 'VoteCast' ||
-      options.event.event === 'Withdraw'
+      options.event.event === 'Withdraw' ||
+      options.event.event === 'Deposit'
     ) {
       targetAddress = [options.event.args[0]];
     }
