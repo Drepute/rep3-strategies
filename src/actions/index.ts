@@ -1,6 +1,7 @@
 import {
   createBadgeVoucherOrMint,
   createOrUpdateMembership,
+  expireBadgeParam,
 } from './utils/helperFunctions';
 import { ActionOnType, BadgeActions } from './utils/type';
 
@@ -19,6 +20,7 @@ export default class ActionCaller {
     options:
       | { changingLevel: number }
       | { badgeType: number; actionType: BadgeActions }
+      | { tokenId:number}
   ) {
     this.contractAddress = contractAddress;
     this.actionType = actionType;
@@ -56,6 +58,17 @@ export default class ActionCaller {
         } catch (error) {
           return error;
         }
+        case ActionOnType.expiry:
+          try {
+            return await expireBadgeParam(
+              this.contractAddress,
+              this.eoa,
+              this.network,
+              this.badgeOptions.tokenID
+            );
+          } catch (error) {
+            return error;
+          }
       default:
         return null;
     }

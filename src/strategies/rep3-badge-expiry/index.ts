@@ -3,6 +3,16 @@ import { ActionOnType } from '../../actions/utils/type';
 import { StrategyParamsType } from '../../types';
 import { subgraph } from '../../utils';
 
+
+// includedLevels: { 1: { expiry: 2 }, 2: { expiry: 6 } },
+// chainId: 80001,
+// type: associationBadge
+// config:{
+  // type:3,
+  // data:{ 1: { expiry: 2 }, 2: { expiry: 6 } }
+// }
+// }
+
 function getDaysInSeconds(numODays: number) {
   return numODays * 24 * 60 * 60;
 }
@@ -14,6 +24,10 @@ function getTimestampInSeconds() {
 function timeDifference(date1: number, date2: number) {
   const difference = date1 - date2;
   return difference;
+}
+
+function isExpiredDate (date:string){
+  return Math.floor(new Date(date).getTime() / 1000) < getTimestampInSeconds()
 }
 
 const getAllMembershipNfts = async (
@@ -66,6 +80,9 @@ const getAllExpiringMembershipBadges = async (
       contractAddress
     );
     const latestValidMembership: any[] = [];
+
+    // to remove duplicate from upgrade of memberships
+
     responseData.forEach((membership: any) => {
       if (
         latestValidMembership.filter(
@@ -96,6 +113,71 @@ const getAllExpiringMembershipBadges = async (
   }
 };
 
+const getAllAssociationBadges = async (
+  url: string,
+  contractAddress: string,
+  _type:number,
+  page = 0,
+  allBadges: any[] = []
+) => {
+  const badges = await subgraph.subgraphRequest(url, {
+    associationBadges: {
+      __args: {
+        where: {
+          contractAddress,
+          _type
+        },
+        orderBy: 'time',
+        orderDirection: 'desc',
+        skip: page * 100,
+      },
+      claimer: true,
+      tokenID: true,
+      time: true,
+      metadataUri: true,
+    },
+  });
+  const all = allBadges.concat(badges.associationBadges);
+
+  if (badges.associationBadges.length === 100) {
+    page = page + 1;
+    const res: any[] = await getAllAssociationBadges(
+      url,
+      contractAddress,
+      _type,
+      page,
+      all
+    );
+    return res;
+  } else {
+    return all;
+  }
+};
+
+const getAllExpiredAssociationBadges = async(
+  subgraphUrls: any,
+  contractAddress: string,
+  config:{type:number,data:{[key: string]: { expiry: string }}}
+  ) => {
+    try {
+      const responseData = await getAllAssociationBadges(
+        subgraphUrls,
+        contractAddress,
+        config.type
+      );
+      const expiredbadges :any[] = [];
+      responseData.forEach((badges:any)=>{
+        if(Object.keys(config.data).includes(badges.data) && isExpiredDate(config.data[badges.data].expiry)){
+          expiredbadges.push(badges)
+        }
+      })
+      return expiredbadges
+    } catch (error) {
+      console.log('error', error);
+      return [];
+    }
+};
+
 export async function strategy({
   contractAddress,
   eoa,
@@ -115,7 +197,7 @@ export async function strategy({
     latestMembership.map(async (x: any) => {
       const actions = new ActionCaller(
         contractAddress,
-        ActionOnType.membership,
+        ActionOnType.expiry,
         x.claimer,
         1,
         {
