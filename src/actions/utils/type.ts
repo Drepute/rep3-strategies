@@ -14,5 +14,5 @@ export enum MembershipActions {
 export enum BadgeActions {
   createBadgeVoucher = 'createBadgeVoucher',
   directMint = 'batchIssueBadge',
-  burnBadge = 'batchBurn'
+  burnBadge = 'batchBurnBadge'
 }

@@ -20,7 +20,7 @@ export default class ActionCaller {
     options:
       | { changingLevel: number }
       | { badgeType: number; actionType: BadgeActions }
-      | { tokenId:number}
+      | { tokenId:number,badgeType: number}
   ) {
     this.contractAddress = contractAddress;
     this.actionType = actionType;
@@ -64,6 +64,7 @@ export default class ActionCaller {
               this.contractAddress,
               this.eoa,
               this.network,
+              this.badgeOptions.badgeType,
               this.badgeOptions.tokenID
             );
           } catch (error) {

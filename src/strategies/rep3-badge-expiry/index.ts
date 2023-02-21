@@ -3,15 +3,8 @@ import { ActionOnType } from '../../actions/utils/type';
 import { StrategyParamsType } from '../../types';
 import { subgraph } from '../../utils';
 
+//TODO: Membership differentiation from expiry
 
-// includedLevels: { 1: { expiry: 2 }, 2: { expiry: 6 } },
-// chainId: 80001,
-// type: associationBadge
-// config:{
-  // type:3,
-  // data:{ 1: { expiry: 2 }, 2: { expiry: 6 } }
-// }
-// }
 
 function getDaysInSeconds(numODays: number) {
   return numODays * 24 * 60 * 60;
@@ -188,20 +181,29 @@ export async function strategy({
     80001: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-mumbai',
   };
   console.log('eoa', eoa);
-  const latestMembership = await getAllExpiringMembershipBadges(
-    SUBGRAPH_URLS[options.chainId],
-    contractAddress,
-    options.includedLevels
-  );
+  let badgeList:any[]
+  if(options.type === 'associationBadge'){
+    badgeList = await getAllExpiredAssociationBadges(
+      SUBGRAPH_URLS[options.chainId],
+      contractAddress,
+      options.config
+    )
+  }else{
+    badgeList = await getAllExpiringMembershipBadges(
+      SUBGRAPH_URLS[options.chainId],
+      contractAddress,
+      options.includedLevels
+    )
+  }
   const results = await Promise.all(
-    latestMembership.map(async (x: any) => {
+    badgeList.map(async (x: any) => {
       const actions = new ActionCaller(
         contractAddress,
         ActionOnType.expiry,
         x.claimer,
         1,
         {
-          changingLevel: 0,
+          tokenId:x.tokenId,badgeType: options.config.type
         }
       );
       return await actions.calculateActionParams();
