@@ -127,8 +127,8 @@ const getAllAssociationBadges = async (
       claimer: true,
       tokenID: true,
       time: true,
-      metadataUri: true,
-      _type:true,
+      metadatUri: true,
+      type:true,
       data:true
     },
   });
