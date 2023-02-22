@@ -72,6 +72,7 @@ export const expireBadgeParam = async (
   networkId: number,
   badgeType: number,
   tokenId: number,
+  metadataUri:string
 ) => {
   const membershipDetailsForEOA = await getRep3MembershipDetails(
     contractAddress,
@@ -83,7 +84,8 @@ export const expireBadgeParam = async (
         level: membershipDetailsForEOA.level,
         memberTokenId: membershipDetailsForEOA.tokenID,
         badgeType,
-        badgeTokenId:tokenId
+        badgeTokenId:tokenId,
+        metadataUri
       },
       action: BadgeActions.burnBadge,
     };

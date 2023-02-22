@@ -128,6 +128,8 @@ const getAllAssociationBadges = async (
       tokenID: true,
       time: true,
       metadataUri: true,
+      _type:true,
+      data:true
     },
   });
   const all = allBadges.concat(badges.associationBadges);
@@ -203,7 +205,7 @@ export async function strategy({
         x.claimer,
         1,
         {
-          tokenId:x.tokenId,badgeType: options.config.type
+          tokenId:x.tokenId,badgeType: options.config.type , metadataUri:x.metadataUri
         }
       );
       return await actions.calculateActionParams();
