@@ -65,3 +65,26 @@ export const createBadgeVoucherOrMint = async (
     };
   }
 };
+
+export const expireBadgeParam = async (
+  contractAddress: string,
+  eoa: string,
+  networkId: number,
+  badgeType: number,
+  tokenId: number,
+) => {
+  const membershipDetailsForEOA = await getRep3MembershipDetails(
+    contractAddress,
+    eoa,
+    networkId
+  );
+    return {
+      params: {
+        level: membershipDetailsForEOA.level,
+        memberTokenId: membershipDetailsForEOA.tokenID,
+        badgeType,
+        badgeTokenId:tokenId
+      },
+      action: BadgeActions.burnBadge,
+    };
+};
