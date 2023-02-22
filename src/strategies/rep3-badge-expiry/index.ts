@@ -5,7 +5,6 @@ import { subgraph } from '../../utils';
 
 //TODO: Membership differentiation from expiry
 
-
 function getDaysInSeconds(numODays: number) {
   return numODays * 24 * 60 * 60;
 }
@@ -19,8 +18,10 @@ function timeDifference(date1: number, date2: number) {
   return difference;
 }
 
-function isExpiredDate (date:string){
-  return Math.floor(new Date(date).getTime() / 1000) < getTimestampInSeconds()
+function isExpiredDate(date: string) {
+  console.log('expired time', Math.floor(new Date(date).getTime() / 1000));
+  console.log('current time', getTimestampInSeconds());
+  return Math.floor(new Date(date).getTime() / 1000) < getTimestampInSeconds();
 }
 
 const getAllMembershipNfts = async (
@@ -109,7 +110,7 @@ const getAllExpiringMembershipBadges = async (
 const getAllAssociationBadges = async (
   url: string,
   contractAddress: string,
-  _type:number,
+  _type: number,
   page = 0,
   allBadges: any[] = []
 ) => {
@@ -118,7 +119,7 @@ const getAllAssociationBadges = async (
       __args: {
         where: {
           contractAddress,
-          _type
+          type: _type,
         },
         orderBy: 'time',
         orderDirection: 'desc',
@@ -128,8 +129,8 @@ const getAllAssociationBadges = async (
       tokenID: true,
       time: true,
       metadatUri: true,
-      type:true,
-      data:true
+      type: true,
+      data: true,
     },
   });
   const all = allBadges.concat(badges.associationBadges);
@@ -149,28 +150,38 @@ const getAllAssociationBadges = async (
   }
 };
 
-const getAllExpiredAssociationBadges = async(
+const getAllExpiredAssociationBadges = async (
   subgraphUrls: any,
   contractAddress: string,
-  config:{type:number,data:{[key: string]: { expiry: string }}}
-  ) => {
-    try {
-      const responseData = await getAllAssociationBadges(
-        subgraphUrls,
-        contractAddress,
-        config.type
+  config: { type: number; data: { [key: string]: { expiry: string } } }
+) => {
+  try {
+    const responseData = await getAllAssociationBadges(
+      subgraphUrls,
+      contractAddress,
+      config.type
+    );
+    const expiredbadges: any[] = [];
+    responseData.forEach((badges: any) => {
+      console.log(
+        'rep3 badges',
+        responseData,
+        Object.keys(config.data),
+        badges.data,
+        isExpiredDate(config.data[badges.data].expiry)
       );
-      const expiredbadges :any[] = [];
-      responseData.forEach((badges:any)=>{
-        if(Object.keys(config.data).includes(badges.data) && isExpiredDate(config.data[badges.data].expiry)){
-          expiredbadges.push(badges)
-        }
-      })
-      return expiredbadges
-    } catch (error) {
-      console.log('error', error);
-      return [];
-    }
+      if (
+        Object.keys(config.data).includes(badges.data) &&
+        isExpiredDate(config.data[badges.data].expiry)
+      ) {
+        expiredbadges.push(badges);
+      }
+    });
+    return expiredbadges;
+  } catch (error) {
+    console.log('error', error);
+    return [];
+  }
 };
 
 export async function strategy({
@@ -183,19 +194,19 @@ export async function strategy({
     80001: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-mumbai',
   };
   console.log('eoa', eoa);
-  let badgeList:any[]
-  if(options.type === 'associationBadge'){
+  let badgeList: any[];
+  if (options.type === 'associationBadge') {
     badgeList = await getAllExpiredAssociationBadges(
       SUBGRAPH_URLS[options.chainId],
       contractAddress,
       options.config
-    )
-  }else{
+    );
+  } else {
     badgeList = await getAllExpiringMembershipBadges(
       SUBGRAPH_URLS[options.chainId],
       contractAddress,
       options.includedLevels
-    )
+    );
   }
   const results = await Promise.all(
     badgeList.map(async (x: any) => {
@@ -205,7 +216,9 @@ export async function strategy({
         x.claimer,
         1,
         {
-          tokenId:x.tokenId,badgeType: options.config.type , metadataUri:x.metadataUri
+          tokenId: x.tokenId,
+          badgeType: options.config.type,
+          metadataUri: x.metadatUri,
         }
       );
       return await actions.calculateActionParams();
