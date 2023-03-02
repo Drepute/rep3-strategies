@@ -278,16 +278,18 @@ export async function strategy({
   eoa,
   options,
 }: StrategyParamsType) {
-  // const SUBGRAPH_URLS = {
-  //   proposal:
-  //     'https://api.thegraph.com/subgraphs/name/eth-jashan/cult-governance',
-  //   staking: 'https://api.thegraph.com/subgraphs/name/eth-jashan/cult-staking',
-  // };
-  const SUBGRAPH_URLS = {
-    proposal:
-      'https://api.thegraph.com/subgraphs/name/eth-jashan/test-governance',
-    staking: 'https://api.thegraph.com/subgraphs/name/eth-jashan/test-staking',
+  const SUBGRAPH_LINKS = {
+    mainnet:{
+      proposal:'https://api.thegraph.com/subgraphs/name/eth-jashan/cult-governance',
+      staking: 'https://api.thegraph.com/subgraphs/name/eth-jashan/cult-staking',
+    },
+    testnet:{
+        proposal:'https://api.thegraph.com/subgraphs/name/eth-jashan/test-governance',
+        staking: 'https://api.thegraph.com/subgraphs/name/eth-jashan/test-staking',
+    }
   };
+  const network:"mainnet"|"testnet" = options.network
+  const SUBGRAPH_URLS = SUBGRAPH_LINKS[network]
 
   let targetAddress: string[] = [];
 
