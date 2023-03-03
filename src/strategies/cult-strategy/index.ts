@@ -206,8 +206,8 @@ const getActionOnEOA = async (
     console.log(responseStakeData.users[0].startTime > new Date("03/03/23").getTime()?responseStakeData.users[0].startTime:new Date("03/03/20").getTime(), responseStakeData.users[0].endTime > new Date("03/03/20").getTime()?responseStakeData.users[0].endTime:new Date("03/03/20").getTime())
     const monthsOfStaking = calculateLevelBasedOnMonths(
       responseStakeData.users[0].amount,
-      responseStakeData.users[0].startTime > new Date("03/03/23").getTime()?responseStakeData.users[0].startTime:new Date("03/03/20").getTime(),
-      responseStakeData.users[0].endTime > new Date("03/03/23").getTime()?responseStakeData.users[0].endTime:new Date("03/03/20").getTime()
+      responseStakeData.users[0].startTime > new Date("03/03/23").getTime()?responseStakeData.users[0].startTime:new Date("03/03/23").getTime(),
+      responseStakeData.users[0].endTime > new Date("03/03/23").getTime()?responseStakeData.users[0].endTime:new Date("03/03/23").getTime()
     );
     months = monthsOfStaking;
 
