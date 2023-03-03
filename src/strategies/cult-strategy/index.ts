@@ -9,7 +9,6 @@ function getTimestampInSeconds() {
 
 function timeDifference(date1: number, date2: number) {
   const difference = date1 - date2;
-
   return (difference * 1000) / (86400000 * 30);
 }
 
@@ -23,6 +22,7 @@ const calculateMonthsOnStaking = (
     return timeDifference(endTime, startTime);
   } else {
     // If money is still staked
+    // check the start is more than 3rd march
     return Math.floor(timeDifference(getTimestampInSeconds(), startTime));
   }
 };
@@ -203,10 +203,11 @@ const getActionOnEOA = async (
     responseStakeData.users.length > 0 &&
     responseStakeData.users[0].amount !== '0'
   ) {
+    console.log(responseStakeData.users[0].startTime > new Date("03/03/23").getTime()?responseStakeData.users[0].startTime:new Date("03/03/20").getTime(), responseStakeData.users[0].endTime > new Date("03/03/20").getTime()?responseStakeData.users[0].endTime:new Date("03/03/20").getTime())
     const monthsOfStaking = calculateLevelBasedOnMonths(
       responseStakeData.users[0].amount,
-      responseStakeData.users[0].startTime,
-      responseStakeData.users[0].endTime
+      responseStakeData.users[0].startTime > new Date("03/03/23").getTime()?responseStakeData.users[0].startTime:new Date("03/03/20").getTime(),
+      responseStakeData.users[0].endTime > new Date("03/03/23").getTime()?responseStakeData.users[0].endTime:new Date("03/03/20").getTime()
     );
     months = monthsOfStaking;
 
