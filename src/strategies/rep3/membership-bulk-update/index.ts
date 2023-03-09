@@ -71,7 +71,7 @@ export async function strategy({
         contractAddress,
         ActionOnType.updateUri,
         x.claimer,
-        80001,
+        options.network === 'testnet'?80001:137,
         {changingLevel:x.level}
       );
       return await actions.calculateActionParams();
