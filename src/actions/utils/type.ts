@@ -1,13 +1,15 @@
 export enum ActionOnType {
   membership = 'membership',
   badge = 'badge',
-  expiry = 'expiry'
+  expiry = 'expiry',
+  updateUri = 'updateUri'
 }
 
 export enum MembershipActions {
   createMembershipVoucher = 'createMembershipVoucher',
   upgradeMembershipNFT = 'updateMembership',
   downgradeMembershipNFT = 'updateMembership',
+  bulkMembershipURIChange= 'bulkMembershipURIChange',
   noChange = 'false',
 }
 
