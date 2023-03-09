@@ -2,10 +2,10 @@ import { readFileSync } from 'fs';
 import path from 'path';
 
 import { StrategyType } from '../types';
-import * as rep3IsMember from './rep3-is-member';
+import * as rep3IsMember from './rep3/rep3-is-member';
 import * as erc20BalanceOf from './erc20-balance-of';
 import * as cultGov from './cult-strategy';
-import * as rep3BadgeExpiry from './rep3-badge-expiry';
+import * as rep3BadgeExpiry from './rep3/rep3-badge-expiry';
 
 const strategies: Record<string, StrategyType> = {
   'rep3-is-member': rep3IsMember,
