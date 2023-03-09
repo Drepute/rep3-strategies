@@ -7,7 +7,7 @@ function getTimestampInSeconds() {
   return Math.floor(Date.now() / 1000);
 }
 
-function timeDifference(date1: number, date2: number) {
+function  timeDifference(date1: number, date2: number) {
   const difference = date1 - date2;
   return (difference * 1000) / (86400000 * 30);
 }
@@ -33,7 +33,7 @@ const calculateLevelBasedOnMonths = (
   endTime: number
 ) => {
   const months = calculateMonthsOnStaking(amount, startTime, endTime);
-
+console.log("monthss",calculateMonthsOnStaking(amount, startTime, endTime))
   switch (months >= 0) {
     case months === 0: {
       return 1;
@@ -203,11 +203,10 @@ const getActionOnEOA = async (
     responseStakeData.users.length > 0 &&
     responseStakeData.users[0].amount !== '0'
   ) {
-    console.log(responseStakeData.users[0].startTime > new Date("03/03/23").getTime()?responseStakeData.users[0].startTime:new Date("03/03/20").getTime(), responseStakeData.users[0].endTime > new Date("03/03/20").getTime()?responseStakeData.users[0].endTime:new Date("03/03/20").getTime())
     const monthsOfStaking = calculateLevelBasedOnMonths(
       responseStakeData.users[0].amount,
-      responseStakeData.users[0].startTime > new Date("03/03/23").getTime()?responseStakeData.users[0].startTime:new Date("03/03/23").getTime(),
-      responseStakeData.users[0].endTime > new Date("03/03/23").getTime()?responseStakeData.users[0].endTime:new Date("03/03/23").getTime()
+      responseStakeData.users[0].startTime > (new Date("03/03/23").getTime()/1000)?responseStakeData.users[0].startTime:(new Date("03/03/23").getTime()/1000),
+      responseStakeData.users[0].endTime > (new Date("03/03/23").getTime()/1000)?responseStakeData.users[0].endTime:(new Date("03/03/23").getTime()/1000)
     );
     months = monthsOfStaking;
 
