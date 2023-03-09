@@ -90,3 +90,20 @@ export const expireBadgeParam = async (
       action: BadgeActions.burnBadge,
     };
 };
+
+export const updateMembershipUri = async (
+  contractAddress: string,
+  eoa: string,
+  networkId: number,
+) => {
+  const membershipDetailsForEOA = await getRep3MembershipDetails(
+    contractAddress,
+    eoa,
+    networkId
+  );
+      return {
+        params: { ...membershipDetailsForEOA },
+        action: MembershipActions.bulkMembershipURIChange,
+        eoa,
+      };
+}

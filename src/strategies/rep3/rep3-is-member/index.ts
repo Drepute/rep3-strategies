@@ -1,5 +1,5 @@
-import { subgraph } from '../../utils';
-import { StrategyParamsType } from '../../types';
+import { subgraph } from '../../../utils';
+import { StrategyParamsType } from '../../../types';
 
 const SUBGRAPH_URLS = {
   main: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-matic',

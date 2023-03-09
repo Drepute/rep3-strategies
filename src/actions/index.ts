@@ -1,7 +1,7 @@
 import {
   createBadgeVoucherOrMint,
   createOrUpdateMembership,
-  expireBadgeParam,
+  updateMembershipUri,
 } from './utils/helperFunctions';
 import { ActionOnType, BadgeActions } from './utils/type';
 
@@ -58,15 +58,12 @@ export default class ActionCaller {
         } catch (error) {
           return error;
         }
-        case ActionOnType.expiry:
+        case ActionOnType.updateUri:
           try {
-            return await expireBadgeParam(
+            return await updateMembershipUri(
               this.contractAddress,
               this.eoa,
               this.network,
-              this.badgeOptions.badgeType,
-              this.badgeOptions.tokenID,
-              this.badgeOptions.metadataUri
             );
           } catch (error) {
             return error;
