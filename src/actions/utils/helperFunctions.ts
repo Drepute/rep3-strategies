@@ -7,6 +7,13 @@ export const createOrUpdateMembership = async (
   networkId: number,
   upgradeTier: number | undefined
 ) => {
+  if(upgradeTier === 0){
+    return {
+      params: {},
+      action: false,
+      eoa,
+    };
+  }else{
   const membershipDetailsForEOA = await getRep3MembershipDetails(
     contractAddress,
     eoa,
@@ -33,7 +40,7 @@ export const createOrUpdateMembership = async (
       action: MembershipActions.createMembershipVoucher,
       eoa,
     };
-  }
+  }}
 };
 
 export const createBadgeVoucherOrMint = async (

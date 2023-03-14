@@ -24,6 +24,37 @@ import { getAllAssociationBadges } from '../../utils/rep3';
 //   return Math.floor(new Date(date).getTime() / 1000) < getTimestampInSeconds();
 // }
 
+const getInfoOnMonth = (months:number) => {
+    switch (months>=0){
+        case months === 0 :
+            return {startDate:`1/${months+1}/24`,endDate:`31/${months+1}/24`}
+        case months === 1 :
+            return {startDate:`1/${months+1}/24`,endDate:`28/${months+1}/24`}
+        case months === 2 :
+            return {startDate:`1/${months+1}/24`,endDate:`31/${months+1}/24`}
+        case months === 3 :
+            return {startDate:`1/${months+1}/23`,endDate:`30/${months+1}/23`}
+        case months === 4 :
+            return {startDate:`1/${months+1}/23`,endDate:`31/${months+1}/23`}
+        case months === 5 :
+            return {startDate:`1/${months+1}/23`,endDate:`30/${months+1}/23`}
+        case months === 6 :
+            return {startDate:`1/${months+1}/23`,endDate:`31/${months+1}/23`}
+        case months === 7 :
+            return {startDate:`1/${months+1}/23`,endDate:`31/${months+1}/23`}
+        case months === 8 :
+            return {startDate:`1/${months+1}/23`,endDate:`30/${months+1}/23`}
+        case months === 9 :
+            return {startDate:`1/${months+1}/23`,endDate:`31/${months+1}/23`}
+        case months === 10 :
+            return {startDate:`1/${months+1}/23`,endDate:`30/${months+1}/23`}
+        case months === 11 :
+            return {startDate:`1/${months+1}/23`,endDate:`31/${months+1}/23`}
+        default :
+            return {startDate:`1/${months+1}/24`,endDate:`31/${months+1}/24`}
+    }
+}
+
 const calculateTier = (contriNumber:number) => {
     if(contriNumber === 0){
         return 1
@@ -47,28 +78,15 @@ const getAllExpiredAssociationBadges = async (
       contractAddress,
       type
     );
-    console.log("ressss", responseData)
+    const currentMonth = new Date().getMonth()
+    console.log("info month",getInfoOnMonth(currentMonth))
+    const validBadges = responseData.filter(x=>x.time>=new Date(getInfoOnMonth(currentMonth)?.startDate).getTime() && x.time<=new Date(getInfoOnMonth(currentMonth)?.endDate).getTime())
     const badges:any[] = []
-    responseData.forEach((badge:any) => {
+    validBadges.forEach((badge:any) => {
         if(badges.filter(x=>x.claimer === badge.claimer).length===0){
             badges.push({...badge,tier:calculateTier(responseData.filter(x => x.claimer === badge.claimer).length)})
         }
     })
-    // responseData.forEach((badges: any) => {
-    //   console.log(
-    //     'rep3 badges',
-    //     responseData,
-    //     Object.keys(config.data),
-    //     badges.data,
-    //     isExpiredDate(config.data[badges.data].expiry)
-    //   );
-    //   if (
-    //     Object.keys(config.data).includes(badges.data) &&
-    //     isExpiredDate(config.data[badges.data].expiry)
-    //   ) {
-    //     expiredbadges.push(badges);
-    //   }
-    // });
     return badges;
   } catch (error) {
     console.log('error', error);
@@ -81,11 +99,13 @@ export async function strategy({
   eoa,
   options,
 }: StrategyParamsType) {
+    
     console.log(eoa)
-  const SUBGRAPH_URLS: any = {
-    137: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-matic',
-    80001: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-mumbai',
-  };
+    const SUBGRAPH_URLS: any = {
+        137: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-matic',
+        80001: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-mumbai',
+    };
+
     const badgeList: any[] = await getAllExpiredAssociationBadges(
       SUBGRAPH_URLS[options.chainId],
       contractAddress,
