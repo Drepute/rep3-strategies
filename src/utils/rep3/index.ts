@@ -65,7 +65,7 @@ export const getAllMembershipNfts = async (
         time: true,
         metadatUri: true,
         type: true,
-        data: true,
+        // data: true,
       },
     });
     const all = allBadges.concat(badges.associationBadges);
