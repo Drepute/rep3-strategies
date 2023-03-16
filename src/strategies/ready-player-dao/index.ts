@@ -80,11 +80,12 @@ const getAllExpiredAssociationBadges = async (
     );
     const currentMonth = new Date().getMonth()
     console.log("info month",getInfoOnMonth(currentMonth))
-    const validBadges = responseData.filter(x=>x.time>=new Date(getInfoOnMonth(currentMonth)?.startDate).getTime() && x.time<=new Date(getInfoOnMonth(currentMonth)?.endDate).getTime())
+    //const validBadges = responseData.filter(x=>x.time>=new Date(getInfoOnMonth(currentMonth)?.startDate).getTime() && x.time<=new Date(getInfoOnMonth(currentMonth)?.endDate).getTime())
     const badges:any[] = []
-    validBadges.forEach((badge:any) => {
+    responseData.forEach((badge:any) => {
         if(badges.filter(x=>x.claimer === badge.claimer).length===0){
-            badges.push({...badge,tier:calculateTier(responseData.filter(x => x.claimer === badge.claimer).length)})
+          console.log("tier",calculateTier(responseData.filter(x =>x.time>=new Date(getInfoOnMonth(currentMonth)?.startDate).getTime() && x.time<=new Date(getInfoOnMonth(currentMonth)?.endDate).getTime() && x.claimer === badge.claimer).length))
+            badges.push({...badge,tier:calculateTier(responseData.filter(x =>x.time>=new Date(getInfoOnMonth(currentMonth)?.startDate).getTime() && x.time<=new Date(getInfoOnMonth(currentMonth)?.endDate).getTime() && x.claimer === badge.claimer).length)})
         }
     })
     return badges;
@@ -102,12 +103,12 @@ export async function strategy({
     
     console.log(eoa)
     const SUBGRAPH_URLS: any = {
-        137: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-matic',
-        80001: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-mumbai',
+        "mainnet": 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-matic',
+        "testnet": 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-mumbai',
     };
 
     const badgeList: any[] = await getAllExpiredAssociationBadges(
-      SUBGRAPH_URLS[options.chainId],
+      SUBGRAPH_URLS[options.network],
       contractAddress,
       options.type
     );
@@ -118,7 +119,7 @@ export async function strategy({
         contractAddress,
         ActionOnType.membership,
         x.claimer,
-        1,
+        options.network==='mainnet'?137:80001,
         {
           changingLevel:x.tier
         }

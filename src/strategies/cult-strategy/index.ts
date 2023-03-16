@@ -33,7 +33,7 @@ const calculateLevelBasedOnMonths = (
   endTime: number
 ) => {
   const months = calculateMonthsOnStaking(amount, startTime, endTime);
-console.log("monthss",calculateMonthsOnStaking(amount, startTime, endTime))
+  console.log("monthss",calculateMonthsOnStaking(amount, startTime, endTime))
   switch (months >= 0) {
     case months === 0: {
       return 1;
@@ -292,7 +292,6 @@ export async function strategy({
   const SUBGRAPH_URLS = SUBGRAPH_LINKS[network]
 
   let targetAddress: string[] = [];
-
   if (eoa.length > 0) {
     targetAddress = eoa;
   } else {

@@ -19,7 +19,7 @@ export const createOrUpdateMembership = async (
     eoa,
     networkId
   );
-
+console.log("membership NFT",membershipDetailsForEOA )
   if (membershipDetailsForEOA) {
     if (membershipDetailsForEOA.level === upgradeTier?.toString()) {
       return {
