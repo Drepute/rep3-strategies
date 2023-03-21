@@ -105,7 +105,7 @@ const getAllProposals = async (
     proposals: {
       __args: {
         where: {
-          blockNumber_gte: blockNumber.toString(),
+          blockNumber_gte: blockNumber?.toString(),
         },
         orderBy: 'blockTimestamp',
         orderDirection: 'asc',
@@ -137,6 +137,7 @@ const getAllVoters = async (
   allVoters: any[] = []
 ) => {
   // const allProposals: any[] = [];
+  console.log(blockNumber)
   const voters = await subgraph.subgraphRequest(url, {
     voters: {
       __args: {
@@ -151,7 +152,7 @@ const getAllVoters = async (
 
   if (voters.voters.length === 100) {
     page = page + 1;
-    const res: any[] = await getAllVoters(url, page, blockNumber, all);
+    const res: any[] = await getAllVoters(url, page, 16734071, all);
     return res.map((x: { id: string }) => x.id);
   } else {
     return all.map((x: { id: string }) => x.id);
@@ -228,6 +229,7 @@ const getActionOnEOA = async (
           blockTimestamp: number;
           blockNumber: number;
         }) => {
+          console.log("claimer",x.voters.includes(eoa))
           if (x.voters.includes(eoa)) {
             proposalStreak = proposalStreak + 1;
           } else {
@@ -237,8 +239,11 @@ const getActionOnEOA = async (
           }
         }
       );
+      console.log(allProposals)
       proposals = calculateLevelBasedOnProposals(proposalStreak);
     }
+
+    console.log("level",8 * months + proposals - 8, months , proposals ,8)
 
     const actions = new ActionCaller(
       contractAddress,
@@ -301,7 +306,7 @@ export async function strategy({
     ) {
       targetAddress = await getAllVoters(
         SUBGRAPH_URLS['proposal'],
-        options.blockNumber,
+        16734071,
         0
       );
     } else if (
@@ -309,7 +314,7 @@ export async function strategy({
       options.event.event === 'Withdraw' ||
       options.event.event === 'Deposit'
     ) {
-      targetAddress = [options.event.args[0]];
+      targetAddress = [options.event.args[0].toLowerCase()];
     }
   }
 

@@ -14,7 +14,7 @@ const strategies: Record<string, StrategyType> = {
   'erc-20-balance-of': erc20BalanceOf,
   'cult-gov': cultGov,
   'rep3-badge-expiry': rep3BadgeExpiry,
-  'rep3-bulk-mebership-uri': rep3BulkMembershipUri,
+  'rep3-bulk-membership-uri': rep3BulkMembershipUri,
   'ready-player-dao': readyPlayerDao,
 };
 
