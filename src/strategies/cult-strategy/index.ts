@@ -152,8 +152,9 @@ const getAllVoters = async (
 
   if (voters.voters.length === 100) {
     page = page + 1;
-    const res: any[] = await getAllVoters(url, page, 16734071, all);
-    return res.map((x: { id: string }) => x.id);
+    const res: any[] = await getAllVoters(url,16734071, page, all);
+    console.log(res);
+    return res;
   } else {
     return all.map((x: { id: string }) => x.id);
   }

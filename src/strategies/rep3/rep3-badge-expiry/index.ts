@@ -1,7 +1,10 @@
 import ActionCaller from '../../../actions';
 import { ActionOnType } from '../../../actions/utils/type';
 import { StrategyParamsType } from '../../../types';
-import { getAllAssociationBadges, getAllMembershipNfts } from '../../../utils/rep3';
+import {
+  getAllAssociationBadges,
+  getAllMembershipNfts,
+} from '../../../utils/rep3';
 
 //TODO: Membership differentiation from expiry
 
@@ -19,12 +22,10 @@ function timeDifference(date1: number, date2: number) {
 }
 
 function isExpiredDate(date: string) {
-  console.log('expired time', Math.floor(new Date(date).getTime() / 1000));
+  console.log('expired time', Math.floor(new Date(date).getTime()));
   console.log('current time', getTimestampInSeconds());
-  return Math.floor(new Date(date).getTime() / 1000) < getTimestampInSeconds();
+  return Math.floor(new Date(date).getTime()) < getTimestampInSeconds();
 }
-
-
 
 const getAllExpiringMembershipBadges = async (
   subgraphUrls: any,
@@ -79,7 +80,9 @@ const getAllExpiredAssociationBadges = async (
     const responseData = await getAllAssociationBadges(
       subgraphUrls,
       contractAddress,
-      config.type
+      config.type,
+      0,
+      0
     );
     const expiredbadges: any[] = [];
     responseData.forEach((badges: any) => {
@@ -88,15 +91,17 @@ const getAllExpiredAssociationBadges = async (
         responseData,
         Object.keys(config.data),
         badges.data,
-        isExpiredDate(config.data[badges.data].expiry)
+        config.data[badges.data]
       );
       if (
         Object.keys(config.data).includes(badges.data) &&
         isExpiredDate(config.data[badges.data].expiry)
       ) {
+        console.log('dsjjsdsd', isExpiredDate(config.data[badges.data].expiry));
         expiredbadges.push(badges);
       }
     });
+    console.log('badge', expiredbadges);
     return expiredbadges;
   } catch (error) {
     console.log('error', error);
@@ -134,9 +139,9 @@ export async function strategy({
         contractAddress,
         ActionOnType.expiry,
         x.claimer,
-        1,
+        options.chainId,
         {
-          tokenId: x.tokenId,
+          tokenId: x.tokenID,
           badgeType: options.config.type,
           metadataUri: x.metadatUri,
         }

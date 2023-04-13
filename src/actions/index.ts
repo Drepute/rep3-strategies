@@ -1,6 +1,7 @@
 import {
   createBadgeVoucherOrMint,
   createOrUpdateMembership,
+  expireBadgeParam,
   updateMembershipUri,
 } from './utils/helperFunctions';
 import { ActionOnType, BadgeActions } from './utils/type';
@@ -20,7 +21,7 @@ export default class ActionCaller {
     options:
       | { changingLevel: number }
       | { badgeType: number; actionType: BadgeActions }
-      | { tokenId:number,badgeType: number,metadataUri:string}
+      | { tokenId: number; badgeType: number; metadataUri: string }
   ) {
     this.contractAddress = contractAddress;
     this.actionType = actionType;
@@ -46,6 +47,19 @@ export default class ActionCaller {
         } catch (error) {
           return error;
         }
+      case ActionOnType.expiry:
+        try {
+          return await expireBadgeParam(
+            this.contractAddress,
+            this.eoa,
+            this.network,
+            this?.badgeOptions?.badgeType,
+            this?.badgeOptions?.tokenId,
+            this?.badgeOptions?.metadataUri
+          );
+        } catch (error) {
+          return error;
+        }
       case ActionOnType.badge:
         try {
           return await createBadgeVoucherOrMint(
@@ -58,16 +72,16 @@ export default class ActionCaller {
         } catch (error) {
           return error;
         }
-        case ActionOnType.updateUri:
-          try {
-            return await updateMembershipUri(
-              this.contractAddress,
-              this.eoa,
-              this.network,
-            );
-          } catch (error) {
-            return error;
-          }
+      case ActionOnType.updateUri:
+        try {
+          return await updateMembershipUri(
+            this.contractAddress,
+            this.eoa,
+            this.network
+          );
+        } catch (error) {
+          return error;
+        }
       default:
         return null;
     }
