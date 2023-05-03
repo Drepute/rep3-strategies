@@ -7,7 +7,8 @@ import * as erc20BalanceOf from './erc20-balance-of';
 import * as cultGov from './cult-strategy';
 import * as readyPlayerDao from './ready-player-dao';
 import * as rep3BadgeExpiry from './rep3/rep3-badge-expiry';
-import * as rep3BulkMembershipUri from "./rep3/membership-bulk-update"
+import * as rep3BulkMembershipUri from './rep3/membership-bulk-update';
+import * as acrossStrategy from './across-strategy';
 
 const strategies: Record<string, StrategyType> = {
   'rep3-is-member': rep3IsMember,
@@ -16,6 +17,7 @@ const strategies: Record<string, StrategyType> = {
   'rep3-badge-expiry': rep3BadgeExpiry,
   'rep3-bulk-membership-uri': rep3BulkMembershipUri,
   'ready-player-dao': readyPlayerDao,
+  'across-strategy': acrossStrategy,
 };
 
 Object.keys(strategies).forEach(function(strategyName) {
