@@ -13,6 +13,15 @@ export enum MembershipActions {
   noChange = 'false',
 }
 
+export enum MembershipActionsV2 {
+  tierMint = 'tierMint',
+  upgrade
+  // upgradeMembershipNFT = 'updateMembership',
+  // downgradeMembershipNFT = 'updateMembership',
+  // bulkMembershipURIChange = 'bulkMembershipURIChange',
+  // noChange = 'false',
+}
+
 export enum BadgeActions {
   createBadgeVoucher = 'createBadgeVoucher',
   directMint = 'batchIssueBadge',

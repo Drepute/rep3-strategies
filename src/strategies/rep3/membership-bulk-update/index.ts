@@ -1,6 +1,6 @@
-// import ActionCaller from '../../../actions';
+// import ActionCallerV1 from '../../../actions';
 // import { ActionOnType } from '../../../actions/utils/type';
-import ActionCaller from '../../../actions';
+import ActionCallerV1 from '../../../actions/actionV1';
 import { ActionOnType } from '../../../actions/utils/type';
 import { StrategyParamsType } from '../../../types';
 import {  getAllMembershipNfts } from '../../../utils/rep3';
@@ -67,7 +67,7 @@ export async function strategy({
   // console.log('eoss',eoaList)
   const results = await Promise.all(
     eoaList.map(async (x: any) => {
-      const actions = new ActionCaller(
+      const actions = new ActionCallerV1(
         contractAddress,
         ActionOnType.updateUri,
         x.claimer,

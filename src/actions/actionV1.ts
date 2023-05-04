@@ -3,10 +3,10 @@ import {
   createOrUpdateMembership,
   expireBadgeParam,
   updateMembershipUri,
-} from './utils/helperFunctions';
+} from './utils/helperFunctionsV1';
 import { ActionOnType, BadgeActions } from './utils/type';
 
-export default class ActionCaller {
+export default class ActionCallerV1 {
   public contractAddress: string;
   public actionType: ActionOnType;
   public eoa: string;

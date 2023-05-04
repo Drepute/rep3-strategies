@@ -1,4 +1,4 @@
-import ActionCaller from '../../actions';
+import ActionCallerV1 from '../../actions/actionV1';
 import { ActionOnType } from '../../actions/utils/type';
 import { StrategyParamsType } from '../../types';
 import { subgraph } from '../../utils';
@@ -246,7 +246,7 @@ const getActionOnEOA = async (
 
     console.log("level",8 * months + proposals - 8, months , proposals ,8)
 
-    const actions = new ActionCaller(
+    const actions = new ActionCallerV1(
       contractAddress,
       ActionOnType.membership,
       eoa,
@@ -260,7 +260,7 @@ const getActionOnEOA = async (
     responseStakeData.users.length > 0 &&
     responseStakeData.users[0].amount === '0'
   ) {
-    const actions = new ActionCaller(
+    const actions = new ActionCallerV1(
       contractAddress,
       ActionOnType.membership,
       eoa,

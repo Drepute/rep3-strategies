@@ -1,4 +1,4 @@
-import ActionCaller from '../../actions';
+import ActionCallerV1 from '../../actions/actionV1';
 import { ActionOnType } from '../../actions/utils/type';
 import { StrategyParamsType } from '../../types';
 import ContractCaller from '../../utils/contract';
@@ -19,7 +19,7 @@ export async function strategy({
   contract.contractSetup();
   const result = await contract.executeFunctionCall('erc20', 'balanceOf', eoa);
   if (result.toString() === '0') {
-    const actions = new ActionCaller(
+    const actions = new ActionCallerV1(
       contractAddress,
       ActionOnType.membership,
       eoa[0],

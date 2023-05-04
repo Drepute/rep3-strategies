@@ -1,4 +1,4 @@
-import ActionCaller from '../../../actions';
+import ActionCallerV1 from '../../../actions/actionV1';
 import { ActionOnType } from '../../../actions/utils/type';
 import { StrategyParamsType } from '../../../types';
 import {
@@ -135,7 +135,7 @@ export async function strategy({
   }
   const results = await Promise.all(
     badgeList.map(async (x: any) => {
-      const actions = new ActionCaller(
+      const actions = new ActionCallerV1(
         contractAddress,
         ActionOnType.expiry,
         x.claimer,
