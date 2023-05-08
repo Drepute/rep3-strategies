@@ -1,7 +1,7 @@
 import {
-    createBadgeVoucherOrMint,
+    // createBadgeVoucherOrMint,
     createOrUpdateMembership,
-    expireBadgeParam,
+    // expireBadgeParam,
     updateMembershipUri,
   } from './utils/helperFunctionsV1';
   import { ActionOnType, BadgeActions } from './utils/type';
