@@ -30,7 +30,7 @@ export const createOrUpdateMembershipV2 = async (
       } else {
         return {
           params: { ...tierDetailsForEOA, upgradeTier, functionName:"facetFunction",facet: "tierMint",facetFunctionName: "mint" },
-          action: MembershipActionsV2.tierMint,
+          action: MembershipActionsV2.upgradeTier,
           eoa,
         };
       }

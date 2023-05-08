@@ -15,7 +15,7 @@ export enum MembershipActions {
 
 export enum MembershipActionsV2 {
   tierMint = 'tierMint',
-  upgrade
+  upgradeTier= 'upgradeTier'
   // upgradeMembershipNFT = 'updateMembership',
   // downgradeMembershipNFT = 'updateMembership',
   // bulkMembershipURIChange = 'bulkMembershipURIChange',
