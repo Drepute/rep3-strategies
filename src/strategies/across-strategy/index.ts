@@ -189,7 +189,16 @@ const calculateTiers = (holderInfo: any[], poolInfo:any[]) => {
       tier = tier*2
     }
     const amount = calculateAmount(holderInfo,poolInfo)
-    console.log(amount, tier)
+    if(amount*10e-18<500){
+      tier = tier*1
+    }else if (amount*10e-18>=500&&amount*10e-18<=1500){
+      tier = tier*2
+    }else if (amount*10e-18>1500&&amount*10e-18<=5000){
+      tier = tier*3
+    }else if (amount*10e-18>5000){
+      tier = tier*4
+    }
+  console.log(amount*10e-18, tier)
     return tier;
   } else {
     return tier;
