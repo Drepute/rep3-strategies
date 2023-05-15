@@ -9,7 +9,7 @@ import * as readyPlayerDao from './ready-player-dao';
 import * as rep3BadgeExpiry from './rep3/rep3-badge-expiry';
 import * as rep3BulkMembershipUri from './rep3/membership-bulk-update';
 import * as acrossStrategy from './across-strategy';
-
+import * as premiaStrategy from './premia-strategy';
 const strategies: Record<string, StrategyType> = {
   'rep3-is-member': rep3IsMember,
   'erc-20-balance-of': erc20BalanceOf,
@@ -18,6 +18,7 @@ const strategies: Record<string, StrategyType> = {
   'rep3-bulk-membership-uri': rep3BulkMembershipUri,
   'ready-player-dao': readyPlayerDao,
   'across-strategy': acrossStrategy,
+  'premia-strategy': premiaStrategy,
 };
 
 Object.keys(strategies).forEach(function(strategyName) {
