@@ -47,6 +47,17 @@ export default class ActionCallerV1 {
         } catch (error) {
           return error;
         }
+      case ActionOnType.directMembership:
+        try {
+          return await createOrUpdateMembership(
+            this.contractAddress,
+            this.eoa,
+            this.network,
+            this?.membershipOptions?.changingLevel
+          );
+        } catch (error) {
+          return error;
+        }
       case ActionOnType.expiry:
         try {
           return await expireBadgeParam(

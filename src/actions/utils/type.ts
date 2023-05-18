@@ -1,5 +1,6 @@
 export enum ActionOnType {
   membership = 'membership',
+  directMembership = 'directMembership',
   badge = 'badge',
   expiry = 'expiry',
   updateUri = 'updateUri',
@@ -15,11 +16,7 @@ export enum MembershipActions {
 
 export enum MembershipActionsV2 {
   tierMint = 'tierMint',
-  upgradeTier= 'upgradeTier'
-  // upgradeMembershipNFT = 'updateMembership',
-  // downgradeMembershipNFT = 'updateMembership',
-  // bulkMembershipURIChange = 'bulkMembershipURIChange',
-  // noChange = 'false',
+  upgradeTier = 'upgradeTier',
 }
 
 export enum BadgeActions {

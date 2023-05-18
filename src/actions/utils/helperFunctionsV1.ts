@@ -116,3 +116,18 @@ export const updateMembershipUri = async (
     eoa,
   };
 };
+
+export const generateData = (
+  levels: string | any[],
+  categories: string | any[]
+) => {
+  if (levels.length !== categories.length) {
+    return [];
+  }
+  const levelCategoryArray: any[] = [];
+  for (let i = 0; i < levels.length; i++) {
+    const levelCategory = (levels[i] << 8) | categories[i];
+    levelCategoryArray.push(levelCategory);
+  }
+  return levelCategoryArray;
+};
