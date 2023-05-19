@@ -1,54 +1,17 @@
 import { subgraphRequest } from '.';
 import { network } from '../contract/network';
 
-export const getRep3MembershipDetails = async (
-  contractAddress: string,
+export const getRep3V2BadgeDetails = async (
+  parentCommunity: string,
   eoa: string,
   networkId: number
 ) => {
   const URL = network[networkId].subgraph;
   const QUERY = {
-    membershipNFTs: {
+    questBadges: {
       __args: {
         where: {
-          contractAddress,
-          claimer: eoa,
-        },
-        orderBy: 'time',
-        orderDirection: 'desc',
-      },
-      claimer: true,
-      tokenID: true,
-      level: true,
-      category: true,
-      contractAddress: true,
-      time: true,
-      metadataUri: true,
-    },
-  };
-  try {
-    const responseData = await subgraphRequest(URL, QUERY);
-    if (responseData['membershipNFTs'].length > 0) {
-      return responseData['membershipNFTs'][0];
-    } else {
-      return false;
-    }
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-export const getRep3V2TierDetails = async (
-  credential: string,
-  eoa: string,
-  networkId: number
-) => {
-  const URL = network[networkId].subgraph;
-  const QUERY = {
-    tierNFts: {
-      __args: {
-        where: {
-          credential,
+          parentCommunity,
           claimer: eoa,
         },
         orderBy: 'blockTimestamp',
@@ -57,16 +20,17 @@ export const getRep3V2TierDetails = async (
       claimer: true,
       tokenId: true,
       tier: true,
-      credential: true,
+      data: true,
+      parentCommunity: true,
       blockTimestamp: true,
       metadataUri: true,
-      txHash:true
+      txHash: true,
     },
   };
   try {
     const responseData = await subgraphRequest(URL, QUERY);
-    if (responseData['tierNFts'].length > 0) {
-      return responseData['membershipNFTs'][0];
+    if (responseData['questBadges'].length > 0) {
+      return responseData['questBadges'][0];
     } else {
       return false;
     }

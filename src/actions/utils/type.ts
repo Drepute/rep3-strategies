@@ -13,10 +13,12 @@ export enum MembershipActions {
   bulkMembershipURIChange = 'bulkMembershipURIChange',
   noChange = 'false',
 }
-
+export enum ActionOnTypeV2 {
+  badge = 'badge',
+}
 export enum MembershipActionsV2 {
-  tierMint = 'tierMint',
-  upgradeTier = 'upgradeTier',
+  badgeMint = 'mint',
+  updateTier = 'updateTier',
 }
 
 export enum BadgeActions {
