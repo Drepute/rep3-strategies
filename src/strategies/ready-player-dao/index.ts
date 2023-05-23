@@ -53,18 +53,27 @@ const getAllExpiredAssociationBadges = async (
 ) => {
   try {
     const currentMonth = new Date().getMonth();
-    console.log(
-      'info month',
-      getInfoOnMonth(currentMonth),
-      1677628859,
-      1680307199
+    let startDate: any = getInfoOnMonth(currentMonth).startDate;
+    startDate = startDate.split('/');
+    const startTimestamp = new Date(
+      parseInt(`20${startDate[2]}`),
+      startDate[1] - 1,
+      startDate[0]
     );
+    let endDate: any = getInfoOnMonth(currentMonth).endDate;
+    endDate = endDate.split('/');
+    const endTimestamp = new Date(
+      parseInt(`20${endDate[2]}`),
+      endDate[1] - 1,
+      endDate[0]
+    );
+    console.log('info month', startTimestamp.getTime(), endTimestamp);
     const responseData = await getAllAssociationBadges(
       subgraphUrls,
       contractAddress,
       type,
-      1677628859,
-      1680677160
+      startTimestamp.getTime() / 1000,
+      endTimestamp.getTime() / 1000
     );
     const badges: any[] = [];
     responseData.forEach((badge: any) => {

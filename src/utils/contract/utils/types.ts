@@ -11,6 +11,7 @@ interface NetworkInfos {
   network: string;
   rpc: string;
   subgraph: string;
+  subgraphV2: string;
 }
 
 export interface NetwrokObj {

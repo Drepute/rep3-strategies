@@ -7,7 +7,7 @@ function getTimestampInSeconds() {
   return Math.floor(Date.now() / 1000);
 }
 
-function  timeDifference(date1: number, date2: number) {
+function timeDifference(date1: number, date2: number) {
   const difference = date1 - date2;
   return (difference * 1000) / (86400000 * 30);
 }
@@ -33,7 +33,7 @@ const calculateLevelBasedOnMonths = (
   endTime: number
 ) => {
   const months = calculateMonthsOnStaking(amount, startTime, endTime);
-  console.log("monthss",calculateMonthsOnStaking(amount, startTime, endTime))
+  console.log('monthss', calculateMonthsOnStaking(amount, startTime, endTime));
   switch (months >= 0) {
     case months === 0: {
       return 1;
@@ -136,8 +136,7 @@ const getAllVoters = async (
   page = 0,
   allVoters: any[] = []
 ) => {
-  // const allProposals: any[] = [];
-  console.log(blockNumber)
+  console.log(blockNumber);
   const voters = await subgraph.subgraphRequest(url, {
     voters: {
       __args: {
@@ -152,7 +151,7 @@ const getAllVoters = async (
 
   if (voters.voters.length === 100) {
     page = page + 1;
-    const res: any[] = await getAllVoters(url,16734071, page, all);
+    const res: any[] = await getAllVoters(url, 16734071, page, all);
     console.log(res);
     return res;
   } else {
@@ -207,8 +206,13 @@ const getActionOnEOA = async (
   ) {
     const monthsOfStaking = calculateLevelBasedOnMonths(
       responseStakeData.users[0].amount,
-      responseStakeData.users[0].startTime > (new Date("03/03/23").getTime()/1000)?responseStakeData.users[0].startTime:(new Date("03/03/23").getTime()/1000),
-      responseStakeData.users[0].endTime > (new Date("03/03/23").getTime()/1000)?responseStakeData.users[0].endTime:(new Date("03/03/23").getTime()/1000)
+      responseStakeData.users[0].startTime >
+        new Date('03/03/23').getTime() / 1000
+        ? responseStakeData.users[0].startTime
+        : new Date('03/03/23').getTime() / 1000,
+      responseStakeData.users[0].endTime > new Date('03/03/23').getTime() / 1000
+        ? responseStakeData.users[0].endTime
+        : new Date('03/03/23').getTime() / 1000
     );
     months = monthsOfStaking;
 
@@ -230,21 +234,23 @@ const getActionOnEOA = async (
           blockTimestamp: number;
           blockNumber: number;
         }) => {
-          console.log("claimer",x.voters.includes(eoa))
-          if (x.voters.includes(eoa)) {
+          if (x.voters.includes(eoa.toLowerCase())) {
             proposalStreak = proposalStreak + 1;
+            console.log(proposalStreak);
           } else {
             if (proposalStreak !== 0) {
               proposalStreak = proposalStreak - 1;
+              console.log(proposalStreak);
             }
           }
         }
       );
-      console.log(allProposals)
+      console.log(allProposals);
       proposals = calculateLevelBasedOnProposals(proposalStreak);
     }
 
-    console.log("level",8 * months + proposals - 8, months , proposals ,8)
+    console.log('level', months, months * 8, proposals - 8, proposals);
+    console.log('level', 8 * months + (proposals - 8));
 
     const actions = new ActionCallerV1(
       contractAddress,
@@ -285,17 +291,21 @@ export async function strategy({
   options,
 }: StrategyParamsType) {
   const SUBGRAPH_LINKS = {
-    mainnet:{
-      proposal:'https://api.thegraph.com/subgraphs/name/eth-jashan/cult-governance',
-      staking: 'https://api.thegraph.com/subgraphs/name/eth-jashan/cult-staking',
+    mainnet: {
+      proposal:
+        'https://api.thegraph.com/subgraphs/name/eth-jashan/cult-governance',
+      staking:
+        'https://api.thegraph.com/subgraphs/name/eth-jashan/cult-staking',
     },
-    testnet:{
-        proposal:'https://api.thegraph.com/subgraphs/name/eth-jashan/test-governance',
-        staking: 'https://api.thegraph.com/subgraphs/name/eth-jashan/test-staking',
-    }
+    testnet: {
+      proposal:
+        'https://api.thegraph.com/subgraphs/name/eth-jashan/test-governance',
+      staking:
+        'https://api.thegraph.com/subgraphs/name/eth-jashan/test-staking',
+    },
   };
-  const network:"mainnet"|"testnet" = options.network
-  const SUBGRAPH_URLS = SUBGRAPH_LINKS[network]
+  const network: 'mainnet' | 'testnet' = options.network;
+  const SUBGRAPH_URLS = SUBGRAPH_LINKS[network];
 
   let targetAddress: string[] = [];
   if (eoa.length > 0) {

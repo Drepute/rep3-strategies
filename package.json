@@ -1,5 +1,5 @@
 {
-  "version": "4.0.1-development",
+  "version": "0.0.5-development",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -7,7 +7,6 @@
     "dist",
     "src"
   ],
-  "type": "module",
   "engines": {
     "node": ">=10"
   },
@@ -31,9 +30,9 @@
     "singleQuote": true,
     "trailingComma": "es5"
   },
-  "name": "rep3-strategies",
+  "name": "rep3-strategy",
   "author": "Jashan Shetty",
-  "module": "dist/rep3-strategies.esm.js",
+  "module": "dist/rep3-strategy.esm.js",
   "devDependencies": {
     "@size-limit/preset-small-lib": "^8.1.0",
     "@typescript-eslint/eslint-plugin": "^5.42.1",
