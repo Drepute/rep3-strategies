@@ -7,19 +7,19 @@ export const createOrUpdateMembership = async (
   networkId: number,
   upgradeTier: number | undefined
 ) => {
-  if (upgradeTier === 0) {
-    return {
-      params: {},
-      action: false,
-      eoa,
-    };
-  } else {
+  // if (upgradeTier === 0) {
+  //   return {
+  //     params: { ...membershipDetailsForEOA, upgradeTier },
+  //     action: false,
+  //     eoa,
+  //   };
+  // } else {
     const membershipDetailsForEOA = await getRep3MembershipDetails(
       contractAddress,
       eoa,
       networkId
     );
-    console.log('membership NFT', membershipDetailsForEOA);
+    // console.log('membership NFT', membershipDetailsForEOA);
     if (membershipDetailsForEOA) {
       if (membershipDetailsForEOA.level === upgradeTier?.toString()) {
         return {
@@ -41,7 +41,7 @@ export const createOrUpdateMembership = async (
         eoa,
       };
     }
-  }
+  // }
 };
 
 export const createBadgeVoucherOrMint = async (

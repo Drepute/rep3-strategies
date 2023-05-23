@@ -33,7 +33,6 @@ const calculateLevelBasedOnMonths = (
   endTime: number
 ) => {
   const months = calculateMonthsOnStaking(amount, startTime, endTime);
-  console.log('monthss', calculateMonthsOnStaking(amount, startTime, endTime));
   switch (months >= 0) {
     case months === 0: {
       return 1;
@@ -123,7 +122,7 @@ const getAllProposals = async (
 
   if (proposals.proposals.length === 100) {
     page = page + 1;
-    const res: any[] = await getAllProposals(url, page, blockNumber, all);
+    const res: any[] = await getAllProposals(url,blockNumber, page,all);
     return res;
   } else {
     return all;
@@ -152,7 +151,7 @@ const getAllVoters = async (
   if (voters.voters.length === 100) {
     page = page + 1;
     const res: any[] = await getAllVoters(url, 16734071, page, all);
-    console.log(res);
+    
     return res;
   } else {
     return all.map((x: { id: string }) => x.id);
@@ -236,21 +235,17 @@ const getActionOnEOA = async (
         }) => {
           if (x.voters.includes(eoa.toLowerCase())) {
             proposalStreak = proposalStreak + 1;
-            console.log(proposalStreak);
           } else {
             if (proposalStreak !== 0) {
               proposalStreak = proposalStreak - 1;
-              console.log(proposalStreak);
             }
           }
         }
       );
-      console.log(allProposals);
       proposals = calculateLevelBasedOnProposals(proposalStreak);
     }
 
-    console.log('level', months, months * 8, proposals - 8, proposals);
-    console.log('level', 8 * months + (proposals - 8));
+    
 
     const actions = new ActionCallerV1(
       contractAddress,
