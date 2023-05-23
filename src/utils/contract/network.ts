@@ -8,6 +8,7 @@ export const network: NetwrokObj = {
     rpc:
       'https://eth-mainnet.g.alchemy.com/v2/TjxOaj0jbq-FVA2jFK2p_h_KnrooFuHg',
     subgraph: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-matic',
+    subgraphV2:"https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-v2-mumbai"
   },
   '2': {
     name: 'Ethereum Mainnet',
@@ -16,6 +17,7 @@ export const network: NetwrokObj = {
     rpc:
       'https://eth-mainnet.alchemyapi.io/v2/4bdDVB5QAaorY2UE-GBUbM2yQB3QJqzv',
     subgraph: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-matic',
+    subgraphV2:"https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-v2-mumbai"
   },
   '137': {
     name: 'Matic Mainnet',
@@ -24,6 +26,7 @@ export const network: NetwrokObj = {
     rpc:
       'https://eth-mainnet.alchemyapi.io/v2/4bdDVB5QAaorY2UE-GBUbM2yQB3QJqzv',
     subgraph: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-matic',
+    subgraphV2:"https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-v2-mumbai"
   },
   '80001': {
     name: 'Mumbai Testnet',
@@ -32,5 +35,6 @@ export const network: NetwrokObj = {
     rpc:
       'https://eth-mainnet.alchemyapi.io/v2/4bdDVB5QAaorY2UE-GBUbM2yQB3QJqzv',
     subgraph: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-mumbai',
+    subgraphV2:"https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-v2-mumbai"
   },
 };
