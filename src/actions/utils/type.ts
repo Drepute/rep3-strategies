@@ -9,7 +9,7 @@ export enum ActionOnType {
 export enum MembershipActions {
   createMembershipVoucher = 'createMembershipVoucher',
   upgradeMembershipNFT = 'updateMembership',
-  downgradeMembershipNFT = 'updateMembership',
+  issueMembership = 'issueMembership',
   bulkMembershipURIChange = 'bulkMembershipURIChange',
   noChange = 'false',
 }

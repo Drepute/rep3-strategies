@@ -1,5 +1,3 @@
-// import ActionCallerV1 from '../../../actions';
-// import { ActionOnType } from '../../../actions/utils/type';
 import ActionCallerV1 from '../../../actions/actionV1';
 import { ActionOnType } from '../../../actions/utils/type';
 import { StrategyParamsType } from '../../../types';
@@ -7,24 +5,6 @@ import {  getAllMembershipNfts } from '../../../utils/rep3';
 
 //TODO: Membership differentiation from expiry
 
-// function getDaysInSeconds(numODays: number) {
-//   return numODays * 24 * 60 * 60;
-// }
-
-// function getTimestampInSeconds() {
-//   return Math.floor(Date.now() / 1000);
-// }
-
-// function timeDifference(date1: number, date2: number) {
-//   const difference = date1 - date2;
-//   return difference;
-// }
-
-// function isExpiredDate(date: string) {
-//   console.log('expired time', Math.floor(new Date(date).getTime() / 1000));
-//   console.log('current time', getTimestampInSeconds());
-//   return Math.floor(new Date(date).getTime() / 1000) < getTimestampInSeconds();
-// }
 
 
 
@@ -72,7 +52,7 @@ export async function strategy({
         ActionOnType.updateUri,
         x.claimer,
         options.network === 'testnet'?80001:137,
-        {changingLevel:x.level}
+        {changingLevel:x.level,isVoucher:false}
       );
       return await actions.calculateActionParams();
     })

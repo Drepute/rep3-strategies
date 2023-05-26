@@ -252,7 +252,6 @@ export async function strategy({
   );
 
   if (tokens) {
-    // if(eoa.length>0){}else{}
     let stakers: any[] = [];
     const promisesTokenUSDPrice = poolInfo.map(async (x: any) => {
       try {
