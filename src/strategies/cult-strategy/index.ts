@@ -254,6 +254,7 @@ const getActionOnEOA = async (
       1,
       {
         changingLevel: 8 * months + proposals - 8,
+        isVoucher:false
       }
     );
     return await actions.calculateActionParams();
@@ -268,6 +269,7 @@ const getActionOnEOA = async (
       1,
       {
         changingLevel: 0,
+        isVoucher:false
       }
     );
     return await actions.calculateActionParams();

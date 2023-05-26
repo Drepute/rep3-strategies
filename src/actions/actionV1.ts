@@ -19,7 +19,7 @@ export default class ActionCallerV1 {
     eoa: string,
     network: number,
     options:
-      | { changingLevel: number }
+      | { changingLevel: number,isVoucher:true|false }
       | { badgeType: number; actionType: BadgeActions }
       | { tokenId: number; badgeType: number; metadataUri: string }
   ) {
@@ -42,7 +42,8 @@ export default class ActionCallerV1 {
             this.contractAddress,
             this.eoa,
             this.network,
-            this?.membershipOptions?.changingLevel
+            this?.membershipOptions?.changingLevel,
+            this?.membershipOptions?.isVoucher
           );
         } catch (error) {
           return error;

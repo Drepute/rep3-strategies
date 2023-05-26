@@ -127,6 +127,7 @@ export async function strategy({
         options.network === 'mainnet' ? 137 : 80001,
         {
           changingLevel: x.tier,
+          isVoucher:false
         }
       );
       return await actions.calculateActionParams();
