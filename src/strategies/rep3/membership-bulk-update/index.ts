@@ -1,4 +1,4 @@
-import ActionCallerV1 from '../../../actions/actionV1';
+import ActionCallerV1 from '../../../actions/v1';
 import { ActionOnType } from '../../../actions/utils/type';
 import { StrategyParamsType } from '../../../types';
 import {  getAllMembershipNfts } from '../../../utils/rep3';

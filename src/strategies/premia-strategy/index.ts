@@ -1,8 +1,9 @@
-import ActionCallerV1 from '../../actions/actionV1';
+import ActionCallerV1 from '../../actions/v1';
 import { ActionOnType } from '../../actions/utils/type';
 import { StrategyParamsType } from '../../types';
 import { subgraph } from '../../utils';
 import { network } from '../../utils/contract/network';
+import fetch from 'cross-fetch';
 
 const getAllPaginatedStakers = async (
   url: string,
@@ -85,16 +86,16 @@ const getAllMembers = async (
   }
 };
 
-// const getCourseFinished = async(user:string,apiKey:string):Promise<any[]> => {
-//   const response = await fetch(`https://academy.premia.blue/api/user?api_key=${apiKey}&account=${user}`)
-//   const courses = await response.json()
-//   console.log("number of courses", courses)
-//   return courses.courses
-// }
+const getCourseFinished = async(user:string,apiKey:string):Promise<any[]> => {
+  const response = await fetch(`https://academy.premia.blue/api/user?api_key=${apiKey}&account=${user}`)
+  const courses = await response.json()
+  console.log("number of courses", courses)
+  return courses.courses
+}
 
 const getActionOnEOA = async (eoa: string, contractAddress: string,apiKey:string) => {
-  // const coursesCount = await getCourseFinished(eoa,apiKey)
-  // const tier = coursesCount.length>0?2:1
+  const coursesCount = await getCourseFinished(eoa,apiKey)
+  const tier = coursesCount.length>0?2:1
   console.log(apiKey)
   const actions = new ActionCallerV1(
     contractAddress,
@@ -102,7 +103,7 @@ const getActionOnEOA = async (eoa: string, contractAddress: string,apiKey:string
     eoa,
     137,
     {
-      changingLevel:2,
+      changingLevel:tier,
       isVoucher:true
     }
   );

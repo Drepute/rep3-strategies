@@ -1,4 +1,4 @@
-import ActionCallerV2 from '../../actions/actionV2';
+import ActionCallerV2 from '../../actions/v2';
 import { ActionOnTypeV2 } from '../../actions/utils/type';
 import { StrategyParamsType } from '../../types';
 import { subgraph } from '../../utils';
