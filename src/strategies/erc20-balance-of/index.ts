@@ -24,7 +24,7 @@ export async function strategy({
       ActionOnType.membership,
       eoa[0],
       options.network,
-      { changingLevel: 2 }
+      { changingLevel: 2,isVoucher:true }
     );
     const final = await actions.calculateActionParams();
     return final;

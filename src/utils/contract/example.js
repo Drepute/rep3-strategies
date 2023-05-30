@@ -1,5 +1,5 @@
 import ContractCaller from './index';
-import { abi } from './utils/abis/erc20Abi';
+const { abi } = './utils/abis/erc20Abi';
 (async () => {
   console.time('contract Call');
   try {

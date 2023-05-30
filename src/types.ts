@@ -13,3 +13,28 @@ export interface StrategyType {
   example?: CallStrategyParamsType | null;
   about?: string;
 }
+
+export enum GenericAdapters {
+  holdXNumberOfNft = 'holdXNumberOfNft',
+  holdSpecialNft = 'holdSpecialNft',
+}
+
+export type AdapterWithVariables = {
+  operationOnXNumberOfNft: {
+    
+      nftAddress: string;
+      balanceThreshold: number;
+      operator:"==="|">="|"<="|"<"|">"
+      chainId: number;
+    
+  };
+  operationOnXNumberOfToken:{
+     
+      tokenAddress: string;
+      balanceThreshold: number;
+      operator:"==="|">="|"<="|"<"|">"
+      chainId: number;
+    
+  }
+};
+export type AdapterNames = keyof AdapterWithVariables;
