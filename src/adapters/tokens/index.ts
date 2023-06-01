@@ -48,3 +48,7 @@ const tokenGetterCall = async (
     );
     return arthematicOperand(functionParams.balanceThreshold,parseInt(response.toString()),functionParams.operator);
   };
+
+  export const getBalanceOfTokenAtXTime = (provider:ethers.providers.JsonRpcProvider) => {
+    provider.getBalance()
+  }

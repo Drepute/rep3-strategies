@@ -5,10 +5,10 @@ import { subgraph } from '../../utils';
 import { network } from '../../utils/contract/network';
 import fetch from 'cross-fetch';
 
-const getAllPaginatedStakers = async (
+const getAllPaginatedMembers = async (
   url: string,
   contractAddress:string,
-  lastId: string,
+  lastTokenId: number,
   page = 0,
   allMembers: any[] = []
 ) => {
@@ -17,7 +17,7 @@ const getAllPaginatedStakers = async (
       __args: {
         where: {
           contractAddress,
-          id_gt: lastId,
+          tokenID_gt: lastTokenId,
         },
         first: 1000,
       },
@@ -28,10 +28,10 @@ const getAllPaginatedStakers = async (
   const all = allMembers.concat(stakers.membershipNFTs);
   if (stakers.membershipNFTs.length === 1000) {
     page = page + 1;
-    const res: any[] | undefined = await getAllPaginatedStakers(
+    const res: any[] | undefined = await getAllPaginatedMembers(
       url,
-      lastId,
-      all[all.length - 1].id,
+      contractAddress,
+      all[all.length - 1].tokenID,
       page,
       all
     );
@@ -54,12 +54,13 @@ const getAllMembers = async (
           where:{
             contractAddress
           },
-          orderBy: 'time',
+          orderBy: 'tokenID',
           orderDirection: 'asc',
           skip: page * 100,
         },
         claimer:true,
-        id:true
+        id:true,
+        tokenID:true
       },
     });
     const all = allMembers.concat(stakers.membershipNFTs);
@@ -76,10 +77,10 @@ const getAllMembers = async (
       return all;
     }
   } else {
-    return await getAllPaginatedStakers(
+    return await getAllPaginatedMembers(
       url,
       contractAddress,
-      allMembers[allMembers.length - 1].id,
+      allMembers[allMembers.length - 1].tokenID,
       page,
       allMembers,
     );

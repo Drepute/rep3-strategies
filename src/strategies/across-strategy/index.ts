@@ -278,7 +278,9 @@ export async function strategy({
       }
     });
     await Promise.all(promises);
+    console.log("stakersss",stakers)
     let stakerListAddress = stakers.map(x => x.address);
+    if(stakerListAddress.length>0){
     stakerListAddress = stakerListAddress.filter(
       (c, index) => stakerListAddress.indexOf(c) === index
     );
@@ -289,7 +291,6 @@ export async function strategy({
       );
       return {tier,claimer:x}
     });
-    console.log(tierClaimerList)
     const results = await Promise.all(
       tierClaimerList.map(async (x: any) => {
         const actions = new ActionCallerV2(
@@ -305,7 +306,10 @@ export async function strategy({
       })
     );
     return results
+    }else{
+      return [{action:false,eoa,params:{}}]
+    }
   }else{
-    return []
+    return [{action:false,eoa:eoa[0],params:{}}]
   }
 }

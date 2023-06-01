@@ -2,6 +2,7 @@ import ActionCallerV1 from '../../actions/v1';
 import { ActionOnType } from '../../actions/utils/type';
 import { StrategyParamsType } from '../../types';
 import { subgraph } from '../../utils';
+import { network } from '../../network';
 
 function getTimestampInSeconds() {
   return Math.floor(Date.now() / 1000);
@@ -93,7 +94,88 @@ const calculateLevelBasedOnProposals = (proposals: number) => {
       return 1;
   }
 };
+const getAllPaginatedMembers = async (
+  url: string,
+  contractAddress:string,
+  lastTokenId: number,
+  page = 0,
+  allMembers: any[] = []
+) => {
+  const stakers = await subgraph.subgraphRequest(url, {
+    membershipNFTs: {
+      __args: {
+        where: {
+          contractAddress,
+          tokenID_gt: lastTokenId,
+        },
+        first: 1000,
+      },
+      claimer:true,
+        id:true,
+        tokenID:true
+    },
+  });
+  const all = allMembers.concat(stakers.membershipNFTs);
+  if (stakers.membershipNFTs.length === 1000) {
+    page = page + 1;
+    const res: any[] | undefined = await getAllPaginatedMembers(
+      url,
+      contractAddress,
+      all[all.length - 1].tokenID,
+      page,
+      all
+    );
+    return res;
+  } else {
+    return all;
+  }
+};
 
+const getAllMembers = async (
+  url: string,
+  contractAddress:string,
+  page = 0,
+  allMembers: any[] = [],
+) => {
+  if (page < 1) {
+    const stakers = await subgraph.subgraphRequest(url, {
+      membershipNFTs: {
+        __args: {
+          where:{
+            contractAddress
+          },
+          orderBy: 'tokenID',
+          orderDirection: 'asc',
+          skip: page * 100,
+        },
+        claimer:true,
+        id:true,
+        tokenID:true
+      },
+    });
+    const all = allMembers.concat(stakers.membershipNFTs);
+    if (stakers.membershipNFTs.length === 100) {
+      page = page + 1;
+      const res: any[] | undefined = await getAllMembers(
+        url,
+        contractAddress,
+        page,
+        all
+      );
+      return res;
+    } else {
+      return all;
+    }
+  } else {
+    return await getAllPaginatedMembers(
+      url,
+      contractAddress,
+      allMembers[allMembers.length - 1].tokenID,
+      page,
+      allMembers,
+    );
+  }
+};
 const getAllProposals = async (
   url: string,
   blockNumber: number,
@@ -129,34 +211,34 @@ const getAllProposals = async (
   }
 };
 
-const getAllVoters = async (
-  url: string,
-  blockNumber: number,
-  page = 0,
-  allVoters: any[] = []
-) => {
-  console.log(blockNumber);
-  const voters = await subgraph.subgraphRequest(url, {
-    voters: {
-      __args: {
-        orderBy: 'id',
-        orderDirection: 'asc',
-        skip: page * 100,
-      },
-      id: true,
-    },
-  });
-  const all = allVoters.concat(voters.voters);
+// const getAllVoters = async (
+//   url: string,
+//   blockNumber: number,
+//   page = 0,
+//   allVoters: any[] = []
+// ) => {
+//   console.log(blockNumber);
+//   const voters = await subgraph.subgraphRequest(url, {
+//     voters: {
+//       __args: {
+//         orderBy: 'id',
+//         orderDirection: 'asc',
+//         skip: page * 100,
+//       },
+//       id: true,
+//     },
+//   });
+//   const all = allVoters.concat(voters.voters);
 
-  if (voters.voters.length === 100) {
-    page = page + 1;
-    const res: any[] = await getAllVoters(url, 16734071, page, all);
+//   if (voters.voters.length === 100) {
+//     page = page + 1;
+//     const res: any[] = await getAllVoters(url, 16734071, page, all);
     
-    return res;
-  } else {
-    return all.map((x: { id: string }) => x.id);
-  }
-};
+//     return res;
+//   } else {
+//     return all.map((x: { id: string }) => x.id);
+//   }
+// };
 
 const getActionOnEOA = async (
   eoa: string,
@@ -301,8 +383,8 @@ export async function strategy({
         'https://api.thegraph.com/subgraphs/name/eth-jashan/test-staking',
     },
   };
-  const network: 'mainnet' | 'testnet' = options.network;
-  const SUBGRAPH_URLS = SUBGRAPH_LINKS[network];
+  const networks: 'mainnet' | 'testnet' = options.network;
+  const SUBGRAPH_URLS = SUBGRAPH_LINKS[networks];
 
   let targetAddress: string[] = [];
   if (eoa.length > 0) {
@@ -312,11 +394,12 @@ export async function strategy({
       options.event.event === 'ProposalExecuted' ||
       options.event.event === 'ProposalCanceled'
     ) {
-      targetAddress = await getAllVoters(
-        SUBGRAPH_URLS['proposal'],
-        16734071,
-        0
-      );
+      targetAddress = await getAllMembers(network[networks==="mainnet"?137:80001].subgraph,contractAddress);
+      targetAddress = targetAddress.map((x:any)=>x.claimer.toLowerCase())
+      targetAddress = targetAddress.filter((c, index) => {
+        return targetAddress.indexOf(c) === index;
+      });
+      console.log(targetAddress)
     } else if (
       options.event.event === 'VoteCast' ||
       options.event.event === 'Withdraw' ||
