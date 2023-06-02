@@ -8,7 +8,7 @@ import {
   const buildStrategyFromOptions = async <T extends AdapterNames>(
     eoa: string,
     adapterName: T,
-    variables: AdapterWithVariables[T]|any
+    variables: AdapterWithVariables["operationOnXNumberOfToken"]
   ):Promise<boolean> => {
     switch (adapterName) {
       case 'operationOnXNumberOfToken':
@@ -17,11 +17,12 @@ import {
         return false;
     }
   };
-  export async function strategy({
+  
+  export async function genericStrategy({
     contractAddress,
     eoa,
     options,
   }: StrategyParamsType) {
     console.log(eoa, contractAddress, options);
-    return await buildStrategyFromOptions(eoa[0],options.name,options.varaibles)
+    return await buildStrategyFromOptions(eoa[0],options.name,options.variable)
   }

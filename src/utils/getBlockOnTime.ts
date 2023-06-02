@@ -12,9 +12,7 @@ export default class BlockExplorer {
     public firstBlock?:object|any
     public blockTime?:number|any
     constructor(chainId:number) {
-        // console.log(provider)
         this.provider = new ethers.providers.JsonRpcProvider(network[chainId].rpc)
-        // this.web3 = typeof web3.eth != 'undefined' ? web3 : { eth: web3 };
         this.checkedBlocks = {};
         this.savedBlocks = {};
         this.requests = 0;

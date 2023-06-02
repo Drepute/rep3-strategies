@@ -43,6 +43,7 @@ export const operationOnXNumberOfNft = async (
     operator:"==="|">="|"<="|"<"|">"
   }
 ) => {
+  console.log(holder,functionParams)
   const response = await nftGetterCall(
     functionParams.nftAddress,
     'balanceOf',

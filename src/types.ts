@@ -38,3 +38,4 @@ export type AdapterWithVariables = {
   }
 };
 export type AdapterNames = keyof AdapterWithVariables;
+

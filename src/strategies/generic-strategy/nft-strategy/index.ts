@@ -8,7 +8,7 @@ import { operationOnXNumberOfNft } from '../../../adapters/nft';
 const buildStrategyFromOptions = async <T extends AdapterNames>(
   eoa: string,
   adapterName: T,
-  variables: AdapterWithVariables[T]|any
+  variables: AdapterWithVariables["operationOnXNumberOfNft"]
 ):Promise<boolean> => {
   switch (adapterName) {
     case 'operationOnXNumberOfNft':
@@ -17,13 +17,14 @@ const buildStrategyFromOptions = async <T extends AdapterNames>(
       return false;
   }
 };
-export async function strategy({
+
+export async function genericStrategy({
   contractAddress,
   eoa,
   options,
 }: StrategyParamsType) {
   console.log(eoa, contractAddress, options);
-  return await buildStrategyFromOptions(eoa[0],options.name,options.varaibles)
+  return await buildStrategyFromOptions(eoa[0],options.name,options.variable)
 }
 
 
