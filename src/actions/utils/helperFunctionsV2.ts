@@ -21,7 +21,7 @@ export const createOrUpdateBadgeV2 = async (
     );
     console.log('Tier NFT', tierDetailsForEOA);
     if (tierDetailsForEOA) {
-      if (tierDetailsForEOA.tier === upgradeTier?.toString()) {
+      if (tierDetailsForEOA.tier === upgradeTier) {
         return {
           params: { ...tierDetailsForEOA, upgradeTier },
           action: false,

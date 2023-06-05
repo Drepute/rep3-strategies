@@ -7,11 +7,24 @@ import fetch from 'cross-fetch';
 
 const getAllPaginatedMembers = async (
   url: string,
-  contractAddress:string,
+  contractAddress: string,
   lastTokenId: number,
   page = 0,
   allMembers: any[] = []
 ) => {
+  console.log({
+    membershipNFTs: {
+      __args: {
+        where: {
+          contractAddress,
+          tokenID_gt: lastTokenId,
+        },
+        first: 1000,
+      },
+      claimer: true,
+      id: true,
+    },
+  });
   const stakers = await subgraph.subgraphRequest(url, {
     membershipNFTs: {
       __args: {
@@ -21,8 +34,9 @@ const getAllPaginatedMembers = async (
         },
         first: 1000,
       },
-      claimer:true,
-      id:true
+      claimer: true,
+      id: true,
+      tokenID: true,
     },
   });
   const all = allMembers.concat(stakers.membershipNFTs);
@@ -43,24 +57,24 @@ const getAllPaginatedMembers = async (
 
 const getAllMembers = async (
   url: string,
-  contractAddress:string,
+  contractAddress: string,
   page = 0,
-  allMembers: any[] = [],
+  allMembers: any[] = []
 ) => {
   if (page < 1) {
     const stakers = await subgraph.subgraphRequest(url, {
       membershipNFTs: {
         __args: {
-          where:{
-            contractAddress
+          where: {
+            contractAddress,
           },
           orderBy: 'tokenID',
           orderDirection: 'asc',
           skip: page * 100,
         },
-        claimer:true,
-        id:true,
-        tokenID:true
+        claimer: true,
+        id: true,
+        tokenID: true,
       },
     });
     const all = allMembers.concat(stakers.membershipNFTs);
@@ -77,35 +91,45 @@ const getAllMembers = async (
       return all;
     }
   } else {
+    console.log(allMembers[allMembers.length - 1].tokenID);
     return await getAllPaginatedMembers(
       url,
       contractAddress,
       allMembers[allMembers.length - 1].tokenID,
       page,
-      allMembers,
+      allMembers
     );
   }
 };
 
-const getCourseFinished = async(user:string,apiKey:string):Promise<any[]> => {
-  const response = await fetch(`https://academy.premia.blue/api/user?api_key=${apiKey}&account=${user}`)
-  const courses = await response.json()
-  console.log("number of courses", courses)
-  return courses.courses
-}
+const getCourseFinished = async (
+  user: string,
+  apiKey: string
+): Promise<any[]> => {
+  const response = await fetch(
+    `https://academy.premia.blue/api/user?api_key=${apiKey}&account=${user}`
+  );
+  const courses = await response.json();
+  console.log('number of courses', courses);
+  return courses.courses;
+};
 
-const getActionOnEOA = async (eoa: string, contractAddress: string,apiKey:string) => {
-  const coursesCount = await getCourseFinished(eoa,apiKey)
-  const tier = coursesCount.length>0?2:1
-  console.log(apiKey)
+const getActionOnEOA = async (
+  eoa: string,
+  contractAddress: string,
+  apiKey: string
+) => {
+  const coursesCount = await getCourseFinished(eoa, apiKey);
+  const tier = coursesCount.length > 0 ? 2 : 1;
+  console.log(apiKey);
   const actions = new ActionCallerV1(
     contractAddress,
     ActionOnType.membership,
     eoa,
     137,
     {
-      changingLevel:tier,
-      isVoucher:true
+      changingLevel: tier,
+      isVoucher: true,
     }
   );
   return await actions.calculateActionParams();
@@ -118,18 +142,21 @@ export async function strategy({
 }: StrategyParamsType) {
   console.log(eoa);
 
-  let targetAddress = await getAllMembers(network[options.network==="mainnet"?137:80001].subgraph,contractAddress)
-  targetAddress = targetAddress.map((x)=>x.claimer)
-  
+  let targetAddress = await getAllMembers(
+    network[options.network === 'mainnet' ? 137 : 80001].subgraph,
+    contractAddress
+  );
+  targetAddress = targetAddress.map(x => x.claimer);
+
   targetAddress = targetAddress.filter((c, index) => {
     return targetAddress.indexOf(c) === index;
   });
-  
-  console.log("all target",targetAddress)
-  
+
+  console.log('all target', targetAddress);
+
   const results = await Promise.all(
     targetAddress.map(async (x: string) => {
-      return await getActionOnEOA(x, contractAddress,options.apiKey);
+      return await getActionOnEOA(x, contractAddress, options.apiKey);
     })
   );
   return results;

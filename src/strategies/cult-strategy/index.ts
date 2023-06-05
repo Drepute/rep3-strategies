@@ -96,7 +96,7 @@ const calculateLevelBasedOnProposals = (proposals: number) => {
 };
 const getAllPaginatedMembers = async (
   url: string,
-  contractAddress:string,
+  contractAddress: string,
   lastTokenId: number,
   page = 0,
   allMembers: any[] = []
@@ -110,9 +110,9 @@ const getAllPaginatedMembers = async (
         },
         first: 1000,
       },
-      claimer:true,
-        id:true,
-        tokenID:true
+      claimer: true,
+      id: true,
+      tokenID: true,
     },
   });
   const all = allMembers.concat(stakers.membershipNFTs);
@@ -133,24 +133,24 @@ const getAllPaginatedMembers = async (
 
 const getAllMembers = async (
   url: string,
-  contractAddress:string,
+  contractAddress: string,
   page = 0,
-  allMembers: any[] = [],
+  allMembers: any[] = []
 ) => {
   if (page < 1) {
     const stakers = await subgraph.subgraphRequest(url, {
       membershipNFTs: {
         __args: {
-          where:{
-            contractAddress
+          where: {
+            contractAddress,
           },
           orderBy: 'tokenID',
           orderDirection: 'asc',
           skip: page * 100,
         },
-        claimer:true,
-        id:true,
-        tokenID:true
+        claimer: true,
+        id: true,
+        tokenID: true,
       },
     });
     const all = allMembers.concat(stakers.membershipNFTs);
@@ -172,7 +172,7 @@ const getAllMembers = async (
       contractAddress,
       allMembers[allMembers.length - 1].tokenID,
       page,
-      allMembers,
+      allMembers
     );
   }
 };
@@ -204,41 +204,12 @@ const getAllProposals = async (
 
   if (proposals.proposals.length === 100) {
     page = page + 1;
-    const res: any[] = await getAllProposals(url,blockNumber, page,all);
+    const res: any[] = await getAllProposals(url, blockNumber, page, all);
     return res;
   } else {
     return all;
   }
 };
-
-// const getAllVoters = async (
-//   url: string,
-//   blockNumber: number,
-//   page = 0,
-//   allVoters: any[] = []
-// ) => {
-//   console.log(blockNumber);
-//   const voters = await subgraph.subgraphRequest(url, {
-//     voters: {
-//       __args: {
-//         orderBy: 'id',
-//         orderDirection: 'asc',
-//         skip: page * 100,
-//       },
-//       id: true,
-//     },
-//   });
-//   const all = allVoters.concat(voters.voters);
-
-//   if (voters.voters.length === 100) {
-//     page = page + 1;
-//     const res: any[] = await getAllVoters(url, 16734071, page, all);
-    
-//     return res;
-//   } else {
-//     return all.map((x: { id: string }) => x.id);
-//   }
-// };
 
 const getActionOnEOA = async (
   eoa: string,
@@ -327,8 +298,6 @@ const getActionOnEOA = async (
       proposals = calculateLevelBasedOnProposals(proposalStreak);
     }
 
-    
-
     const actions = new ActionCallerV1(
       contractAddress,
       ActionOnType.membership,
@@ -336,7 +305,7 @@ const getActionOnEOA = async (
       1,
       {
         changingLevel: 8 * months + proposals - 8,
-        isVoucher:false
+        isVoucher: false,
       }
     );
     return await actions.calculateActionParams();
@@ -351,7 +320,7 @@ const getActionOnEOA = async (
       1,
       {
         changingLevel: 0,
-        isVoucher:false
+        isVoucher: false,
       }
     );
     return await actions.calculateActionParams();
@@ -394,12 +363,15 @@ export async function strategy({
       options.event.event === 'ProposalExecuted' ||
       options.event.event === 'ProposalCanceled'
     ) {
-      targetAddress = await getAllMembers(network[networks==="mainnet"?137:80001].subgraph,contractAddress);
-      targetAddress = targetAddress.map((x:any)=>x.claimer.toLowerCase())
+      targetAddress = await getAllMembers(
+        network[networks === 'mainnet' ? 137 : 80001].subgraph,
+        contractAddress
+      );
+      targetAddress = targetAddress.map((x: any) => x.claimer.toLowerCase());
       targetAddress = targetAddress.filter((c, index) => {
         return targetAddress.indexOf(c) === index;
       });
-      console.log(targetAddress)
+      console.log(targetAddress);
     } else if (
       options.event.event === 'VoteCast' ||
       options.event.event === 'Withdraw' ||
@@ -420,7 +392,9 @@ export async function strategy({
         );
       })
     );
-    return results;
+    return targetAddress.length > 1
+      ? results.filter((x: any) => x.action === false)
+      : results;
   } else {
     return eoa.map((x: string) => {
       return { eao: x, action: false };

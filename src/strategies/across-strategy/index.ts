@@ -9,19 +9,21 @@ const getAllPaginatedStakers = async (
   lastId: string,
   page = 0,
   allStakers: any[] = [],
-  holder:string|false
+  holder: string | false
 ) => {
   const stakers = await subgraph.subgraphRequest(url, {
     userInfos: {
       __args: {
-        where: holder?{
-          token: tokensId,
-          id_gt: lastId,
-          address:holder
-        }:{
-          token: tokensId,
-          id_gt: lastId,
-        },
+        where: holder
+          ? {
+              token: tokensId,
+              id_gt: lastId,
+              address: holder,
+            }
+          : {
+              token: tokensId,
+              id_gt: lastId,
+            },
         first: 1000,
       },
       id: true,
@@ -39,7 +41,8 @@ const getAllPaginatedStakers = async (
       tokensId,
       all[all.length - 1].id,
       page,
-      all,holder
+      all,
+      holder
     );
     return res;
   } else {
@@ -52,18 +55,20 @@ const getAllStakers = async (
   tokensId: any,
   page = 0,
   allStakers: any[] = [],
-  holder:string|false
+  holder: string | false
 ) => {
   if (page < 1) {
     const stakers = await subgraph.subgraphRequest(url, {
       userInfos: {
         __args: {
-          where:holder?{
-            token: tokensId,
-            address:holder
-          }:{
-            token: tokensId,
-          },
+          where: holder
+            ? {
+                token: tokensId,
+                address: holder,
+              }
+            : {
+                token: tokensId,
+              },
           orderBy: 'blockTimestamp',
           orderDirection: 'asc',
           skip: page * 100,
@@ -153,9 +158,7 @@ function timeDifference(date1: number, date2: number) {
   return (difference * 1000) / 86400000;
 }
 
-const calculateMonthsOnStaking = (
-  startTime: number
-) => {
+const calculateMonthsOnStaking = (startTime: number) => {
   return Math.floor(timeDifference(getTimestampInSeconds(), startTime));
 };
 // weth
@@ -163,12 +166,10 @@ const calculateMonthsOnStaking = (
 // usd-coin
 // dai
 const calculateAmount = (holderInfo: any[], poolInfo: any[]) => {
-  
   const allUsdAmount = holderInfo.map(x => {
-    
     return (
-      poolInfo.filter(y => y.addr.toLowerCase() === x.token.id.toLowerCase())[0].usdAmount*
-      x.cumulativeBalance
+      poolInfo.filter(y => y.addr.toLowerCase() === x.token.id.toLowerCase())[0]
+        .usdAmount * x.cumulativeBalance
     );
   });
   // console.log("usd amounts",allUsdAmount.reduce((partialSum, a) => partialSum + a, 0))
@@ -195,7 +196,7 @@ const calculateTiers = (holderInfo: any[], poolInfo: any[]) => {
       tier = tier * 2;
     }
     const amount = calculateAmount(holderInfo, poolInfo);
-    
+
     if (amount * 10e-18 < 500) {
       tier = tier * 1;
     } else if (amount * 10e-18 >= 500 && amount * 10e-18 <= 1500) {
@@ -205,8 +206,8 @@ const calculateTiers = (holderInfo: any[], poolInfo: any[]) => {
     } else if (amount * 10e-18 > 5000) {
       tier = tier * 4;
     }
-    
-    return {tier};
+
+    return { tier };
   } else {
     return tier;
   }
@@ -262,54 +263,54 @@ export async function strategy({
       }
     });
     const poolInfoWithUsd = await Promise.all(promisesTokenUSDPrice);
-    const promises = tokens.filter(x=>x.id!=="0xc2fab88f215f62244d2e32c8a65e8f58da8415a5").map(async (x: any) => {
-      try {
-        const stakersList = await getAllStakers(
-          SUBGRAPH_URLS.staking,
-          x.id,
-          0,
-          [],
-          eoa.length>0?eoa[0]:false
-        );
-        stakers = stakers.concat(stakersList);
-        
-      } catch (error) {
-        console.log('error', error);
-      }
-    });
+    const promises = tokens
+      .filter(x => x.id !== '0xc2fab88f215f62244d2e32c8a65e8f58da8415a5')
+      .map(async (x: any) => {
+        try {
+          const stakersList = await getAllStakers(
+            SUBGRAPH_URLS.staking,
+            x.id,
+            0,
+            [],
+            eoa.length > 0 ? eoa[0] : false
+          );
+          stakers = stakers.concat(stakersList);
+        } catch (error) {
+          console.log('error', error);
+        }
+      });
     await Promise.all(promises);
-    console.log("stakersss",stakers)
     let stakerListAddress = stakers.map(x => x.address);
-    if(stakerListAddress.length>0){
-    stakerListAddress = stakerListAddress.filter(
-      (c, index) => stakerListAddress.indexOf(c) === index
-    );
-    const tierClaimerList:any[] = stakerListAddress.map(x => {
-      const tier = calculateTiers(
-        stakers.filter(y => y.address === x),
-        poolInfoWithUsd
+    if (stakerListAddress.length > 0) {
+      stakerListAddress = stakerListAddress.filter(
+        (c, index) => stakerListAddress.indexOf(c) === index
       );
-      return {tier,claimer:x}
-    });
-    const results = await Promise.all(
-      tierClaimerList.map(async (x: any) => {
-        const actions = new ActionCallerV2(
-          contractAddress,
-          ActionOnTypeV2.badge,
-          x.claimer,
-          options.network === 'mainnet' ? 137 : 80001,
-          {
-            changingLevel: x.tier,
-          }
+      const tierClaimerList: any[] = stakerListAddress.map(x => {
+        const tier = calculateTiers(
+          stakers.filter(y => y.address === x),
+          poolInfoWithUsd
         );
-        return await actions.calculateActionParams();
-      })
-    );
-    return results
-    }else{
-      return [{action:false,eoa,params:{}}]
+        return { tier, claimer: x };
+      });
+      const results = await Promise.all(
+        tierClaimerList.map(async (x: any) => {
+          const actions = new ActionCallerV2(
+            contractAddress,
+            ActionOnTypeV2.badge,
+            x.claimer,
+            options.network === 'mainnet' ? 137 : 80001,
+            {
+              changingLevel: x.tier,
+            }
+          );
+          return await actions.calculateActionParams();
+        })
+      );
+      return results;
+    } else {
+      return [{ action: false, eoa, params: {} }];
     }
-  }else{
-    return [{action:false,eoa:eoa[0],params:{}}]
+  } else {
+    return [{ action: false, eoa: eoa[0], params: {} }];
   }
 }
