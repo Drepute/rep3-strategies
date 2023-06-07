@@ -35,7 +35,7 @@ export default class ActionCallerV2 {
             this.contractAddress,
             this.eoa,
             this.network,
-            this?.membershipOptions?.changingLevel
+            this?.membershipOptions?.changingLevel?.tier
           );
         } catch (error) {
           return error;

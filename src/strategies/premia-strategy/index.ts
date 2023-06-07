@@ -62,7 +62,7 @@ const getAllMembers = async (
   allMembers: any[] = []
 ) => {
   if (page < 1) {
-    const stakers = await subgraph.subgraphRequest(url, {
+    const claimer = await subgraph.subgraphRequest(url, {
       membershipNFTs: {
         __args: {
           where: {
@@ -77,8 +77,8 @@ const getAllMembers = async (
         tokenID: true,
       },
     });
-    const all = allMembers.concat(stakers.membershipNFTs);
-    if (stakers.membershipNFTs.length === 100) {
+    const all = allMembers.concat(claimer.membershipNFTs);
+    if (claimer.membershipNFTs.length === 100) {
       page = page + 1;
       const res: any[] | undefined = await getAllMembers(
         url,

@@ -19,11 +19,11 @@ export const createOrUpdateBadgeV2 = async (
       eoa,
       networkId
     );
-    console.log('Tier NFT', tierDetailsForEOA);
+    console.log('Tier NFT', tierDetailsForEOA, upgradeTier);
     if (tierDetailsForEOA) {
       if (tierDetailsForEOA.tier === upgradeTier) {
         return {
-          params: { ...tierDetailsForEOA, upgradeTier },
+          params: { ...tierDetailsForEOA, upgradeTier: { tier: upgradeTier } },
           action: false,
           eoa,
         };
@@ -31,7 +31,7 @@ export const createOrUpdateBadgeV2 = async (
         return {
           params: {
             ...tierDetailsForEOA,
-            upgradeTier,
+            upgradeTier: { tier: upgradeTier },
           },
           action: MembershipActionsV2.updateTier,
           eoa,
@@ -41,7 +41,7 @@ export const createOrUpdateBadgeV2 = async (
       return {
         params: {
           ...tierDetailsForEOA,
-          upgradeTier,
+          upgradeTier: { tier: upgradeTier },
         },
         action: MembershipActionsV2.badgeMint,
         eoa,
