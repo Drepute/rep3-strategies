@@ -39,16 +39,22 @@ async function multipleCallStrategy<T extends AdapterNames>(
       eoa: [string];
       options: { name: T; variable: AdapterWithVariables[T]; tier: number };
     }) => {
-      const res: boolean = await multipleStrategies[x.strategy].genericStrategy({
-        contractAddress: x.contractAddress,
-        eoa: x.eoa,
-        options: x.options,
-      });
-      return {executionResult:res,tier:x.options.tier,strategy:x.strategy}; //{boolean,tier,strategy,currentParams}
+      const res: boolean = await multipleStrategies[x.strategy].genericStrategy(
+        {
+          contractAddress: x.contractAddress,
+          eoa: x.eoa,
+          options: x.options,
+        }
+      );
+      return {
+        executionResult: res,
+        tier: x.options.tier,
+        strategy: x.strategy,
+      }; //{boolean,tier,strategy,currentParams}
     }
   );
   const results = await Promise.all(promiseResults);
-  console.log('results.......', results);
+  //console.log('results.......', results);
 }
 
 export const { subgraph } = utils;

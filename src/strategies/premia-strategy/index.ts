@@ -12,19 +12,6 @@ const getAllPaginatedMembers = async (
   page = 0,
   allMembers: any[] = []
 ) => {
-  console.log({
-    membershipNFTs: {
-      __args: {
-        where: {
-          contractAddress,
-          tokenID_gt: lastTokenId,
-        },
-        first: 1000,
-      },
-      claimer: true,
-      id: true,
-    },
-  });
   const stakers = await subgraph.subgraphRequest(url, {
     membershipNFTs: {
       __args: {
@@ -91,7 +78,7 @@ const getAllMembers = async (
       return all;
     }
   } else {
-    console.log(allMembers[allMembers.length - 1].tokenID);
+    //console.log(allMembers[allMembers.length - 1].tokenID);
     return await getAllPaginatedMembers(
       url,
       contractAddress,
@@ -102,7 +89,7 @@ const getAllMembers = async (
   }
 };
 
-const getCourseFinished = async (
+export const getCourseFinished = async (
   user: string,
   apiKey: string
 ): Promise<any[]> => {
@@ -110,8 +97,12 @@ const getCourseFinished = async (
     `https://academy.premia.blue/api/user?api_key=${apiKey}&account=${user}`
   );
   const courses = await response.json();
-  console.log('number of courses', courses);
-  return courses.courses;
+  if (courses.courses.length > 0) {
+    const res = courses.courses.map((x: string) => parseInt(x[0]));
+    return res;
+  } else {
+    return courses.courses;
+  }
 };
 
 const getActionOnEOA = async (
@@ -127,7 +118,7 @@ const getActionOnEOA = async (
     eoa,
     137,
     {
-      changingLevel: tier,
+      changingLevel: tier + 1,
       isVoucher: true,
     }
   );
@@ -139,7 +130,7 @@ export async function strategy({
   eoa,
   options,
 }: StrategyParamsType) {
-  console.log(eoa);
+  //console.log(eoa);
 
   let targetAddress = await getAllMembers(
     network[options.network === 'mainnet' ? 137 : 80001].subgraph,
@@ -151,7 +142,7 @@ export async function strategy({
     return targetAddress.indexOf(c) === index;
   });
 
-  console.log('all target', targetAddress);
+  //console.log('all target', targetAddress);
 
   const results = await Promise.all(
     targetAddress.map(async (x: string) => {

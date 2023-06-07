@@ -371,7 +371,7 @@ export async function strategy({
       targetAddress = targetAddress.filter((c, index) => {
         return targetAddress.indexOf(c) === index;
       });
-      console.log(targetAddress);
+      //console.log(targetAddress);
     } else if (
       options.event.event === 'VoteCast' ||
       options.event.event === 'Withdraw' ||

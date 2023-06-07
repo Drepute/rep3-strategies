@@ -4,7 +4,7 @@ import { StrategyParamsType } from '../../types';
 import { getAllAssociationBadges } from '../../utils/rep3';
 
 const getInfoOnMonth = (months: number) => {
-  console.log('current month', months);
+  //console.log('current month', months);
   switch (months >= 0) {
     case months === 0:
       return { startDate: `1/${months}/24`, endDate: `31/${months}/24` };
@@ -36,7 +36,7 @@ const getInfoOnMonth = (months: number) => {
 };
 
 const calculateTier = (contriNumber: number) => {
-  console.log('badges', contriNumber);
+  //console.log('badges', contriNumber);
   if (contriNumber === 0) {
     return 1;
   } else if (contriNumber >= 4) {
@@ -67,7 +67,7 @@ const getAllExpiredAssociationBadges = async (
       endDate[1] - 1,
       endDate[0]
     );
-    console.log('info month', startTimestamp.getTime(), endTimestamp);
+    //console.log('info month', startTimestamp.getTime(), endTimestamp);
     const responseData = await getAllAssociationBadges(
       subgraphUrls,
       contractAddress,
@@ -78,7 +78,7 @@ const getAllExpiredAssociationBadges = async (
     const badges: any[] = [];
     responseData.forEach((badge: any) => {
       if (badges.filter(x => x.claimer === badge.claimer).length === 0) {
-        console.log(
+        //console.log(
           'claimer',
           badge.claimer,
           calculateTier(
@@ -95,7 +95,7 @@ const getAllExpiredAssociationBadges = async (
     });
     return badges;
   } catch (error) {
-    console.log('error', error);
+    //console.log('error', error);
     return [];
   }
 };
@@ -105,7 +105,7 @@ export async function strategy({
   eoa,
   options,
 }: StrategyParamsType) {
-  console.log(eoa);
+  //console.log(eoa);
   const SUBGRAPH_URLS: any = {
     mainnet: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-matic',
     testnet: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-mumbai',
@@ -116,7 +116,7 @@ export async function strategy({
     contractAddress,
     options.type
   );
-  console.log('badge list', badgeList);
+  //console.log('badge list', badgeList);
 
   const results = await Promise.all(
     badgeList.map(async (x: any) => {

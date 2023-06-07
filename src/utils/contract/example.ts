@@ -17,7 +17,7 @@ import { abi } from './utils/abis/erc20Abi';
       'balanceOf',
       '0x565CBd65Cb3e65445AfD14169003A528C985e9C7'
     );
-    console.log(result);
+    //console.log(result);
     console.timeEnd('contract Call');
   } catch (error) {
     console.error(error);

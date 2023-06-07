@@ -23,6 +23,6 @@ export async function genericStrategy({
   eoa,
   options,
 }: StrategyParamsType) {
-  console.log(eoa, contractAddress, options);
+  //console.log(eoa, contractAddress, options);
   return await buildStrategyFromOptions(eoa[0], options.name, options.variable);
 }

@@ -22,8 +22,8 @@ function timeDifference(date1: number, date2: number) {
 }
 
 function isExpiredDate(date: string) {
-  console.log('expired time', Math.floor(new Date(date).getTime()));
-  console.log('current time', getTimestampInSeconds());
+  //console.log('expired time', Math.floor(new Date(date).getTime()));
+  //console.log('current time', getTimestampInSeconds());
   return Math.floor(new Date(date).getTime()) < getTimestampInSeconds();
 }
 
@@ -66,7 +66,7 @@ const getAllExpiringMembershipBadges = async (
 
     return expiredAddress;
   } catch (error) {
-    console.log('error', error);
+    //console.log('error', error);
     return [];
   }
 };
@@ -86,7 +86,7 @@ const getAllExpiredAssociationBadges = async (
     );
     const expiredbadges: any[] = [];
     responseData.forEach((badges: any) => {
-      console.log(
+      //console.log(
         'rep3 badges',
         responseData,
         Object.keys(config.data),
@@ -97,14 +97,14 @@ const getAllExpiredAssociationBadges = async (
         Object.keys(config.data).includes(badges.data) &&
         isExpiredDate(config.data[badges.data].expiry)
       ) {
-        console.log('dsjjsdsd', isExpiredDate(config.data[badges.data].expiry));
+        //console.log('dsjjsdsd', isExpiredDate(config.data[badges.data].expiry));
         expiredbadges.push(badges);
       }
     });
-    console.log('badge', expiredbadges);
+    //console.log('badge', expiredbadges);
     return expiredbadges;
   } catch (error) {
-    console.log('error', error);
+    //console.log('error', error);
     return [];
   }
 };
@@ -118,7 +118,7 @@ export async function strategy({
     137: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-matic',
     80001: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-mumbai',
   };
-  console.log('eoa', eoa);
+  //console.log('eoa', eoa);
   let badgeList: any[];
   if (options.type === 'associationBadge') {
     badgeList = await getAllExpiredAssociationBadges(

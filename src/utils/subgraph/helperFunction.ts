@@ -28,7 +28,7 @@ export const getRep3V2BadgeDetails = async (
     },
   };
   try {
-    console.log(URL)
+    //console.log(URL)
     const responseData = await subgraphRequest(URL, QUERY);
     if (responseData['questBadges'].length > 0) {
       return responseData['questBadges'][0];

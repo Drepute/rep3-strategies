@@ -19,7 +19,7 @@ export const createOrUpdateBadgeV2 = async (
       eoa,
       networkId
     );
-    console.log('Tier NFT', tierDetailsForEOA, upgradeTier);
+    //console.log('Tier NFT', tierDetailsForEOA, upgradeTier);
     if (tierDetailsForEOA) {
       if (tierDetailsForEOA.tier === upgradeTier) {
         return {

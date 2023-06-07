@@ -6,35 +6,37 @@ export const createOrUpdateMembership = async (
   eoa: string,
   networkId: number,
   upgradeTier: number | undefined,
-  isVoucher:true|false = false
+  isVoucher: true | false = false
 ) => {
-    const membershipDetailsForEOA = await getRep3MembershipDetails(
-      contractAddress,
-      eoa,
-      networkId
-    );
-    console.log('membership NFT', membershipDetailsForEOA);
-    if (membershipDetailsForEOA) {
-      if (membershipDetailsForEOA.level === upgradeTier?.toString()) {
-        return {
-          params: { ...membershipDetailsForEOA, upgradeTier },
-          action: false,
-          eoa,
-        };
-      } else {
-        return {
-          params: { ...membershipDetailsForEOA, upgradeTier },
-          action: MembershipActions.upgradeMembershipNFT,
-          eoa,
-        };
-      }
+  const membershipDetailsForEOA = await getRep3MembershipDetails(
+    contractAddress,
+    eoa,
+    networkId
+  );
+  //console.log('membership NFT', membershipDetailsForEOA);
+  if (membershipDetailsForEOA) {
+    if (membershipDetailsForEOA.level === upgradeTier?.toString()) {
+      return {
+        params: { ...membershipDetailsForEOA, upgradeTier },
+        action: false,
+        eoa,
+      };
     } else {
       return {
         params: { ...membershipDetailsForEOA, upgradeTier },
-        action:isVoucher?MembershipActions.issueMembership: MembershipActions.createMembershipVoucher,
+        action: MembershipActions.upgradeMembershipNFT,
         eoa,
       };
     }
+  } else {
+    return {
+      params: { ...membershipDetailsForEOA, upgradeTier },
+      action: isVoucher
+        ? MembershipActions.issueMembership
+        : MembershipActions.createMembershipVoucher,
+      eoa,
+    };
+  }
   // }
 };
 

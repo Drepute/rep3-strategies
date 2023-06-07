@@ -145,7 +145,7 @@ const getPriceOfToken = async (tokenSymbol: string) => {
     const data = await res.json();
     return data.data.price;
   } catch (error) {
-    console.log(error);
+    //console.log(error);
   }
 };
 
@@ -172,7 +172,6 @@ const calculateAmount = (holderInfo: any[], poolInfo: any[]) => {
         .usdAmount * x.cumulativeBalance
     );
   });
-  // console.log("usd amounts",allUsdAmount.reduce((partialSum, a) => partialSum + a, 0))
   return allUsdAmount.reduce((partialSum, a) => partialSum + a, 0);
 };
 
@@ -225,12 +224,12 @@ export async function strategy({
     },
     testnet: {
       staking:
-        'https://api.thegraph.com/subgraphs/name/eth-jashan/across-staking',
+        'https://api.thegraph.com/subgraphs/name/eth-jashan/across-staking-test',
     },
   };
   const network: 'mainnet' | 'testnet' = options.network;
   const SUBGRAPH_URLS = SUBGRAPH_LINKS[network];
-  console.log(contractAddress, eoa);
+  //console.log(contractAddress, eoa);
 
   const poolInfo = [
     {
@@ -259,7 +258,7 @@ export async function strategy({
         const usdPrice = await getPriceOfToken(x.name);
         return { ...x, usdAmount: usdPrice };
       } catch (error) {
-        console.log('error', error);
+        //console.log('error', error);
       }
     });
     const poolInfoWithUsd = await Promise.all(promisesTokenUSDPrice);
@@ -276,7 +275,7 @@ export async function strategy({
           );
           stakers = stakers.concat(stakersList);
         } catch (error) {
-          console.log('error', error);
+          //console.log('error', error);
         }
       });
     await Promise.all(promises);
