@@ -120,8 +120,7 @@ const getActionOnEOA = async (
   apiKey: string
 ) => {
   const coursesCount = await getCourseFinished(eoa, apiKey);
-  const tier = coursesCount.length > 0 ? 2 : 1;
-  console.log(apiKey);
+  const tier = coursesCount.length > 0 ? Math.max(...coursesCount) : 0;
   const actions = new ActionCallerV1(
     contractAddress,
     ActionOnType.membership,
