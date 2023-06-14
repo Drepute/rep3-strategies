@@ -97,12 +97,6 @@ export const getCourseFinished = async (
     `https://academy.premia.blue/api/user?api_key=${apiKey}&account=${user}`
   );
   const courses = await response.json();
-  console.log(
-    'courses',
-    courses.courses
-      .filter((x: string) => x !== 'tc-exam')
-      .map((x: string) => parseInt(x[0])),courses.courses.filter((x: string) => x === 'tc-exam')
-  );
   if (courses.courses.length > 0) {
     const res = courses.courses
       .filter((x: string) => x !== 'tc-exam')
