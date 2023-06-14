@@ -150,7 +150,7 @@ export async function strategy({
   });
   const results:any[] = []
   await Promise.all(
-    targetAddress.slice(0,100).map(async (x: string) => {
+    targetAddress.map(async (x: string) => {
       const res:any =  await getActionOnEOA(x, contractAddress,options.network, options.apiKey);
       results.push(res.category)
       results.push(res.returnObj)
