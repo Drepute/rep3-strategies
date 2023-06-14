@@ -19,7 +19,7 @@ export default class ActionCallerV1 {
     eoa: string,
     network: number,
     options:
-      | { changingLevel: number,isVoucher:true|false }
+      | { changingLevel: number; isVoucher: true | false }
       | { badgeType: number; actionType: BadgeActions }
       | { tokenId: number; badgeType: number; metadataUri: string }
   ) {
@@ -34,7 +34,7 @@ export default class ActionCallerV1 {
     }
   }
 
-  calculateActionParams = async () => {
+  calculateActionParams = async (category: number | boolean = false) => {
     switch (this.actionType) {
       case ActionOnType.membership:
         try {
@@ -43,7 +43,8 @@ export default class ActionCallerV1 {
             this.eoa,
             this.network,
             this?.membershipOptions?.changingLevel,
-            this?.membershipOptions?.isVoucher
+            this?.membershipOptions?.isVoucher,
+            category
           );
         } catch (error) {
           return error;

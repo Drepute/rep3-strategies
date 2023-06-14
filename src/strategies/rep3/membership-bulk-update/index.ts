@@ -46,7 +46,7 @@ export async function strategy({
     mainnet: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-matic',
     testnet: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-mumbai',
   };
-  //console.log('eoa', eoa);
+  console.log('eoa', eoa);
   const eoaList = await getIncludedMembership(
     SUBGRAPH_URLS[options.network],
     contractAddress,

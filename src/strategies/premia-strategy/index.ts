@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import ActionCallerV1 from '../../actions/v1';
 import { ActionOnType } from '../../actions/utils/type';
 import { StrategyParamsType } from '../../types';
@@ -78,7 +79,6 @@ const getAllMembers = async (
       return all;
     }
   } else {
-    //console.log(allMembers[allMembers.length - 1].tokenID);
     return await getAllPaginatedMembers(
       url,
       contractAddress,
@@ -92,37 +92,52 @@ const getAllMembers = async (
 export const getCourseFinished = async (
   user: string,
   apiKey: string
-): Promise<any[]> => {
+): Promise<{ tier: any[]; category: boolean | number }> => {
   const response = await fetch(
     `https://academy.premia.blue/api/user?api_key=${apiKey}&account=${user}`
   );
   const courses = await response.json();
+  console.log(
+    'courses',
+    courses.courses
+      .filter((x: string) => x !== 'tc-exam')
+      .map((x: string) => parseInt(x[0])),courses.courses.filter((x: string) => x === 'tc-exam')
+  );
   if (courses.courses.length > 0) {
-    const res = courses.courses.map((x: string) => parseInt(x[0]));
-    return res;
+    const res = courses.courses
+      .filter((x: string) => x !== 'tc-exam')
+      .map((x: string) => parseInt(x[0]));
+    return {
+      tier: res,
+      category:
+        courses.courses.filter((x: string) => x === 'tc-exam').length > 0
+          ? 1
+          : false,
+    };
   } else {
-    return courses.courses;
+    return {tier:courses.courses,category:false};
   }
 };
 
 const getActionOnEOA = async (
   eoa: string,
-  contractAddress: string,
+  contractAddress: string,network:string,
   apiKey: string
 ) => {
   const coursesCount = await getCourseFinished(eoa, apiKey);
-  const tier = coursesCount.length > 0 ? Math.max(...coursesCount) : 0;
+  const tier =
+    coursesCount.tier.length > 0 ? Math.max(...coursesCount.tier) : 0;
   const actions = new ActionCallerV1(
     contractAddress,
     ActionOnType.membership,
     eoa,
-    137,
+    network === 'mainnet' ? 137 : 80001,
     {
       changingLevel: tier + 1,
       isVoucher: true,
     }
   );
-  return await actions.calculateActionParams();
+  return await actions.calculateActionParams(coursesCount.category);
 };
 
 export async function strategy({
@@ -130,24 +145,23 @@ export async function strategy({
   eoa,
   options,
 }: StrategyParamsType) {
-  //console.log(eoa);
-
+  console.log(eoa);
   let targetAddress = await getAllMembers(
     network[options.network === 'mainnet' ? 137 : 80001].subgraph,
     contractAddress
   );
   targetAddress = targetAddress.map(x => x.claimer);
-
   targetAddress = targetAddress.filter((c, index) => {
     return targetAddress.indexOf(c) === index;
   });
-
-  //console.log('all target', targetAddress);
-
-  const results = await Promise.all(
-    targetAddress.map(async (x: string) => {
-      return await getActionOnEOA(x, contractAddress, options.apiKey);
+  const results:any[] = []
+  await Promise.all(
+    targetAddress.slice(0,100).map(async (x: string) => {
+      const res:any =  await getActionOnEOA(x, contractAddress,options.network, options.apiKey);
+      results.push(res.category)
+      results.push(res.returnObj)
     })
   );
-  return results;
+  const nonNullResult =  results.filter(x=>x!==null&&x!==undefined);
+  return nonNullResult.filter(x=>x.action !==false)
 }

@@ -86,13 +86,6 @@ const getAllExpiredAssociationBadges = async (
     );
     const expiredbadges: any[] = [];
     responseData.forEach((badges: any) => {
-      //console.log(
-        'rep3 badges',
-        responseData,
-        Object.keys(config.data),
-        badges.data,
-        config.data[badges.data]
-      );
       if (
         Object.keys(config.data).includes(badges.data) &&
         isExpiredDate(config.data[badges.data].expiry)
@@ -118,7 +111,7 @@ export async function strategy({
     137: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-matic',
     80001: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-mumbai',
   };
-  //console.log('eoa', eoa);
+  console.log('eoa', eoa);
   let badgeList: any[];
   if (options.type === 'associationBadge') {
     badgeList = await getAllExpiredAssociationBadges(

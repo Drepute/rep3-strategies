@@ -9,7 +9,6 @@ const tokenGetterCall = async (
   params: any[],
   chainId: number
 ) => {
-  //console.log(functionName, ...params);
   const provider = new ethers.providers.JsonRpcProvider(network[chainId].rpc);
   const tokenContract = new ethers.Contract(address, erc20Abi, provider);
   const res = await tokenContract[functionName](...params);
@@ -66,7 +65,7 @@ export const getBalanceOfTokenAtXTime = async (
 ) => {
   const blockExplorer = new BlockExplorer(functionParams.chainId);
   const toBlock = await blockExplorer.getDate(functionParams.timeStampInUnix);
-  //console.log(holder,toBlock)
+  console.log(holder, toBlock);
   const eventSignature = 'Transfer(address,address,uint256)';
   const eventTopic = ethers.utils.id(eventSignature); // Get the data hex string
   const provider = new ethers.providers.JsonRpcProvider(
@@ -78,5 +77,5 @@ export const getBalanceOfTokenAtXTime = async (
     toBlock: toBlock.block,
     fromBlock: 17328013,
   });
-  //console.log(allPastLogs)
+  console.log(allPastLogs);
 };

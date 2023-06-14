@@ -78,13 +78,6 @@ const getAllExpiredAssociationBadges = async (
     const badges: any[] = [];
     responseData.forEach((badge: any) => {
       if (badges.filter(x => x.claimer === badge.claimer).length === 0) {
-        //console.log(
-          'claimer',
-          badge.claimer,
-          calculateTier(
-            responseData.filter(x => x.claimer === badge.claimer).length
-          )
-        );
         badges.push({
           ...badge,
           tier: calculateTier(
@@ -105,7 +98,7 @@ export async function strategy({
   eoa,
   options,
 }: StrategyParamsType) {
-  //console.log(eoa);
+  console.log(eoa);
   const SUBGRAPH_URLS: any = {
     mainnet: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-matic',
     testnet: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-mumbai',
