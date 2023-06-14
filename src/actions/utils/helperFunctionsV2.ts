@@ -7,19 +7,19 @@ export const createOrUpdateBadgeV2 = async (
   networkId: number,
   upgradeTier: number | undefined
 ) => {
-  if (upgradeTier === 0) {
-    return {
-      params: {},
-      action: false,
-      eoa,
-    };
-  } else {
+  // if (upgradeTier === 0) {
+  //   return {
+  //     params: {},
+  //     action: false,
+  //     eoa,
+  //   };
+  // } else {
     const tierDetailsForEOA = await getRep3V2BadgeDetails(
       credentials,
       eoa,
       networkId
     );
-    //console.log('Tier NFT', tierDetailsForEOA, upgradeTier);
+    console.log('Tier NFT', tierDetailsForEOA, upgradeTier);
     if (tierDetailsForEOA) {
       if (tierDetailsForEOA.tier === upgradeTier) {
         return {
@@ -47,5 +47,5 @@ export const createOrUpdateBadgeV2 = async (
         eoa,
       };
     }
-  }
+  // }
 };

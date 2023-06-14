@@ -208,7 +208,7 @@ const calculateTiers = (holderInfo: any[], poolInfo: any[]) => {
 
     return { tier };
   } else {
-    return tier;
+    return {tier};
   }
 };
 
