@@ -4,6 +4,7 @@ export enum ActionOnType {
   badge = 'badge',
   expiry = 'expiry',
   updateUri = 'updateUri',
+  category='categoryLevel'
 }
 
 export enum MembershipActions {

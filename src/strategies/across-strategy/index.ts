@@ -208,7 +208,7 @@ const calculateTiers = (holderInfo: any[], poolInfo: any[]) => {
 
     return { tier };
   } else {
-    return {tier};
+    return { tier };
   }
 };
 
@@ -291,6 +291,7 @@ export async function strategy({
         );
         return { tier, claimer: x };
       });
+      console.log(tierClaimerList)
       const results = await Promise.all(
         tierClaimerList.map(async (x: any) => {
           const actions = new ActionCallerV2(

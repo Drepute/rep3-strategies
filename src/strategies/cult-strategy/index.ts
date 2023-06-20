@@ -217,44 +217,38 @@ const getActionOnEOA = async (
   contractAddress: string,
   blockNumber: number
 ) => {
-  const QUERY_PROPOSALS = {
-    voters: {
-      __args: {
-        where: {
-          id: eoa,
-        },
-      },
-      proposals: true,
-    },
-  };
-  const QUERY_STAKING = {
-    users: {
-      __args: {
-        where: {
-          id: eoa,
-        },
-      },
-      amount: true,
-      startTime: true,
-      endTime: true,
-    },
-  };
+  const QUERY_PROPOSALS = `
+      query Test($eoa:String){ 
+        voters(where: {id: $eoa}) {
+          proposals
+        }
+      }`;
 
-  const responseStakeData = await subgraph.subgraphRequest(
+  const QUERY_STAKING = `
+      query Test2($eoa:String){
+        users(where:{id:$eoa}){
+          amount
+          startTime
+          endTime
+        }
+      }`;
+  const responseStakeData: any = await subgraph.subgraphRequestWithClient(
     subgraphUrls['staking'],
-    QUERY_STAKING
+    QUERY_STAKING,
+    { eoa }
   );
-  const responseProposalData = await subgraph.subgraphRequest(
+  const responseProposalData: any = await subgraph.subgraphRequestWithClient(
     subgraphUrls['proposal'],
-    QUERY_PROPOSALS
+    QUERY_PROPOSALS,
+    { eoa }
   );
-
   let months: number, proposals: number;
   months = 1;
   proposals = 1;
+  console.log(eoa, responseStakeData, responseProposalData);
   if (
-    responseStakeData.users.length > 0 &&
-    responseStakeData.users[0].amount !== '0'
+    responseStakeData?.users.length > 0 &&
+    responseStakeData?.users[0].amount !== '0'
   ) {
     const monthsOfStaking = calculateLevelBasedOnMonths(
       responseStakeData.users[0].amount,
@@ -310,8 +304,8 @@ const getActionOnEOA = async (
     );
     return await actions.calculateActionParams();
   } else if (
-    responseStakeData.users.length > 0 &&
-    responseStakeData.users[0].amount === '0'
+    responseStakeData?.users.length > 0 &&
+    responseStakeData?.users[0].amount === '0'
   ) {
     const actions = new ActionCallerV1(
       contractAddress,
@@ -380,10 +374,10 @@ export async function strategy({
       targetAddress = [options.event.args[0].toLowerCase()];
     }
   }
-
   if (targetAddress.length > 0) {
     const results = await Promise.all(
-      targetAddress.map(async (x: string) => {
+      targetAddress.map(async (x: string, i: number) => {
+        console.log(i);
         return await getActionOnEOA(
           x,
           SUBGRAPH_URLS,
@@ -392,6 +386,7 @@ export async function strategy({
         );
       })
     );
+    console.log(results.filter((x: any) => x.action === false));
     return targetAddress.length > 1
       ? results.filter((x: any) => x.action === false)
       : results;

@@ -1,6 +1,7 @@
 import {
   createBadgeVoucherOrMint,
   createOrUpdateMembership,
+  createOrUpdateMembershipWithCategory,
   expireBadgeParam,
   updateMembershipUri,
 } from './utils/helperFunctionsV1';
@@ -11,7 +12,10 @@ export default class ActionCallerV1 {
   public actionType: ActionOnType;
   public eoa: string;
   public network: number;
-  public membershipOptions?: { changingLevel: number } | any;
+  public membershipOptions?:
+    | { changingLevel: number }
+    | { changingLevelCategory: { level: number; category: number }[] }
+    | any;
   public badgeOptions?: { badgeType: number; actionType: BadgeActions } | any;
   constructor(
     contractAddress: string,
@@ -22,19 +26,31 @@ export default class ActionCallerV1 {
       | { changingLevel: number; isVoucher: true | false }
       | { badgeType: number; actionType: BadgeActions }
       | { tokenId: number; badgeType: number; metadataUri: string }
+      | {
+          changingLevelCategory: {
+            level: number | boolean;
+            category: number | boolean;
+          }[];
+        }
   ) {
     this.contractAddress = contractAddress;
     this.actionType = actionType;
     this.eoa = eoa;
     this.network = network;
-    if (actionType === ActionOnType.membership) {
+    if (
+      actionType === ActionOnType.membership ||
+      ActionOnType.directMembership ||
+      ActionOnType.category
+    ) {
       this.membershipOptions = options;
-    } else {
+    } else if (actionType === ActionOnType.badge || ActionOnType.expiry) {
       this.badgeOptions = options;
+    } else if (actionType === ActionOnType.category) {
+      this.membershipOptions = options;
     }
   }
 
-  calculateActionParams = async (category: number | boolean = false) => {
+  calculateActionParams = async () => {
     switch (this.actionType) {
       case ActionOnType.membership:
         try {
@@ -43,8 +59,18 @@ export default class ActionCallerV1 {
             this.eoa,
             this.network,
             this?.membershipOptions?.changingLevel,
-            this?.membershipOptions?.isVoucher,
-            category
+            this?.membershipOptions?.isVoucher
+          );
+        } catch (error) {
+          return error;
+        }
+      case ActionOnType.category:
+        try {
+          return await createOrUpdateMembershipWithCategory(
+            this.contractAddress,
+            this.eoa,
+            this.network,
+            this.membershipOptions.changingLevelCategory
           );
         } catch (error) {
           return error;

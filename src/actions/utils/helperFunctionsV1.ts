@@ -1,4 +1,7 @@
-import { getRep3MembershipDetails, getRep3MembershipHistory } from '../../utils/subgraph/helperFunction';
+import {
+  getRep3MembershipDetails,
+  getRep3MembershipHistory,
+} from '../../utils/subgraph/helperFunction';
 import { BadgeActions, MembershipActions } from './type';
 
 export const createOrUpdateMembership = async (
@@ -6,83 +9,37 @@ export const createOrUpdateMembership = async (
   eoa: string,
   networkId: number,
   upgradeTier: number | undefined,
-  isVoucher: true | false = false,
-  category: boolean | number = false
+  isVoucher: true | false = false
 ) => {
-  let membershipDetailsForEOA
-  if(category){
-   membershipDetailsForEOA = await getRep3MembershipHistory(
+  const membershipDetailsForEOA = await getRep3MembershipDetails(
     contractAddress,
     eoa,
     networkId
-  )
-  if(membershipDetailsForEOA.length>0){
-    let returnObj
-    if (membershipDetailsForEOA.filter((x:any)=>x.category==="0")[0].level === upgradeTier?.toString()) {
-      returnObj =  {
-        params: { ...membershipDetailsForEOA.filter((x:any)=>x.category==="0")[0], upgradeTier },
+  );
+  if (membershipDetailsForEOA) {
+    if (membershipDetailsForEOA.level === upgradeTier?.toString()) {
+      return {
+        params: { ...membershipDetailsForEOA, upgradeTier },
         action: false,
         eoa,
       };
     } else {
-      returnObj =  {
-        params: { ...membershipDetailsForEOA.filter((x:any)=>x.category==="0")[0], upgradeTier },
+      return {
+        params: { ...membershipDetailsForEOA, upgradeTier },
         action: MembershipActions.upgradeMembershipNFT,
         eoa,
       };
     }
-    return {returnObj,category:membershipDetailsForEOA.filter((x:any)=>x.category === category.toString()).length>0?{
-      params: { category:1, upgradeTier:1 },
-      action: false,
-      eoa,
-    }:{
-      params: { category:1, upgradeTier:1 },
-      action: MembershipActions.issueMembership,
-      eoa,
-    }}
-  }else{
-    return{returnObj:{
+  } else {
+    return {
       params: { ...membershipDetailsForEOA, upgradeTier },
-      action: false,
+      action: isVoucher
+        ? MembershipActions.issueMembership
+        : MembershipActions.createMembershipVoucher,
       eoa,
-    },category:{
-      params: { ...membershipDetailsForEOA, upgradeTier },
-      action: false,
-      eoa,
-    }}
-  }
-  }else{
-    membershipDetailsForEOA = await getRep3MembershipDetails(
-      contractAddress,
-      eoa,
-      networkId
-    )
-    if (membershipDetailsForEOA) {
-      if (membershipDetailsForEOA.level === upgradeTier?.toString()) {
-        return {
-          params: { ...membershipDetailsForEOA, upgradeTier },
-          action: false,
-          eoa,
-        };
-      } else {
-        return {
-          params: { ...membershipDetailsForEOA, upgradeTier },
-          action: MembershipActions.upgradeMembershipNFT,
-          eoa,
-        };
-      }
-    } else {
-      return {
-        params: { ...membershipDetailsForEOA, upgradeTier },
-        action: isVoucher
-          ? MembershipActions.issueMembership
-          : MembershipActions.createMembershipVoucher,
-        eoa,
-      };
-    }
+    };
   }
 };
-
 export const createBadgeVoucherOrMint = async (
   contractAddress: string,
   eoa: string,
@@ -112,7 +69,6 @@ export const createBadgeVoucherOrMint = async (
     };
   }
 };
-
 export const expireBadgeParam = async (
   contractAddress: string,
   eoa: string,
@@ -138,7 +94,6 @@ export const expireBadgeParam = async (
     action: BadgeActions.burnBadge,
   };
 };
-
 export const updateMembershipUri = async (
   contractAddress: string,
   eoa: string,
@@ -155,7 +110,6 @@ export const updateMembershipUri = async (
     eoa,
   };
 };
-
 export const generateData = (
   levels: string | any[],
   categories: string | any[]
@@ -169,4 +123,48 @@ export const generateData = (
     levelCategoryArray.push(levelCategory);
   }
   return levelCategoryArray;
+};
+export const createOrUpdateMembershipWithCategory = async (
+  contractAddress: string,
+  eoa: string,
+  networkId: number,
+  upgradeLevelCategory: { level: number; category: number }[]
+) => {
+  if (upgradeLevelCategory.length > 0) {
+    const membershipDetailsForEOA = await getRep3MembershipHistory(
+      contractAddress,
+      eoa,
+      networkId
+    );
+    const latestMembership = upgradeLevelCategory.map(x => {
+      const latest = membershipDetailsForEOA.filter(
+        y => y.category === x.category.toString()
+      )[0];
+      if (latest) {
+        return {
+          params: { ...latest, upgradeTier: x.level },
+          action:
+            latest.level === x.level.toString()
+              ? MembershipActions.noChange
+              : MembershipActions.upgradeMembershipNFT,
+          eoa,
+        };
+      } else {
+        return {
+          params: { category: x.category, upgradeTier: x.level },
+          action: MembershipActions.issueMembership,
+          eoa,
+        };
+      }
+    });
+    return latestMembership;
+  } else {
+    return [
+      {
+        params: {},
+        action: false,
+        eoa,
+      },
+    ];
+  }
 };

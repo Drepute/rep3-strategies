@@ -1,5 +1,5 @@
 {
-  "version": "0.3.7-development",
+  "version": "0.3.8-development",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -48,6 +48,7 @@
     "typescript": "^4.9.3"
   },
   "dependencies": {
+    "@urql/core": "^4.0.10",
     "axios": "^1.4.0",
     "cross-fetch": "^3.1.5",
     "discord.js": "^14.11.0",

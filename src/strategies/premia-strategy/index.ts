@@ -6,6 +6,11 @@ import { subgraph } from '../../utils';
 import { network } from '../../utils/contract/network';
 import fetch from 'cross-fetch';
 
+const listOfCourses = {
+  '0': ['1.5-exam', '2.5-exam', '3.5-exam'],
+  '1': ['tc-exam'],
+};
+
 const getAllPaginatedMembers = async (
   url: string,
   contractAddress: string,
@@ -89,49 +94,62 @@ const getAllMembers = async (
   }
 };
 
+const getLevelCategory = (courses: any[], category: string) => {
+  let newArray = [courses, listOfCourses[category]];
+  newArray = newArray.reduce((x, y) => x.filter(z => y.includes(z)));
+  if (newArray.length > 0) {
+    if (category === '0') {
+      newArray = newArray.map((x: any) => parseInt(x[0]) + 1);
+      return { level: Math.max(...newArray), category: 0 };
+    } else if (category === '1') {
+      return { level: 1, category: 1 };
+    } else {
+      return { level: false, category: false };
+    }
+  } else {
+    return { level: false, category: false };
+  }
+};
+
 export const getCourseFinished = async (
   user: string,
   apiKey: string
-): Promise<{ tier: any[]; category: boolean | number }> => {
-  const response = await fetch(
-    `https://academy.premia.blue/api/user?api_key=${apiKey}&account=${user}`
-  );
-  const courses = await response.json();
-  if (courses.courses.length > 0) {
-    const res = courses.courses
-      .filter((x: string) => x !== 'tc-exam')
-      .map((x: string) => parseInt(x[0]));
-    return {
-      tier: res,
-      category:
-        courses.courses.filter((x: string) => x === 'tc-exam').length > 0
-          ? 1
-          : false,
-    };
-  } else {
-    return {tier:courses.courses,category:false};
+): Promise<{ level: number | boolean; category: number | boolean }[]> => {
+  try {
+    const response = await fetch(
+      `https://academy.premia.blue/api/user?api_key=${apiKey}&account=${user}`
+    );
+    const courses = await response.json();
+    const categories = Object.keys(listOfCourses);
+    const levelCategory = categories.map(x =>
+      getLevelCategory(courses.courses, x)
+    );
+    return levelCategory;
+  } catch (error) {
+    return [{ level: false, category: false }];
   }
 };
 
 const getActionOnEOA = async (
   eoa: string,
-  contractAddress: string,network:string,
+  contractAddress: string,
+  network: string,
   apiKey: string
 ) => {
-  const coursesCount = await getCourseFinished(eoa, apiKey);
-  const tier =
-    coursesCount.tier.length > 0 ? Math.max(...coursesCount.tier) : 0;
+  let levelCategory = await getCourseFinished(eoa, apiKey);
+  levelCategory = levelCategory.filter(
+    x => x.level !== false && x.category !== false
+  );
   const actions = new ActionCallerV1(
     contractAddress,
-    ActionOnType.membership,
+    ActionOnType.category,
     eoa,
     network === 'mainnet' ? 137 : 80001,
     {
-      changingLevel: tier + 1,
-      isVoucher: true,
+      changingLevelCategory: levelCategory,
     }
   );
-  return await actions.calculateActionParams(coursesCount.category);
+  return await actions.calculateActionParams();
 };
 
 export async function strategy({
@@ -148,14 +166,20 @@ export async function strategy({
   targetAddress = targetAddress.filter((c, index) => {
     return targetAddress.indexOf(c) === index;
   });
-  const results:any[] = []
+  const results: any = [];
+  // let promise
   await Promise.all(
     targetAddress.map(async (x: string) => {
-      const res:any =  await getActionOnEOA(x, contractAddress,options.network, options.apiKey);
-      results.push(res.category)
-      results.push(res.returnObj)
+      const res: any = await getActionOnEOA(
+        x,
+        contractAddress,
+        options.network,
+        options.apiKey
+      );
+      res.forEach((x: any) => results.push(x));
     })
   );
-  const nonNullResult =  results.filter(x=>x!==null&&x!==undefined);
-  return nonNullResult.filter(x=>x.action !==false)
+  // console.log('results', results);
+  const nonNullResult = results.filter(x => x !== null && x !== undefined);
+  return nonNullResult.filter(x => x.action !== false);
 }
