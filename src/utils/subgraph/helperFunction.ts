@@ -81,6 +81,18 @@ export const getRep3MembershipHistory = async (
   networkId: number
 ) => {
   const URL = network[networkId].subgraph;
+  // const QUERY = `
+  //     query Test($claimer:String,contractAddress:String){ 
+  //       membershipNFTs(where:{claimer:$claimer,contractAddress:$contractAddress},orderBy:'time',orderDirection: 'desc') {
+  //         claimer
+  //         tokenID
+  //         level
+  //         category
+  //         contractAddress
+  //         time
+  //         metadataUri
+  //       }
+  //     }`;
   const QUERY = {
     membershipNFTs: {
       __args: {

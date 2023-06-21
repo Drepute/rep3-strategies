@@ -5,12 +5,27 @@ import { StrategyParamsType } from '../../types';
 import { subgraph } from '../../utils';
 import { network } from '../../utils/contract/network';
 import fetch from 'cross-fetch';
+import  { createClient } from 'redis';
 
 const listOfCourses = {
-  '0': ['1.5-exam', '2.5-exam', '3.5-exam'],
+  '0': ['1.5-exam', '2.5-exam', '3.5-exam', '4.5-exam', '5.5-exam'],
   '1': ['tc-exam'],
+  // '2': ['1.5-strat-exam', '2.5-strat-exam', '3.5-strat-exam'],
 };
+let redisClient;
+(async () => {
+  redisClient = createClient({
+    password: 'CW4xB0fi22GN6Enp8z6P4PUJt3cVRP30',
+    socket: {
+        host: 'redis-12292.c15.us-east-1-2.ec2.cloud.redislabs.com',
+        port: 12292
+    }
+});
 
+  redisClient.on("error", (error) => console.error(`Error : ${error}`));
+
+  await redisClient.connect();
+})();
 const getAllPaginatedMembers = async (
   url: string,
   contractAddress: string,
@@ -157,7 +172,13 @@ export async function strategy({
   eoa,
   options,
 }: StrategyParamsType) {
-  console.log(eoa);
+  console.log(contractAddress,
+    eoa,
+    options);
+    const pageNumber = parseInt(await redisClient.get("premia-strategy"));
+    const addressLimit = pageNumber!==0?pageNumber*100:100
+    console.log("number",pageNumber,addressLimit,pageNumber!==0?addressLimit-100:0,addressLimit)
+     await redisClient.set("premia-strategy",0);
   let targetAddress = await getAllMembers(
     network[options.network === 'mainnet' ? 137 : 80001].subgraph,
     contractAddress
@@ -169,7 +190,8 @@ export async function strategy({
   const results: any = [];
   // let promise
   await Promise.all(
-    targetAddress.map(async (x: string) => {
+    targetAddress.slice(pageNumber!==0?addressLimit-100:0,addressLimit).map(async (x: string,i:number) => {
+      console.log(i)
       const res: any = await getActionOnEOA(
         x,
         contractAddress,
@@ -179,7 +201,14 @@ export async function strategy({
       res.forEach((x: any) => results.push(x));
     })
   );
-  // console.log('results', results);
   const nonNullResult = results.filter(x => x !== null && x !== undefined);
-  return nonNullResult.filter(x => x.action !== false);
+  if(targetAddress.length<=addressLimit){
+    await redisClient.set("premia-strategy",0);
+  }else{
+    await redisClient.set("premia-strategy",pageNumber+1);
+  }
+  console.log("redis updated")
+  console.log(nonNullResult.filter(x => x.action !== false && x.action !== 'false').length,targetAddress.length)
+  return nonNullResult.filter(x => x.action !== false && x.action !== 'false');
+  // return results;
 }

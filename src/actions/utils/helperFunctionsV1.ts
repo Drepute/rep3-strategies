@@ -131,33 +131,66 @@ export const createOrUpdateMembershipWithCategory = async (
   upgradeLevelCategory: { level: number; category: number }[]
 ) => {
   if (upgradeLevelCategory.length > 0) {
-    const membershipDetailsForEOA = await getRep3MembershipHistory(
-      contractAddress,
-      eoa,
-      networkId
-    );
-    const latestMembership = upgradeLevelCategory.map(x => {
-      const latest = membershipDetailsForEOA.filter(
-        y => y.category === x.category.toString()
-      )[0];
-      if (latest) {
-        return {
-          params: { ...latest, upgradeTier: x.level },
-          action:
-            latest.level === x.level.toString()
-              ? MembershipActions.noChange
-              : MembershipActions.upgradeMembershipNFT,
-          eoa,
-        };
-      } else {
-        return {
-          params: { category: x.category, upgradeTier: x.level },
-          action: MembershipActions.issueMembership,
-          eoa,
-        };
-      }
-    });
-    return latestMembership;
+    try {
+      const membershipDetailsForEOA = await getRep3MembershipHistory(
+        contractAddress,
+        eoa,
+        networkId
+      );
+      const latestMembership = upgradeLevelCategory.map(x => {
+        const latest = membershipDetailsForEOA.filter(
+          y => y.category === x.category.toString()
+        )[0];
+        if (latest) {
+          return {
+            params: { ...latest, upgradeTier: x.level },
+            action:
+              latest.level === x.level.toString()
+                ? MembershipActions.noChange
+                : MembershipActions.upgradeMembershipNFT,
+            eoa,
+          };
+        } else {
+          return {
+            params: { category: x.category, upgradeTier: x.level },
+            action: MembershipActions.issueMembership,
+            eoa,
+          };
+        }
+      });
+      return latestMembership;
+    } catch (error) {
+      console.log("error",error)
+      return error
+      // const membershipDetailsForEOA = await getRep3MembershipHistory(
+      //   contractAddress,
+      //   eoa,
+      //   networkId
+      // );
+      // const latestMembership = upgradeLevelCategory.map(x => {
+      //   const latest = membershipDetailsForEOA.filter(
+      //     y => y.category === x.category.toString()
+      //   )[0];
+      //   if (latest) {
+      //     return {
+      //       params: { ...latest, upgradeTier: x.level },
+      //       action:
+      //         latest.level === x.level.toString()
+      //           ? MembershipActions.noChange
+      //           : MembershipActions.upgradeMembershipNFT,
+      //       eoa,
+      //     };
+      //   } else {
+      //     return {
+      //       params: { category: x.category, upgradeTier: x.level },
+      //       action: MembershipActions.issueMembership,
+      //       eoa,
+      //     };
+      //   }
+      // });
+      // return latestMembership;
+    }
+    
   } else {
     return [
       {
