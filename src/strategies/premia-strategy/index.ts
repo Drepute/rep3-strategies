@@ -10,7 +10,7 @@ import  { createClient } from 'redis';
 const listOfCourses = {
   '0': ['1.5-exam', '2.5-exam', '3.5-exam', '4.5-exam', '5.5-exam'],
   '1': ['tc-exam'],
-  // '2': ['1.5-strat-exam', '2.5-strat-exam', '3.5-strat-exam'],
+  '2': ['1.5-strat-exam', '2.5-strat-exam', '3.5-strat-exam'],
 };
 let redisClient;
 (async () => {
@@ -114,11 +114,18 @@ const getLevelCategory = (courses: any[], category: string) => {
   newArray = newArray.reduce((x, y) => x.filter(z => y.includes(z)));
   if (newArray.length > 0) {
     if (category === '0') {
+      console.log("categories 0",newArray)
       newArray = newArray.map((x: any) => parseInt(x[0]) + 1);
       return { level: Math.max(...newArray), category: 0 };
     } else if (category === '1') {
       return { level: 1, category: 1 };
-    } else {
+    }
+     else if (category === '2') {
+      console.log("categories 2",newArray)
+      newArray = newArray.map((x: any) => parseInt(x[0]) + 1);
+      return { level: Math.max(...newArray), category: 2 };
+    }
+    else {
       return { level: false, category: false };
     }
   } else {
@@ -136,8 +143,9 @@ export const getCourseFinished = async (
     );
     const courses = await response.json();
     const categories = Object.keys(listOfCourses);
-    const levelCategory = categories.map(x =>
-      getLevelCategory(courses.courses, x)
+    const levelCategory = categories.map(x =>{
+      console.log("categories",courses)
+      return getLevelCategory([ '1.5-exam', '2.5-exam', 'tc-exam', '1.5-strat-exam', '2.5-strat-exam'], x)}
     );
     return levelCategory;
   } catch (error) {
@@ -172,12 +180,12 @@ export async function strategy({
   eoa,
   options,
 }: StrategyParamsType) {
-  console.log(contractAddress,
+  console.log(
     eoa,
-    options);
+    );
     const pageNumber = parseInt(await redisClient.get("premia-strategy"));
-    const addressLimit = pageNumber!==0?pageNumber*100:100
-    console.log("number",pageNumber,addressLimit,pageNumber!==0?addressLimit-100:0,addressLimit)
+    const addressLimit = pageNumber!==0?pageNumber*50:50
+    // console.log("number",pageNumber,addressLimit,pageNumber!==0?addressLimit-50:0,addressLimit)
      await redisClient.set("premia-strategy",0);
   let targetAddress = await getAllMembers(
     network[options.network === 'mainnet' ? 137 : 80001].subgraph,
@@ -190,8 +198,7 @@ export async function strategy({
   const results: any = [];
   // let promise
   await Promise.all(
-    targetAddress.slice(pageNumber!==0?addressLimit-100:0,addressLimit).map(async (x: string,i:number) => {
-      console.log(i)
+    targetAddress.slice(pageNumber!==0?addressLimit-50:0,addressLimit).map(async (x: string) => {
       const res: any = await getActionOnEOA(
         x,
         contractAddress,
