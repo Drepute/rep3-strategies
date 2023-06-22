@@ -2,6 +2,7 @@ import ActionCallerV2 from '../../actions/v2';
 import { ActionOnTypeV2 } from '../../actions/utils/type';
 import { StrategyParamsType } from '../../types';
 import { subgraph } from '../../utils';
+import fetch from 'cross-fetch';
 
 const getAllPaginatedStakers = async (
   url: string,
@@ -187,6 +188,7 @@ const calculateTiers = (holderInfo: any[], poolInfo: any[]) => {
     )[0]?.cumulativeBalance !== '0'
   ) {
     tier = holderInfo.length;
+    console.log("tier stake type",tier)
     const acxInfo = holderInfo.filter(
       x => x.token.id === '0xb0c8fef534223b891d4a430e49537143829c4817'
     );
@@ -194,8 +196,8 @@ const calculateTiers = (holderInfo: any[], poolInfo: any[]) => {
     if (daysOfStaking > 100) {
       tier = tier * 2;
     }
+    console.log("days stake type",daysOfStaking,tier)
     const amount = calculateAmount(holderInfo, poolInfo);
-
     if (amount * 10e-18 < 500) {
       tier = tier * 1;
     } else if (amount * 10e-18 >= 500 && amount * 10e-18 <= 1500) {
@@ -205,7 +207,7 @@ const calculateTiers = (holderInfo: any[], poolInfo: any[]) => {
     } else if (amount * 10e-18 > 5000) {
       tier = tier * 4;
     }
-
+    console.log("amount stake type",amount,tier)
     return { tier };
   } else {
     return { tier };
