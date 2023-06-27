@@ -28,8 +28,8 @@ export default class ActionCallerV1 {
       | { tokenId: number; badgeType: number; metadataUri: string }
       | {
           changingLevelCategory: {
-            level: number | boolean;
-            category: number | boolean;
+            level: number | boolean | string;
+            category: number | boolean | string;
           }[];
         }
   ) {
