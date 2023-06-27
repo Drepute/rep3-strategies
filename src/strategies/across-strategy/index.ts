@@ -266,7 +266,6 @@ const geCurrentExchangeRate = async (tokenAddress:string) => {
   );
   const totalSupply = await lpToken.totalSupply()
   const numerator = (parseInt(pooledToken.liquidReserves.toString())+(parseInt(pooledToken.utilizedReserves.toString())-parseInt(pooledToken.undistributedLpFees.toString())))
-  console.log('resss======', (numerator/totalSupply))
   return numerator/totalSupply
   
 };

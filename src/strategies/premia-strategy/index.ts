@@ -114,6 +114,7 @@ const getLevelCategory = (courses: any[], category: string) => {
   newArray = newArray.reduce((x, y) => x.filter(z => y.includes(z)));
   if (newArray.length > 0) {
     if (category === '0') {
+      console.log("categories 0",newArray)
       newArray = newArray.map((x: any) => parseInt(x[0]) + 1);
       return { level: Math.max(...newArray), category: 0 };
     } else if (category === '1') {
@@ -125,7 +126,6 @@ const getLevelCategory = (courses: any[], category: string) => {
       return { level: false, category: false };
     }
   } else if (newArray.length === 0 && category === '0') {
-    // console.count("here")
     return { level: 1, category: 0 };
   } else {
     return { level: false, category: false };
@@ -210,7 +210,7 @@ export async function strategy({
   const results: any = [];
   await Promise.all(
     targetAddress
-      // .slice(pageNumber !== 0 ? addressLimit - 50 : 0, addressLimit)
+      .slice(pageNumber !== 0 ? addressLimit - 50 : 0, addressLimit)
       .map(async (x: string) => {
         const res: any = await getActionOnEOA(
           x,
