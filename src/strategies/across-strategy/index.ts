@@ -6,7 +6,6 @@ import fetch from 'cross-fetch';
 import { ethers } from 'ethers';
 import { network } from '../../network';
 
-
 const getAllPaginatedStakers = async (
   url: string,
   tokensId: any,
@@ -84,6 +83,7 @@ const getAllStakers = async (
         token: { id: true },
       },
     });
+    console.log(stakers);
     const all = allStakers.concat(stakers.userInfos);
     if (stakers.userInfos.length === 100) {
       page = page + 1;
@@ -110,34 +110,30 @@ const getAllStakers = async (
   }
 };
 
-const getAllTokenInfo = async (
-  url: string,
-  page = 0,
-  allTokens: any[] = []
-) => {
-  const stakers = await subgraph.subgraphRequest(url, {
-    stakedTokenInfos: {
-      __args: {
-        skip: page * 100,
-      },
-      id: true,
-      cumulativeStaked: true,
-    },
-  });
-  const all = allTokens.concat(stakers.stakedTokenInfos);
+// const getAllTokenInfo = async (
+//   url: string,
+//   page = 0,
+//   allTokens: any[] = []
+// ) => {
+//   const stakers = await subgraph.subgraphRequest(url, {
+//     stakedTokenInfos: {
+//       __args: {
+//         skip: page * 100,
+//       },
+//       id: true,
+//       cumulativeStaked: true,
+//     },
+//   });
+//   const all = allTokens.concat(stakers.stakedTokenInfos);
 
-  if (stakers.stakedTokenInfos.length === 100) {
-    page = page + 1;
-    const res: any[] | undefined = await getAllTokenInfo(
-      url,
-      page,
-      all
-    );
-    return res;
-  } else {
-    return all;
-  }
-};
+//   if (stakers.stakedTokenInfos.length === 100) {
+//     page = page + 1;
+//     const res: any[] | undefined = await getAllTokenInfo(url, page, all);
+//     return res;
+//   } else {
+//     return all;
+//   }
+// };
 
 const getPriceOfToken = async (tokenSymbol: string) => {
   try {
@@ -171,16 +167,23 @@ const calculateAmount = (holderInfo: any[], poolInfo: any[]) => {
   const allUsdAmount = holderInfo.map(x => {
     return (
       poolInfo.filter(y => y.addr.toLowerCase() === x.token.id.toLowerCase())[0]
-        .usdAmount * x.cumulativeBalance *poolInfo.filter(y => y.addr.toLowerCase() === x.token.id.toLowerCase())[0]
+        .usdAmount *
+      x.cumulativeBalance *
+      poolInfo.filter(y => y.addr.toLowerCase() === x.token.id.toLowerCase())[0]
         .exchangeRate
     );
   });
+  console.log(allUsdAmount);
   return allUsdAmount.reduce((partialSum, a) => partialSum + a, 0);
 };
 
 const calculateTiers = (holderInfo: any[], poolInfo: any[]) => {
   // Hold ACX Token
+
   let tier = 0;
+  let tokenTier = 0;
+  let volumeTier = 0;
+  let stakingTier = 1;
   if (
     holderInfo.filter(
       x => x.token.id === '0xb0c8fef534223b891d4a430e49537143829c4817'
@@ -190,32 +193,38 @@ const calculateTiers = (holderInfo: any[], poolInfo: any[]) => {
     )[0]?.cumulativeBalance !== '0'
   ) {
     tier = holderInfo.length;
-    console.log('tier stake type', tier);
+    tokenTier = holderInfo.length;
     const acxInfo = holderInfo.filter(
       x => x.token.id === '0xb0c8fef534223b891d4a430e49537143829c4817'
     );
     const daysOfStaking = calculateMonthsOnStaking(acxInfo[0]?.blockTimestamp);
     if (daysOfStaking > 100) {
       tier = tier * 2;
+      stakingTier = 2;
     }
-    console.log('days stake type', daysOfStaking, tier);
+
     const amount = calculateAmount(holderInfo, poolInfo);
+    console.log('amount', amount * 10e-18, holderInfo, poolInfo);
     if (amount * 10e-18 < 500) {
       tier = tier * 1;
+      volumeTier = 1;
     } else if (amount * 10e-18 >= 500 && amount * 10e-18 <= 1500) {
       tier = tier * 2;
+      volumeTier = 2;
     } else if (amount * 10e-18 > 1500 && amount * 10e-18 <= 5000) {
       tier = tier * 3;
+      volumeTier = 3;
     } else if (amount * 10e-18 > 5000) {
       tier = tier * 4;
+      volumeTier = 4;
     }
-    console.log('amount stake type', amount * 10e-18, tier);
-    return { tier };
+    return { mainTier: tier, volumeTier, tokenTier, stakingTier };
   } else {
-    return { tier };
+    console.log({ mainTier: tier, volumeTier, tokenTier, stakingTier });
+    return { mainTier: tier, volumeTier, tokenTier, stakingTier };
   }
 };
-const geCurrentExchangeRate = async (tokenAddress:string) => {
+const geCurrentExchangeRate = async (tokenAddress: string) => {
   const provider = new ethers.providers.JsonRpcProvider(network['1'].rpc);
   const hubpool = new ethers.Contract(
     '0xc186fA914353c44b2E33eBE05f21846F1048bEda',
@@ -241,33 +250,33 @@ const geCurrentExchangeRate = async (tokenAddress:string) => {
     ],
     provider
   );
-  const pooledToken = await hubpool.pooledTokens(
-    tokenAddress
-  );
+  const pooledToken = await hubpool.pooledTokens(tokenAddress);
   const lpToken = new ethers.Contract(
     pooledToken.lpToken,
     [
       {
-        "constant": true,
-        "inputs": [],
-        "name": "totalSupply",
-        "outputs": [
-            {
-                "name": "",
-                "type": "uint256"
-            }
+        constant: true,
+        inputs: [],
+        name: 'totalSupply',
+        outputs: [
+          {
+            name: '',
+            type: 'uint256',
+          },
         ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
+        payable: false,
+        stateMutability: 'view',
+        type: 'function',
       },
     ],
     provider
   );
-  const totalSupply = await lpToken.totalSupply()
-  const numerator = (parseInt(pooledToken.liquidReserves.toString())+(parseInt(pooledToken.utilizedReserves.toString())-parseInt(pooledToken.undistributedLpFees.toString())))
-  return numerator/totalSupply
-  
+  const totalSupply = await lpToken.totalSupply();
+  const numerator =
+    parseInt(pooledToken.liquidReserves.toString()) +
+    (parseInt(pooledToken.utilizedReserves.toString()) -
+      parseInt(pooledToken.undistributedLpFees.toString()));
+  return numerator / totalSupply;
 };
 export async function strategy({
   contractAddress,
@@ -291,43 +300,65 @@ export async function strategy({
     {
       addr: '0x59C1427c658E97a7d568541DaC780b2E5c8affb4',
       name: 'wrapped-bitcoin',
-      erc20Addr:"0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599"
+      erc20Addr: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
     },
-    { addr: '0x4FaBacAC8C41466117D6A38F46d08ddD4948A0cB', name: 'dai',erc20Addr:"0x6B175474E89094C44Da98b954EedeAC495271d0F" },
-    { addr: '0xC9b09405959f63F72725828b5d449488b02be1cA', name: 'usd-coin', erc20Addr:"0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" },
-    { addr: '0x28F77208728B0A45cAb24c4868334581Fe86F95B', name: 'weth',erc20Addr:"0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" },
+    {
+      addr: '0x4FaBacAC8C41466117D6A38F46d08ddD4948A0cB',
+      name: 'dai',
+      erc20Addr: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+    },
+    {
+      addr: '0xC9b09405959f63F72725828b5d449488b02be1cA',
+      name: 'usd-coin',
+      erc20Addr: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+    },
+    {
+      addr: '0x28F77208728B0A45cAb24c4868334581Fe86F95B',
+      name: 'weth',
+      erc20Addr: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+    },
     {
       addr: '0xb0C8fEf534223B891D4A430e49537143829c4817',
       name: 'across-protocol',
-      erc20Addr:"0x44108f0223A3C3028F5Fe7AEC7f9bb2E66beF82F"
+      erc20Addr: '0x44108f0223A3C3028F5Fe7AEC7f9bb2E66beF82F',
     },
   ];
 
-  const tokens = await getAllTokenInfo(
-    'https://api.thegraph.com/subgraphs/name/eth-jashan/across-staking',
-    0
-  );
+  // const tokens = await getAllTokenInfo(
+  //   'https://api.thegraph.com/subgraphs/name/eth-jashan/across-staking',
+  //   0
+  // );
 
-  if (tokens) {
-    let stakers: any[] = [];
+  if (poolInfo) {
+    let stakers: any[] = [
+      // {
+      //   id:
+      //     '0x17A18A1FF86Fc9B67C8536a4ba9d6CaBDCBe599D0xb0c8fef534223b891d4a430e49537143829c4817',
+      //   address: '0x17A18A1FF86Fc9B67C8536a4ba9d6CaBDCBe599D',
+      //   blockTimestamp: '1687522115',
+      //   token: {
+      //     id: '0xb0c8fef534223b891d4a430e49537143829c4817',
+      //   },
+      // },
+    ];
+
     const promisesTokenUSDPrice = poolInfo.map(async (x: any) => {
       try {
         const usdPrice = await getPriceOfToken(x.name);
         const exchangeRate = await geCurrentExchangeRate(x.erc20Addr);
-        return { ...x, usdAmount: usdPrice,exchangeRate };
+        return { ...x, usdAmount: usdPrice, exchangeRate };
       } catch (error) {
         //console.log('error', error);
       }
     });
-    
     const poolInfoWithUsd = await Promise.all(promisesTokenUSDPrice);
-    const promises = tokens
-      .filter(x => x.id !== '0xc2fab88f215f62244d2e32c8a65e8f58da8415a5')
+    const promises = poolInfo
+      .filter(x => x.addr !== '0xc2fab88f215f62244d2e32c8a65e8f58da8415a5')
       .map(async (x: any) => {
         try {
           const stakersList = await getAllStakers(
             SUBGRAPH_URLS.staking,
-            x.id,
+            x.addr,
             0,
             [],
             eoa.length > 0 ? eoa[0] : false
@@ -339,17 +370,19 @@ export async function strategy({
       });
     await Promise.all(promises);
     let stakerListAddress = stakers.map(x => x.address);
+    console.log('stake claim', stakerListAddress);
     if (stakerListAddress.length > 0) {
       stakerListAddress = stakerListAddress.filter(
         (c, index) => stakerListAddress.indexOf(c) === index
       );
       const tierClaimerList: any[] = stakerListAddress.map(x => {
-        const tier = calculateTiers(
+        const { mainTier, volumeTier, tokenTier, stakingTier } = calculateTiers(
           stakers.filter(y => y.address === x),
           poolInfoWithUsd
         );
-        return { tier, claimer: x };
+        return { mainTier, volumeTier, tokenTier, stakingTier, claimer: x };
       });
+      console.log('tier claim', tierClaimerList);
       const results = await Promise.all(
         tierClaimerList.map(async (x: any) => {
           const actions = new ActionCallerV2(
@@ -358,10 +391,15 @@ export async function strategy({
             x.claimer,
             options.network === 'mainnet' ? 137 : 80001,
             {
-              changingLevel: x.tier,
+              changingLevel: x.mainTier,
             }
           );
-          return await actions.calculateActionParams();
+          console.log(x.mainTier);
+          return await actions.calculateActionParams({
+            amount: x.volumeTier,
+            tokenStaked: x.tokenTier,
+            isDaysStaked: x.stakingTier,
+          });
         })
       );
       return results;
@@ -369,6 +407,7 @@ export async function strategy({
       return [{ action: false, eoa, params: {} }];
     }
   } else {
+    console.log('dsdf');
     return [{ action: false, eoa: eoa[0], params: {} }];
   }
 }

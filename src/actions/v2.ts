@@ -1,4 +1,4 @@
-import { createOrUpdateBadgeV2 } from './utils/helperFunctionsV2';
+import { createOrUpdateBadgeV2WithMetadata } from './utils/helperFunctionsV2';
 import { ActionOnTypeV2, BadgeActions } from './utils/type';
 
 export default class ActionCallerV2 {
@@ -27,15 +27,20 @@ export default class ActionCallerV2 {
     }
   }
 
-  calculateActionParams = async () => {
+  calculateActionParams = async (metaDataOptions: {
+    amount: number;
+    isDaysStaked: number;
+    tokenStaked: number;
+  }) => {
     switch (this.actionType) {
       case ActionOnTypeV2.badge:
         try {
-          return await createOrUpdateBadgeV2(
+          return await createOrUpdateBadgeV2WithMetadata(
             this.contractAddress,
             this.eoa,
             this.network,
-            this?.membershipOptions?.changingLevel?.tier
+            this?.membershipOptions?.changingLevel,
+            metaDataOptions
           );
         } catch (error) {
           return error;
