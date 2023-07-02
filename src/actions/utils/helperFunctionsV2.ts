@@ -18,9 +18,9 @@ export const createOrUpdateBadgeV2WithMetadata = async (
     mediaChange: false,
     metaChange: false,
     metaInfo: {
-      amount: metaInfo.amount,
-      isDaysStaked: metaInfo.isDaysStaked,
-      tokenStaked: metaInfo.tokenStaked,
+      volumeTier: metaInfo.amount,
+      daysTier: metaInfo.isDaysStaked,
+      tokenTier: metaInfo.tokenStaked,
       mediaUri: '',
     },
   };
@@ -29,8 +29,6 @@ export const createOrUpdateBadgeV2WithMetadata = async (
     const metadata = await fetch(
       `https://arweave.net/${tierDetailsForEOA.metadataUri}`
     );
-    // `https://arweave.net/4aAga5ETjjBr8rDaZ0Vz271etFafFSGLexpZAjY1dEg`
-    // `https://arweave.net/${tierDetailsForEOA.metadataUri}`;
     const response = await metadata.json();
     console.log(
       'tier detail',
@@ -44,21 +42,20 @@ export const createOrUpdateBadgeV2WithMetadata = async (
         if (metaInfo.amount !== parseInt(element.value)) {
           metaData.mediaChange = true;
           metaData.metaChange = true;
-          metaData.metaInfo.amount = metaInfo.amount;
+          metaData.metaInfo.volumeTier = metaInfo.amount;
         }
       }
-      if (element.trait_type === 'Days Staked') {
-        console.log(element);
+      else if (element.trait_type === 'Days Staked') {
         if (metaInfo.isDaysStaked !== parseInt(element.value)) {
           metaData.mediaChange = true;
           metaData.metaChange = true;
-          metaData.metaInfo.isDaysStaked = metaInfo.isDaysStaked;
+          metaData.metaInfo.daysTier = metaInfo.isDaysStaked;
         }
       }
-      if (element.trait_type === 'Tokens Staked') {
-        console.log(element);
+      else if (element.trait_type === 'Tokens Staked') {
+      
         if (metaInfo.tokenStaked !== parseInt(element.value)) {
-          metaData.metaInfo.tokenStaked = metaInfo.tokenStaked;
+          metaData.metaInfo.tokenTier = metaInfo.tokenStaked;
           metaData.metaChange = true;
         }
       }
@@ -82,15 +79,20 @@ export const createOrUpdateBadgeV2WithMetadata = async (
       };
     }
   } else {
+    metaData.mediaChange = true
+    metaData.metaChange = true
+    metaData.metaInfo.daysTier = metaInfo.isDaysStaked
+    metaData.metaInfo.volumeTier = metaInfo.amount
+    metaData.metaInfo.tokenTier = metaInfo.tokenStaked
     return {
       params: {
         ...tierDetailsForEOA,
         upgradeTier: { tier: upgradeTier },
       },
-      metaData: { badgeChange: true, metaInfo },
+      metaData,
       action: MembershipActionsV2.badgeMint,
       eoa,
     };
   }
-  // }
+  
 };

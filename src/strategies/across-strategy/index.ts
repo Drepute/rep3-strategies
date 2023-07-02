@@ -83,7 +83,6 @@ const getAllStakers = async (
         token: { id: true },
       },
     });
-    console.log(stakers);
     const all = allStakers.concat(stakers.userInfos);
     if (stakers.userInfos.length === 100) {
       page = page + 1;
@@ -187,22 +186,34 @@ const calculateTiers = (holderInfo: any[], poolInfo: any[]) => {
   if (
     holderInfo.filter(
       x => x.token.id === '0xb0c8fef534223b891d4a430e49537143829c4817'
-    ).length === 1 &&
-    holderInfo.filter(
-      x => x.token.id === '0xb0c8fef534223b891d4a430e49537143829c4817'
-    )[0]?.cumulativeBalance !== '0'
+    ).length === 1
+    // holderInfo.filter(
+    //   x => x.token.id === '0xb0c8fef534223b891d4a430e49537143829c4817'
+    // )[0]?.cumulativeBalance !== '0'
   ) {
-    tier = holderInfo.length;
-    tokenTier = holderInfo.length;
+    console.log('holder', holderInfo);
+    tier = holderInfo.filter(x => x.cumulativeBalance !== '0').length;
+    tokenTier = holderInfo.filter(x => x.cumulativeBalance !== '0').length;
+    if (tier === 0) {
+      tier = 1;
+      tokenTier = 1;
+    }
     const acxInfo = holderInfo.filter(
       x => x.token.id === '0xb0c8fef534223b891d4a430e49537143829c4817'
     );
-    const daysOfStaking = calculateMonthsOnStaking(acxInfo[0]?.blockTimestamp);
-    if (daysOfStaking > 100) {
-      tier = tier * 2;
-      stakingTier = 2;
+    if (
+      holderInfo.filter(
+        x => x.token.id === '0xb0c8fef534223b891d4a430e49537143829c4817'
+      )[0]?.cumulativeBalance !== '0'
+    ) {
+      const daysOfStaking = calculateMonthsOnStaking(
+        acxInfo[0]?.blockTimestamp
+      );
+      if (daysOfStaking > 100) {
+        tier = tier * 2;
+        stakingTier = 2;
+      }
     }
-
     const amount = calculateAmount(holderInfo, poolInfo);
     console.log('amount', amount * 10e-18, holderInfo, poolInfo);
     if (amount * 10e-18 < 500) {
@@ -330,17 +341,7 @@ export async function strategy({
   // );
 
   if (poolInfo) {
-    let stakers: any[] = [
-      // {
-      //   id:
-      //     '0x17A18A1FF86Fc9B67C8536a4ba9d6CaBDCBe599D0xb0c8fef534223b891d4a430e49537143829c4817',
-      //   address: '0x17A18A1FF86Fc9B67C8536a4ba9d6CaBDCBe599D',
-      //   blockTimestamp: '1687522115',
-      //   token: {
-      //     id: '0xb0c8fef534223b891d4a430e49537143829c4817',
-      //   },
-      // },
-    ];
+    let stakers: any[] = [];
 
     const promisesTokenUSDPrice = poolInfo.map(async (x: any) => {
       try {
@@ -370,7 +371,6 @@ export async function strategy({
       });
     await Promise.all(promises);
     let stakerListAddress = stakers.map(x => x.address);
-    console.log('stake claim', stakerListAddress);
     if (stakerListAddress.length > 0) {
       stakerListAddress = stakerListAddress.filter(
         (c, index) => stakerListAddress.indexOf(c) === index
@@ -382,7 +382,6 @@ export async function strategy({
         );
         return { mainTier, volumeTier, tokenTier, stakingTier, claimer: x };
       });
-      console.log('tier claim', tierClaimerList);
       const results = await Promise.all(
         tierClaimerList.map(async (x: any) => {
           const actions = new ActionCallerV2(
@@ -407,7 +406,6 @@ export async function strategy({
       return [{ action: false, eoa, params: {} }];
     }
   } else {
-    console.log('dsdf');
     return [{ action: false, eoa: eoa[0], params: {} }];
   }
 }
