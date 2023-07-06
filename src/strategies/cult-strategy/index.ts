@@ -3,19 +3,19 @@ import { ActionOnType } from '../../actions/utils/type';
 import { StrategyParamsType } from '../../types';
 import { subgraph } from '../../utils';
 import { network } from '../../network';
-import  { createClient } from 'redis';
+import { createClient } from 'redis';
 
 let redisClient;
 (async () => {
   redisClient = createClient({
     password: 'CW4xB0fi22GN6Enp8z6P4PUJt3cVRP30',
     socket: {
-        host: 'redis-12292.c15.us-east-1-2.ec2.cloud.redislabs.com',
-        port: 12292
-    }
-});
+      host: 'redis-12292.c15.us-east-1-2.ec2.cloud.redislabs.com',
+      port: 12292,
+    },
+  });
 
-  redisClient.on("error", (error) => console.error(`Error : ${error}`));
+  redisClient.on('error', error => console.error(`Error : ${error}`));
 
   await redisClient.connect();
 })();
@@ -391,20 +391,22 @@ export async function strategy({
     }
   }
   if (targetAddress.length > 0) {
-    if(targetAddress.length>1){
-      const pageNumber = parseInt(await redisClient.get("premia-strategy"));
-      const addressLimit = pageNumber!==0?pageNumber*50:50
-      targetAddress = targetAddress.slice(pageNumber!==0?addressLimit-50:0,addressLimit)
-      console.log(addressLimit,pageNumber)
-      if(targetAddress.length<=addressLimit){
-        await redisClient.set("cult-strategy-strategy",0);
-      }else{
-        await redisClient.set("cult-strategy",pageNumber+1);
+    if (targetAddress.length > 1) {
+      const pageNumber = parseInt(await redisClient.get('premia-strategy'));
+      const addressLimit = pageNumber !== 0 ? pageNumber * 50 : 50;
+      targetAddress = targetAddress.slice(
+        pageNumber !== 0 ? addressLimit - 50 : 0,
+        addressLimit
+      );
+      console.log(addressLimit, pageNumber);
+      if (targetAddress.length <= addressLimit) {
+        await redisClient.set('cult-strategy', 0);
+      } else {
+        await redisClient.set('cult-strategy', pageNumber + 1);
       }
     }
     const results = await Promise.all(
       targetAddress.map(async (x: string) => {
-     
         return await getActionOnEOA(
           x,
           SUBGRAPH_URLS,
@@ -413,9 +415,9 @@ export async function strategy({
         );
       })
     );
-    console.log(results)
+    console.log(results);
     return targetAddress.length > 1
-      ? results.filter((x: any) => x.action === false&&x.action === 'false')
+      ? results.filter((x: any) => x.action === false && x.action === 'false')
       : results;
   } else {
     return eoa.map((x: string) => {

@@ -5,6 +5,22 @@ import { subgraph } from '../../utils';
 import fetch from 'cross-fetch';
 import { ethers } from 'ethers';
 import { network } from '../../network';
+import { createClient } from 'redis';
+import { getAllClaimedMembers } from '../../actions/utils/helperFunctionsV2';
+let redisClient;
+(async () => {
+  redisClient = createClient({
+    password: 'CW4xB0fi22GN6Enp8z6P4PUJt3cVRP30',
+    socket: {
+      host: 'redis-12292.c15.us-east-1-2.ec2.cloud.redislabs.com',
+      port: 12292,
+    },
+  });
+
+  redisClient.on('error', error => console.error(`Error : ${error}`));
+
+  await redisClient.connect();
+})();
 
 const getAllPaginatedStakers = async (
   url: string,
@@ -12,21 +28,16 @@ const getAllPaginatedStakers = async (
   lastId: string,
   page = 0,
   allStakers: any[] = [],
-  holder: string | false
+  holder: string[]
 ) => {
   const stakers = await subgraph.subgraphRequest(url, {
     userInfos: {
       __args: {
-        where: holder
-          ? {
-              token: tokensId,
-              id_gt: lastId,
-              address: holder,
-            }
-          : {
-              token: tokensId,
-              id_gt: lastId,
-            },
+        where: {
+          token: tokensId,
+          id_gt: lastId,
+          address_in: holder,
+        },
         first: 1000,
       },
       id: true,
@@ -37,6 +48,7 @@ const getAllPaginatedStakers = async (
     },
   });
   const all = allStakers.concat(stakers.userInfos);
+
   if (stakers.userInfos.length === 1000) {
     page = page + 1;
     const res: any[] | undefined = await getAllPaginatedStakers(
@@ -58,20 +70,16 @@ const getAllStakers = async (
   tokensId: any,
   page = 0,
   allStakers: any[] = [],
-  holder: string | false
+  holder: string[]
 ) => {
   if (page < 1) {
     const stakers = await subgraph.subgraphRequest(url, {
       userInfos: {
         __args: {
-          where: holder
-            ? {
-                token: tokensId,
-                address: holder,
-              }
-            : {
-                token: tokensId,
-              },
+          where: {
+            token: tokensId,
+            address_in: holder,
+          },
           orderBy: 'blockTimestamp',
           orderDirection: 'asc',
           skip: page * 100,
@@ -98,6 +106,7 @@ const getAllStakers = async (
       return all;
     }
   } else {
+    
     return await getAllPaginatedStakers(
       url,
       tokensId,
@@ -172,7 +181,7 @@ const calculateAmount = (holderInfo: any[], poolInfo: any[]) => {
         .exchangeRate
     );
   });
-  console.log(allUsdAmount);
+
   return allUsdAmount.reduce((partialSum, a) => partialSum + a, 0);
 };
 
@@ -189,33 +198,34 @@ const calculateTiers = (holderInfo: any[], poolInfo: any[]) => {
     ).length === 1
     // holderInfo.filter(
     //   x => x.token.id === '0xb0c8fef534223b891d4a430e49537143829c4817'
-    // )[0]?.cumulativeBalance !== '0'
+    // )[0]?.cumulativeBalance !== '0'&&eoaLength>1
   ) {
-    console.log('holder', holderInfo);
     tier = holderInfo.filter(x => x.cumulativeBalance !== '0').length;
     tokenTier = holderInfo.filter(x => x.cumulativeBalance !== '0').length;
     if (tier === 0) {
       tier = 1;
       tokenTier = 1;
     }
+
     const acxInfo = holderInfo.filter(
       x => x.token.id === '0xb0c8fef534223b891d4a430e49537143829c4817'
     );
+
     if (
       holderInfo.filter(
         x => x.token.id === '0xb0c8fef534223b891d4a430e49537143829c4817'
       )[0]?.cumulativeBalance !== '0'
     ) {
-      const daysOfStaking = calculateMonthsOnStaking(
-        acxInfo[0]?.blockTimestamp
-      );
-      if (daysOfStaking > 100) {
+      const daysOfStaking =
+        calculateMonthsOnStaking(acxInfo[0]?.blockTimestamp) + 1;
+      
+      if (daysOfStaking >= 100) {
         tier = tier * 2;
         stakingTier = 2;
       }
     }
     const amount = calculateAmount(holderInfo, poolInfo);
-    console.log('amount', amount * 10e-18, holderInfo, poolInfo);
+    
     if (amount * 10e-18 < 500) {
       tier = tier * 1;
       volumeTier = 1;
@@ -231,8 +241,7 @@ const calculateTiers = (holderInfo: any[], poolInfo: any[]) => {
     }
     return { mainTier: tier, volumeTier, tokenTier, stakingTier };
   } else {
-    console.log({ mainTier: tier, volumeTier, tokenTier, stakingTier });
-    return { mainTier: tier, volumeTier, tokenTier, stakingTier };
+    return { mainTier: 1, volumeTier, tokenTier, stakingTier };
   }
 };
 const geCurrentExchangeRate = async (tokenAddress: string) => {
@@ -304,9 +313,6 @@ export async function strategy({
         'https://api.thegraph.com/subgraphs/name/eth-jashan/across-staking-test',
     },
   };
-  const network: 'mainnet' | 'testnet' = options.network;
-  const SUBGRAPH_URLS = SUBGRAPH_LINKS[network];
-
   const poolInfo = [
     {
       addr: '0x59C1427c658E97a7d568541DaC780b2E5c8affb4',
@@ -334,47 +340,89 @@ export async function strategy({
       erc20Addr: '0x44108f0223A3C3028F5Fe7AEC7f9bb2E66beF82F',
     },
   ];
-
-  // const tokens = await getAllTokenInfo(
-  //   'https://api.thegraph.com/subgraphs/name/eth-jashan/across-staking',
-  //   0
-  // );
+  const network: 'mainnet' | 'testnet' = options.network;
+  const SUBGRAPH_URLS = SUBGRAPH_LINKS[network];
 
   if (poolInfo) {
     let stakers: any[] = [];
-
+    let stakerListAddress: any[] = [];
     const promisesTokenUSDPrice = poolInfo.map(async (x: any) => {
       try {
         const usdPrice = await getPriceOfToken(x.name);
         const exchangeRate = await geCurrentExchangeRate(x.erc20Addr);
         return { ...x, usdAmount: usdPrice, exchangeRate };
       } catch (error) {
-        //console.log('error', error);
+        console.log('error', error);
       }
     });
     const poolInfoWithUsd = await Promise.all(promisesTokenUSDPrice);
-    const promises = poolInfo
-      .filter(x => x.addr !== '0xc2fab88f215f62244d2e32c8a65e8f58da8415a5')
-      .map(async (x: any) => {
-        try {
-          const stakersList = await getAllStakers(
-            SUBGRAPH_URLS.staking,
-            x.addr,
-            0,
-            [],
-            eoa.length > 0 ? eoa[0] : false
-          );
-          stakers = stakers.concat(stakersList);
-        } catch (error) {
-          //console.log('error', error);
-        }
-      });
-    await Promise.all(promises);
-    let stakerListAddress = stakers.map(x => x.address);
+    if (eoa.length === 1) {
+      const promises = poolInfo
+        .filter(x => x.addr !== '0xc2fab88f215f62244d2e32c8a65e8f58da8415a5')
+        .map(async (x: any) => {
+          try {
+            const stakersList = await getAllStakers(
+              SUBGRAPH_URLS.staking,
+              x.addr,
+              0,
+              [],
+              eoa
+            );
+            stakers = stakers.concat(stakersList);
+          } catch (error) {
+            //console.log('error', error);
+          }
+        });
+      await Promise.all(promises);
+      stakerListAddress = stakers.map(x => x.address);
+    } else {
+      const pageNumber = parseInt(await redisClient.get('across-strategy'));
+      const addressLimit = pageNumber !== 0 ? pageNumber * 50 : 50;
+      const allMembers = await getAllClaimedMembers(
+        contractAddress,
+        0,
+        options.network === 'mainnet' ? 137 : 80001,
+        0,
+        []
+      );
+      stakerListAddress = allMembers
+        .slice(pageNumber !== 0 ? addressLimit - 50 : 0, addressLimit)
+        .map(x => x.claimer);
+      const promises = poolInfo
+        .filter(x => x.addr !== '0xc2fab88f215f62244d2e32c8a65e8f58da8415a5')
+        .map(async (x: any) => {
+          try {
+            const stakersList = await getAllStakers(
+              SUBGRAPH_URLS.staking,
+              x.addr,
+              0,
+              [],
+              stakerListAddress
+            );
+            stakers = stakers.concat(stakersList);
+          } catch (error) {
+            //console.log('error', error);
+          }
+        });
+      await Promise.all(promises);
+      if (allMembers.length <= addressLimit) {
+        await redisClient.set('across-strategy', 0);
+      } else {
+        await redisClient.set('across-strategy', pageNumber + 1);
+      }
+    }
+    console.log(stakerListAddress,stakers)
+
     if (stakerListAddress.length > 0) {
+      //remove duplicate
       stakerListAddress = stakerListAddress.filter(
         (c, index) => stakerListAddress.indexOf(c) === index
       );
+      if(eoa.length===1&&stakers.filter(
+          x => x.token.id === '0xb0c8fef534223b891d4a430e49537143829c4817'
+        )[0]?.cumulativeBalance === '0'){
+          return [{ action: false, eoa, params: {} }];
+        }else{
       const tierClaimerList: any[] = stakerListAddress.map(x => {
         const { mainTier, volumeTier, tokenTier, stakingTier } = calculateTiers(
           stakers.filter(y => y.address === x),
@@ -393,7 +441,6 @@ export async function strategy({
               changingLevel: x.mainTier,
             }
           );
-          console.log(x.mainTier);
           return await actions.calculateActionParams({
             amount: x.volumeTier,
             tokenStaked: x.tokenTier,
@@ -401,7 +448,7 @@ export async function strategy({
           });
         })
       );
-      return results;
+      return results;}
     } else {
       return [{ action: false, eoa, params: {} }];
     }

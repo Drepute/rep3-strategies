@@ -1,6 +1,8 @@
 import fetch from 'cross-fetch';
 import { getRep3V2BadgeDetails } from '../../utils/subgraph/helperFunction';
 import { MembershipActionsV2 } from './type';
+import { subgraph } from '../../utils';
+import { network } from '../../network';
 
 export const createOrUpdateBadgeV2WithMetadata = async (
   credentials: string,
@@ -27,15 +29,10 @@ export const createOrUpdateBadgeV2WithMetadata = async (
 
   if (tierDetailsForEOA) {
     const metadata = await fetch(
-      `https://arweave.net/${tierDetailsForEOA.metadataUri}`
+      tierDetailsForEOA.metadataUri
     );
     const response = await metadata.json();
-    console.log(
-      'tier detail',
-      tierDetailsForEOA.metadataUri,
-      metaInfo,
-      response
-    );
+    
     metaData.metaInfo.mediaUri = response.animation_url;
     response.attributes.map((element: any) => {
       if (element.trait_type === 'Volume') {
@@ -44,16 +41,13 @@ export const createOrUpdateBadgeV2WithMetadata = async (
           metaData.metaChange = true;
           metaData.metaInfo.volumeTier = metaInfo.amount;
         }
-      }
-      else if (element.trait_type === 'Days Staked') {
+      } else if (element.trait_type === 'Days Staked') {
         if (metaInfo.isDaysStaked !== parseInt(element.value)) {
           metaData.mediaChange = true;
           metaData.metaChange = true;
           metaData.metaInfo.daysTier = metaInfo.isDaysStaked;
         }
-      }
-      else if (element.trait_type === 'Tokens Staked') {
-      
+      } else if (element.trait_type === 'Tokens Staked') {
         if (metaInfo.tokenStaked !== parseInt(element.value)) {
           metaData.metaInfo.tokenTier = metaInfo.tokenStaked;
           metaData.metaChange = true;
@@ -79,11 +73,11 @@ export const createOrUpdateBadgeV2WithMetadata = async (
       };
     }
   } else {
-    metaData.mediaChange = true
-    metaData.metaChange = true
-    metaData.metaInfo.daysTier = metaInfo.isDaysStaked
-    metaData.metaInfo.volumeTier = metaInfo.amount
-    metaData.metaInfo.tokenTier = metaInfo.tokenStaked
+    metaData.mediaChange = true;
+    metaData.metaChange = true;
+    metaData.metaInfo.daysTier = metaInfo.isDaysStaked;
+    metaData.metaInfo.volumeTier = metaInfo.amount;
+    metaData.metaInfo.tokenTier = metaInfo.tokenStaked;
     return {
       params: {
         ...tierDetailsForEOA,
@@ -94,5 +88,92 @@ export const createOrUpdateBadgeV2WithMetadata = async (
       eoa,
     };
   }
-  
 };
+
+export const getAllClaimedMembers = async (
+  parentCommunity: string,
+  startTokenId: number,
+  networkId: number,
+  page = 0,
+  allMembers: any[] = []
+) => {
+  const stakers = await subgraph.subgraphRequest(
+    network[networkId].subgraphV2,
+    {
+      questBadges: {
+        __args: {
+          where: {
+            parentCommunity,
+            tokenId_gte: startTokenId,
+          },
+          first: 1000,
+        },
+        claimer: true,
+        id: true,
+        tokenId: true,
+        metadataUri: true,
+      },
+    }
+  );
+  
+  const all = allMembers.concat(stakers.questBadges);
+  if (stakers.questBadges.length === 1000) {
+    page = page + 1;
+    const res: any[] | undefined = await getAllClaimedMembers(
+      parentCommunity,
+      all[all.length - 1].tokenId,
+      networkId,
+      page,
+      all
+    );
+    return res;
+  } else {
+    return all;
+  }
+};
+
+// const getAllMembers = async (
+//   url: string,
+//   contractAddress: string,
+//   page = 0,
+//   allMembers: any[] = []
+// ) => {
+//   if (page < 1) {
+//     const stakers = await subgraph.subgraphRequest(url, {
+//       membershipNFTs: {
+//         __args: {
+//           where: {
+//             contractAddress,
+//           },
+//           orderBy: 'tokenID',
+//           orderDirection: 'asc',
+//           skip: page * 100,
+//         },
+//         claimer: true,
+//         id: true,
+//         tokenID: true,
+//       },
+//     });
+//     const all = allMembers.concat(stakers.membershipNFTs);
+//     if (stakers.membershipNFTs.length === 100) {
+//       page = page + 1;
+//       const res: any[] | undefined = await getAllMembers(
+//         url,
+//         contractAddress,
+//         page,
+//         all
+//       );
+//       return res;
+//     } else {
+//       return all;
+//     }
+//   } else {
+//     return await getAllPaginatedMembers(
+//       url,
+//       contractAddress,
+//       allMembers[allMembers.length - 1].tokenID,
+//       page,
+//       allMembers
+//     );
+//   }
+// };
