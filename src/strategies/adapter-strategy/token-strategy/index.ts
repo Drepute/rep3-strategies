@@ -3,16 +3,24 @@ import {
   AdapterWithVariables,
   StrategyParamsType,
 } from '../../../types';
-import { operationOnXNumberOfToken } from '../../../adapters/tokens';
+import {
+  genericOperationOnToken,
+  operationOnXNumberOfToken,
+} from '../../../adapters/tokens';
 
 const buildStrategyFromOptions = async <T extends AdapterNames>(
   eoa: string,
   adapterName: T,
-  variables: AdapterWithVariables['operationOnXNumberOfToken']
+  variables: AdapterWithVariables[
+    | 'operationOnXNumberOfToken'
+    | 'genericOperationOnNft']
 ): Promise<boolean> => {
   switch (adapterName) {
     case 'operationOnXNumberOfToken':
       return await operationOnXNumberOfToken(eoa, variables);
+
+    case 'genericOperationOnNft':
+      return await genericOperationOnToken(eoa, variables);
     default:
       return false;
   }

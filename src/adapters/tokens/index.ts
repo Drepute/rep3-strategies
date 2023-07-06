@@ -2,6 +2,7 @@ import { network } from '../../network';
 import { erc20Abi } from '../../../abis/erc20Abi.js';
 import { ethers } from 'ethers';
 import BlockExplorer from '../../utils/getBlockOnTime';
+import { AdapterWithVariables } from '../../types';
 
 const tokenGetterCall = async (
   address: string,
@@ -14,7 +15,18 @@ const tokenGetterCall = async (
   const res = await tokenContract[functionName](...params);
   return res;
 };
-
+const genericGetterCall = async (
+  address: string,
+  abi: any[],
+  functionName: string,
+  params: any[],
+  chainId: number
+) => {
+  const provider = new ethers.providers.JsonRpcProvider(network[chainId].rpc);
+  const nftContract = new ethers.Contract(address, abi, provider);
+  const res = await nftContract[functionName](...params);
+  return res;
+};
 const arthematicOperand = (a: number, b: number, op: string) => {
   if (op === '===') {
     return a === b;
@@ -33,16 +45,29 @@ const arthematicOperand = (a: number, b: number, op: string) => {
 
 export const operationOnXNumberOfToken = async (
   holder: string,
-  functionParams: {
-    tokenAddress: string;
-    balanceThreshold: number;
-    chainId: number;
-    operator: '===' | '>=' | '<=' | '<' | '>';
-  }
+  functionParams: AdapterWithVariables['operationOnXNumberOfToken'] | any
 ) => {
   const response = await tokenGetterCall(
     functionParams.tokenAddress,
     'balanceOf',
+    [ethers.utils.getAddress(holder)],
+    functionParams.chainId
+  );
+  console.log(response);
+  return arthematicOperand(
+    functionParams.balanceThreshold,
+    parseInt(response.toString()),
+    functionParams.operator
+  );
+};
+export const genericOperationOnToken = async (
+  holder: string,
+  functionParams: AdapterWithVariables['genericOperationOnToken'] | any
+) => {
+  const response = await genericGetterCall(
+    functionParams.tokenAddress,
+    functionParams.abi,
+    functionParams.functionFragment,
     [ethers.utils.getAddress(holder)],
     functionParams.chainId
   );
@@ -52,7 +77,6 @@ export const operationOnXNumberOfToken = async (
     functionParams.operator
   );
 };
-
 // large sample size
 export const getBalanceOfTokenAtXTime = async (
   holder: string,

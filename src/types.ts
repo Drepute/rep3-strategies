@@ -13,29 +13,48 @@ export interface StrategyType {
   example?: CallStrategyParamsType | null;
   about?: string;
 }
-
-export enum GenericAdapters {
-  holdXNumberOfNft = 'holdXNumberOfNft',
-  holdSpecialNft = 'holdSpecialNft',
-}
-
+// export type StrategyWithAdapters = {
+//   operationOnXNumberOfNft: {
+//     nftAddress: string;
+//     balanceThreshold: number;
+//     operator: '===' | '>=' | '<=' | '<' | '>';
+//     chainId: number;
+//   };
+//   operationOnXNumberOfToken: {
+//     tokenAddress: string;
+//     balanceThreshold: number;
+//     operator: '===' | '>=' | '<=' | '<' | '>';
+//     chainId: number;
+//   };
+// };
 export type AdapterWithVariables = {
   operationOnXNumberOfNft: {
-    
-      nftAddress: string;
-      balanceThreshold: number;
-      operator:"==="|">="|"<="|"<"|">"
-      chainId: number;
-    
+    nftAddress: string;
+    balanceThreshold: number;
+    operator: '===' | '>=' | '<=' | '<' | '>';
+    chainId: number;
   };
-  operationOnXNumberOfToken:{
-     
-      tokenAddress: string;
-      balanceThreshold: number;
-      operator:"==="|">="|"<="|"<"|">"
-      chainId: number;
-    
-  }
+  genericOperationOnNft: {
+    nftAddress: string;
+    functionFragment: string;
+    abi: any[];
+    balanceThreshold: number;
+    operator: '===' | '>=' | '<=' | '<' | '>';
+    chainId: number;
+  };
+  operationOnXNumberOfToken: {
+    tokenAddress: string;
+    balanceThreshold: number;
+    operator: '===' | '>=' | '<=' | '<' | '>';
+    chainId: number;
+  };
+  genericOperationOnToken: {
+    tokenAddress: string;
+    functionFragment: string;
+    abi: any[];
+    balanceThreshold: number;
+    operator: '===' | '>=' | '<=' | '<' | '>';
+    chainId: number;
+  };
 };
 export type AdapterNames = keyof AdapterWithVariables;
-

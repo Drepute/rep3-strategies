@@ -3,16 +3,21 @@ import {
   AdapterWithVariables,
   StrategyParamsType,
 } from '../../../types';
-import { operationOnXNumberOfNft } from '../../../adapters/nft';
+import {
+  genericOperationOnNft,
+  operationOnXNumberOfNft,
+} from '../../../adapters/nft';
 
 const buildStrategyFromOptions = async <T extends AdapterNames>(
   eoa: string,
   adapterName: T,
-  variables: AdapterWithVariables['operationOnXNumberOfNft']
+  variables: AdapterWithVariables[T]
 ): Promise<boolean> => {
   switch (adapterName) {
     case 'operationOnXNumberOfNft':
       return await operationOnXNumberOfNft(eoa, variables);
+    case 'genericOperationOnNft':
+      return await genericOperationOnNft(eoa, variables);
     default:
       return false;
   }

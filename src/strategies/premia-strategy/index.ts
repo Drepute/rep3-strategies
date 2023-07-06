@@ -114,7 +114,7 @@ const getLevelCategory = (courses: any[], category: string) => {
   newArray = newArray.reduce((x, y) => x.filter(z => y.includes(z)));
   if (newArray.length > 0) {
     if (category === '0') {
-      console.log("categories 0",newArray)
+      console.log('categories 0', newArray);
       newArray = newArray.map((x: any) => parseInt(x[0]) + 1);
       return { level: Math.max(...newArray), category: 0 };
     } else if (category === '1') {
@@ -197,16 +197,6 @@ export async function strategy({
   } else {
     targetAddress = await getAllPremiaUser();
   }
-  // let targetAddress = await getAllMembers(
-  //   network[options.network === 'mainnet' ? 137 : 80001].subgraph,
-  //   contractAddress
-  // );
-  // targetAddress = targetAddress.map(x => x.claimer);
-  // targetAddress = targetAddress.filter((c, index) => {
-  //   return targetAddress.indexOf(c) === index;
-  // });
-  console.log(targetAddress
-    .slice(pageNumber !== 0 ? addressLimit - 50 : 0, addressLimit).length)
   const results: any = [];
   await Promise.all(
     targetAddress
