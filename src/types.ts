@@ -3,7 +3,11 @@ export interface StrategyParamsType {
   eoa: [string];
   options: object | any;
 }
-
+export interface adapterStrategy {
+  contractAddress: string;
+  eoa: [string];
+  options: AdapterWithVariables['contractViewAdapter'];
+}
 export interface CallStrategyParamsType extends StrategyParamsType {
   strategy: string;
 }
@@ -13,48 +17,15 @@ export interface StrategyType {
   example?: CallStrategyParamsType | null;
   about?: string;
 }
-// export type StrategyWithAdapters = {
-//   operationOnXNumberOfNft: {
-//     nftAddress: string;
-//     balanceThreshold: number;
-//     operator: '===' | '>=' | '<=' | '<' | '>';
-//     chainId: number;
-//   };
-//   operationOnXNumberOfToken: {
-//     tokenAddress: string;
-//     balanceThreshold: number;
-//     operator: '===' | '>=' | '<=' | '<' | '>';
-//     chainId: number;
-//   };
-// };
 export type AdapterWithVariables = {
-  operationOnXNumberOfNft: {
-    nftAddress: string;
-    balanceThreshold: number;
+  contractViewAdapter: {
+    contractAddress: string;
+    type:'erc1155'|'erc721'|'erc20'|'custom'
     operator: '===' | '>=' | '<=' | '<' | '>';
     chainId: number;
-  };
-  genericOperationOnNft: {
-    nftAddress: string;
-    functionFragment: string;
-    abi: any[];
     balanceThreshold: number;
-    operator: '===' | '>=' | '<=' | '<' | '>';
-    chainId: number;
-  };
-  operationOnXNumberOfToken: {
-    tokenAddress: string;
-    balanceThreshold: number;
-    operator: '===' | '>=' | '<=' | '<' | '>';
-    chainId: number;
-  };
-  genericOperationOnToken: {
-    tokenAddress: string;
-    functionFragment: string;
-    abi: any[];
-    balanceThreshold: number;
-    operator: '===' | '>=' | '<=' | '<' | '>';
-    chainId: number;
+    functionFragment?: string;
+    abi?: any[];
   };
 };
 export type AdapterNames = keyof AdapterWithVariables;
