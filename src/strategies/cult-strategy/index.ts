@@ -5,8 +5,8 @@ import { subgraph } from '../../utils';
 import { network } from '../../network';
 import { createClient } from 'redis';
 
-let redisClient;
-(async () => {
+let redisClient:any;
+const initialize = async () => {
   redisClient = createClient({
     password: 'CW4xB0fi22GN6Enp8z6P4PUJt3cVRP30',
     socket: {
@@ -15,10 +15,10 @@ let redisClient;
     },
   });
 
-  redisClient.on('error', error => console.error(`Error : ${error}`));
+  redisClient.on('error', error => console.error(`Error here 2 : ${error}`));
 
   await redisClient.connect();
-})();
+};
 
 function getTimestampInSeconds() {
   return Math.floor(Date.now() / 1000);
@@ -373,15 +373,29 @@ export async function strategy({
       options.event.event === 'ProposalExecuted' ||
       options.event.event === 'ProposalCanceled'
     ) {
-      targetAddress = await getAllMembers(
+
+      let allTargetAddress = await getAllMembers(
         network[networks === 'mainnet' ? 137 : 80001].subgraph,
         contractAddress
       );
-      targetAddress = targetAddress.map((x: any) => x.claimer.toLowerCase());
-      targetAddress = targetAddress.filter((c, index) => {
-        return targetAddress.indexOf(c) === index;
+      await initialize()
+      const pageNumber = parseInt(await redisClient.get('cult-strategy'));
+      const addressLimit = pageNumber !== 0 ? pageNumber * 50 : 50;
+      allTargetAddress = allTargetAddress.map((x: any) => x.claimer.toLowerCase());
+      allTargetAddress = allTargetAddress.filter((c, index) => {
+        return allTargetAddress.indexOf(c) === index;
       });
-      //console.log(targetAddress);
+      targetAddress = allTargetAddress
+      .slice(
+        pageNumber !== 0 ? addressLimit - 50 : 0,
+        addressLimit
+      );
+      console.log(allTargetAddress.length , addressLimit,pageNumber);
+      if (allTargetAddress.length <= addressLimit) {
+        await redisClient.set('cult-strategy', 0);
+      } else {
+        await redisClient.set('cult-strategy', pageNumber + 1);
+      }
     } else if (
       options.event.event === 'VoteCast' ||
       options.event.event === 'Withdraw' ||
@@ -391,20 +405,17 @@ export async function strategy({
     }
   }
   if (targetAddress.length > 0) {
-    if (targetAddress.length > 1) {
-      const pageNumber = parseInt(await redisClient.get('premia-strategy'));
-      const addressLimit = pageNumber !== 0 ? pageNumber * 50 : 50;
-      targetAddress = targetAddress.slice(
-        pageNumber !== 0 ? addressLimit - 50 : 0,
-        addressLimit
-      );
-      console.log(addressLimit, pageNumber);
-      if (targetAddress.length <= addressLimit) {
-        await redisClient.set('cult-strategy', 0);
-      } else {
-        await redisClient.set('cult-strategy', pageNumber + 1);
-      }
-    }
+    // if (targetAddress.length > 1) {
+      // const pageNumber = parseInt(await redisClient.get('premia-strategy'));
+      // const addressLimit = pageNumber !== 0 ? pageNumber * 50 : 50;
+      
+      // console.log(addressLimit, pageNumber);
+      // if (targetAddress.length <= addressLimit) {
+      //   await redisClient.set('cult-strategy', 0);
+      // } else {
+      //   await redisClient.set('cult-strategy', pageNumber + 1);
+      // }
+    // }
     const results = await Promise.all(
       targetAddress.map(async (x: string) => {
         return await getActionOnEOA(
@@ -417,7 +428,7 @@ export async function strategy({
     );
     console.log(results);
     return targetAddress.length > 1
-      ? results.filter((x: any) => x.action === false && x.action === 'false')
+      ? results.filter((x: any) => x.action !== false && x.action !== 'false')
       : results;
   } else {
     return eoa.map((x: string) => {

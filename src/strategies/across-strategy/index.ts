@@ -5,22 +5,22 @@ import { subgraph } from '../../utils';
 import fetch from 'cross-fetch';
 import { ethers } from 'ethers';
 import { network } from '../../network';
-import { createClient } from 'redis';
+// import { createClient } from 'redis';
 import { getAllClaimedMembers } from '../../actions/utils/helperFunctionsV2';
-let redisClient;
-(async () => {
-  redisClient = createClient({
-    password: 'CW4xB0fi22GN6Enp8z6P4PUJt3cVRP30',
-    socket: {
-      host: 'redis-12292.c15.us-east-1-2.ec2.cloud.redislabs.com',
-      port: 12292,
-    },
-  });
+// let redisClient;
+// (async () => {
+//   redisClient = createClient({
+//     password: 'CW4xB0fi22GN6Enp8z6P4PUJt3cVRP30',
+//     socket: {
+//       host: 'redis-12292.c15.us-east-1-2.ec2.cloud.redislabs.com',
+//       port: 12292,
+//     },
+//   });
 
-  redisClient.on('error', error => console.error(`Error : ${error}`));
+//   redisClient.on('error', error => console.error(`Error : ${error}`));
 
-  await redisClient.connect();
-})();
+//   await redisClient.connect();
+// })();
 
 const getAllPaginatedStakers = async (
   url: string,
@@ -106,7 +106,6 @@ const getAllStakers = async (
       return all;
     }
   } else {
-    
     return await getAllPaginatedStakers(
       url,
       tokensId,
@@ -218,14 +217,14 @@ const calculateTiers = (holderInfo: any[], poolInfo: any[]) => {
     ) {
       const daysOfStaking =
         calculateMonthsOnStaking(acxInfo[0]?.blockTimestamp) + 1;
-      
+
       if (daysOfStaking >= 100) {
         tier = tier * 2;
         stakingTier = 2;
       }
     }
     const amount = calculateAmount(holderInfo, poolInfo);
-    
+    console.log(amount);
     if (amount * 10e-18 < 500) {
       tier = tier * 1;
       volumeTier = 1;
@@ -241,7 +240,12 @@ const calculateTiers = (holderInfo: any[], poolInfo: any[]) => {
     }
     return { mainTier: tier, volumeTier, tokenTier, stakingTier };
   } else {
-    return { mainTier: 1, volumeTier, tokenTier, stakingTier };
+    return {
+      mainTier: 0,
+      volumeTier: 1,
+      tokenTier: holderInfo.length,
+      stakingTier,
+    };
   }
 };
 const geCurrentExchangeRate = async (tokenAddress: string) => {
@@ -313,6 +317,7 @@ export async function strategy({
         'https://api.thegraph.com/subgraphs/name/eth-jashan/across-staking-test',
     },
   };
+  console.log("no reddis")
   const poolInfo = [
     {
       addr: '0x59C1427c658E97a7d568541DaC780b2E5c8affb4',
@@ -376,8 +381,8 @@ export async function strategy({
       await Promise.all(promises);
       stakerListAddress = stakers.map(x => x.address);
     } else {
-      const pageNumber = parseInt(await redisClient.get('across-strategy'));
-      const addressLimit = pageNumber !== 0 ? pageNumber * 50 : 50;
+      // const pageNumber = parseInt(await redisClient.get('across-strategy'));
+      // const addressLimit = pageNumber !== 0 ? pageNumber * 50 : 50;
       const allMembers = await getAllClaimedMembers(
         contractAddress,
         0,
@@ -385,9 +390,7 @@ export async function strategy({
         0,
         []
       );
-      stakerListAddress = allMembers
-        .slice(pageNumber !== 0 ? addressLimit - 50 : 0, addressLimit)
-        .map(x => x.claimer);
+      stakerListAddress = allMembers.map(x => x.claimer);
       const promises = poolInfo
         .filter(x => x.addr !== '0xc2fab88f215f62244d2e32c8a65e8f58da8415a5')
         .map(async (x: any) => {
@@ -405,50 +408,63 @@ export async function strategy({
           }
         });
       await Promise.all(promises);
-      if (allMembers.length <= addressLimit) {
-        await redisClient.set('across-strategy', 0);
-      } else {
-        await redisClient.set('across-strategy', pageNumber + 1);
-      }
+      // if (allMembers.length <= addressLimit) {
+      //   await redisClient.set('across-strategy', 0);
+      // } else {
+      //   await redisClient.set('across-strategy', pageNumber + 1);
+      // }
     }
-    console.log(stakerListAddress,stakers)
-
+    
     if (stakerListAddress.length > 0) {
       //remove duplicate
       stakerListAddress = stakerListAddress.filter(
         (c, index) => stakerListAddress.indexOf(c) === index
       );
-      if(eoa.length===1&&stakers.filter(
+      if (
+        eoa.length === 1 &&
+        stakers.filter(
           x => x.token.id === '0xb0c8fef534223b891d4a430e49537143829c4817'
-        )[0]?.cumulativeBalance === '0'){
-          return [{ action: false, eoa, params: {} }];
-        }else{
-      const tierClaimerList: any[] = stakerListAddress.map(x => {
-        const { mainTier, volumeTier, tokenTier, stakingTier } = calculateTiers(
-          stakers.filter(y => y.address === x),
-          poolInfoWithUsd
-        );
-        return { mainTier, volumeTier, tokenTier, stakingTier, claimer: x };
-      });
-      const results = await Promise.all(
-        tierClaimerList.map(async (x: any) => {
-          const actions = new ActionCallerV2(
-            contractAddress,
-            ActionOnTypeV2.badge,
-            x.claimer,
-            options.network === 'mainnet' ? 137 : 80001,
-            {
-              changingLevel: x.mainTier,
-            }
+        )[0]?.cumulativeBalance === '0'
+      ) {
+        return [{ action: false, eoa, params: {} }];
+      } else {
+        const tierClaimerList: any[] = stakerListAddress.map(x => {
+          const {
+            mainTier,
+            volumeTier,
+            tokenTier,
+            stakingTier,
+          } = calculateTiers(
+            stakers.filter(y => y.address === x),
+            poolInfoWithUsd
           );
-          return await actions.calculateActionParams({
-            amount: x.volumeTier,
-            tokenStaked: x.tokenTier,
-            isDaysStaked: x.stakingTier,
-          });
-        })
-      );
-      return results;}
+          if (mainTier !== 0) {
+            return { mainTier, volumeTier, tokenTier, stakingTier, claimer: x };
+          } else {
+            return { action: false, eoa, params: {} };
+          }
+        });
+        const results = await Promise.all(
+          tierClaimerList.map(async (x: any) => {
+            const actions = new ActionCallerV2(
+              contractAddress,
+              ActionOnTypeV2.badge,
+              x.claimer,
+              options.network === 'mainnet' ? 137 : 80001,
+              {
+                changingLevel: x.mainTier,
+              }
+            );
+            return await actions.calculateActionParams({
+              amount: x.volumeTier,
+              tokenStaked: x.tokenTier,
+              isDaysStaked: x.stakingTier,
+            });
+          })
+        );
+        return results
+        // return eoa.length>1?results:results.filter((x:any) => x.action !== false && x.action !== 'false');
+      }
     } else {
       return [{ action: false, eoa, params: {} }];
     }
