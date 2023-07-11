@@ -1,32 +1,32 @@
-name: main
+# name: main
 
-on: [push]
+# on: [push]
 
-jobs:
-  build:
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    environment: NPM_TOKEN
-    strategy:
-      matrix:
-        node-version: [16.x, 18.x]
-    steps:
-      - uses: actions/checkout@v2
-      - name: Build on Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-      - run: yarn
-        name: Install
-      - run: npm run build --if-present
-        name: Build
-        env:
-          CI: true
-      # - run: npm run semantic-release
-      - run: |
-          npm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
-          npm publish --ignore-scripts
-        name: Publish
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+# jobs:
+#   build:
+#     if: github.ref == 'refs/heads/main'
+#     runs-on: ubuntu-latest
+#     environment: NPM_TOKEN
+#     strategy:
+#       matrix:
+#         node-version: [16.x, 18.x]
+#     steps:
+#       - uses: actions/checkout@v2
+#       - name: Build on Node.js ${{ matrix.node-version }}
+#         uses: actions/setup-node@v1
+#         with:
+#           node-version: ${{ matrix.node-version }}
+#       - run: yarn
+#         name: Install
+#       - run: npm run build --if-present
+#         name: Build
+#         env:
+#           CI: true
+#       # - run: npm run semantic-release
+#       - run: |
+#           npm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
+#           npm publish --ignore-scripts
+#         name: Publish
+#         env:
+#           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+#           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
