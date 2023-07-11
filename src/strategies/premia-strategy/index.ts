@@ -12,8 +12,8 @@ const listOfCourses = {
   '1': ['tc-exam'],
   '2': ['1.5-strat-exam', '2.5-strat-exam', '3.5-strat-exam'],
 };
-let redisClient;
-(async () => {
+let redisClient:any;
+const initialize = async () => {
   redisClient = createClient({
     password: 'CW4xB0fi22GN6Enp8z6P4PUJt3cVRP30',
     socket: {
@@ -22,10 +22,10 @@ let redisClient;
     },
   });
 
-  redisClient.on('error', error => console.error(`Error : ${error}`));
+  redisClient.on('error', error => console.error(`Error here 2 : ${error}`));
 
   await redisClient.connect();
-})();
+};
 const getAllPaginatedMembers = async (
   url: string,
   contractAddress: string,
@@ -118,8 +118,10 @@ const getLevelCategory = (courses: any[], category: string) => {
       newArray = newArray.map((x: any) => parseInt(x[0]) + 1);
       return { level: Math.max(...newArray), category: 0 };
     } else if (category === '1') {
+      console.log('categories 1', newArray);
       return { level: 1, category: 1 };
     } else if (category === '2') {
+      console.log('categories 2', newArray);
       newArray = newArray.map((x: any) => parseInt(x[0]));
       return { level: Math.max(...newArray), category: 2 };
     } else {
@@ -188,20 +190,22 @@ export async function strategy({
   eoa,
   options,
 }: StrategyParamsType) {
-  const pageNumber = parseInt(await redisClient.get('premia-strategy'));
-  const addressLimit = pageNumber !== 0 ? pageNumber * 50 : 50;
-  await redisClient.set('premia-strategy', 0);
+  let pageNumber = 0;
+  let addressLimit = 50;
   let targetAddress;
   if (eoa.length > 0) {
     targetAddress = eoa;
   } else {
+    await initialize()
+    pageNumber = parseInt(await redisClient.get('premia-strategy'));
+    addressLimit = pageNumber !== 0 ? pageNumber * 50 : 50;
     targetAddress = await getAllPremiaUser();
   }
+  
   const results: any = [];
+  console.log("addresses",pageNumber,addressLimit,targetAddress.length,targetAddress.slice(pageNumber !== 0 ? addressLimit - 50 : 0, addressLimit).length,targetAddress.slice(pageNumber !== 0 ? addressLimit - 50 : 0, addressLimit))
   await Promise.all(
-    targetAddress
-      .slice(pageNumber !== 0 ? addressLimit - 50 : 0, addressLimit)
-      .map(async (x: string) => {
+    targetAddress.slice(pageNumber !== 0 ? addressLimit - 50 : 0, addressLimit).map(async (x: string) => {
         const res: any = await getActionOnEOA(
           x,
           contractAddress,

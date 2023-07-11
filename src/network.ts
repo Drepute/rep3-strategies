@@ -1,7 +1,7 @@
 import { NetwrokObj } from "./utils/contract/utils/types";
 
 
-export const network: NetwrokObj = {
+export const network:  NetwrokObj = {
   '1': {
     name: 'Ethereum Mainnet',
     chainId: 1,

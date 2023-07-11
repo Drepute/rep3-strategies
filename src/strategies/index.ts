@@ -10,8 +10,8 @@ import * as rep3BadgeExpiry from './rep3/rep3-badge-expiry';
 import * as rep3BulkMembershipUri from './rep3/membership-bulk-update';
 import * as acrossStrategy from './across-strategy';
 import * as premiaStrategy from './premia-strategy';
-import * as nftStrategy from './adapter-strategy/nft-strategy';
-import * as tokenStrategy from './adapter-strategy/token-strategy';
+import * as contractStrategy from './contract-strategy';
+
 const strategies: Record<string, StrategyType> = {
   'rep3-is-member': rep3IsMember,
   'erc-20-balance-of': erc20BalanceOf,
@@ -22,10 +22,11 @@ const strategies: Record<string, StrategyType> = {
   'across-strategy': acrossStrategy,
   'premia-strategy': premiaStrategy,
 };
+
 const multipleStrategies: Record<string, any> = {
-  'nft-strategy': nftStrategy,
-  'token-strategy': tokenStrategy,
+  'contract-strategy': contractStrategy
 };
+
 Object.keys(strategies).forEach(function(strategyName) {
   let example = null;
   let about = '';
