@@ -118,8 +118,10 @@ const getLevelCategory = (courses: any[], category: string) => {
       newArray = newArray.map((x: any) => parseInt(x[0]) + 1);
       return { level: Math.max(...newArray), category: 0 };
     } else if (category === '1') {
+      console.log('categories 1', newArray);
       return { level: 1, category: 1 };
     } else if (category === '2') {
+      console.log('categories 2', newArray);
       newArray = newArray.map((x: any) => parseInt(x[0]));
       return { level: Math.max(...newArray), category: 2 };
     } else {
