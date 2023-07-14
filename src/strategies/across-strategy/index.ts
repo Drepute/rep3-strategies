@@ -362,7 +362,6 @@ export async function strategy({
     });
     const poolInfoWithUsd = await Promise.all(promisesTokenUSDPrice);
     if (eoa.length === 1) {
-      console.log(eoa);
       const promises = poolInfo
         .filter(x => x.addr !== '0xc2fab88f215f62244d2e32c8a65e8f58da8415a5')
         .map(async (x: any) => {
@@ -473,7 +472,7 @@ export async function strategy({
             });
           })
         );
-
+        //removing false action from update result
         return eoa.length === 1
           ? results
           : results.filter(
