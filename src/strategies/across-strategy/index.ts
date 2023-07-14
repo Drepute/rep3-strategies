@@ -224,7 +224,7 @@ const calculateTiers = (holderInfo: any[], poolInfo: any[]) => {
       }
     }
     const amount = calculateAmount(holderInfo, poolInfo);
-    console.log(amount);
+
     if (amount * 10e-18 < 500) {
       tier = tier * 1;
       volumeTier = 1;
@@ -317,7 +317,7 @@ export async function strategy({
         'https://api.thegraph.com/subgraphs/name/eth-jashan/across-staking-test',
     },
   };
-  
+
   const poolInfo = [
     {
       addr: '0x59C1427c658E97a7d568541DaC780b2E5c8affb4',
@@ -362,7 +362,7 @@ export async function strategy({
     });
     const poolInfoWithUsd = await Promise.all(promisesTokenUSDPrice);
     if (eoa.length === 1) {
-      console.log(eoa)
+      console.log(eoa);
       const promises = poolInfo
         .filter(x => x.addr !== '0xc2fab88f215f62244d2e32c8a65e8f58da8415a5')
         .map(async (x: any) => {
@@ -415,7 +415,7 @@ export async function strategy({
       //   await redisClient.set('across-strategy', pageNumber + 1);
       // }
     }
-    
+
     if (stakerListAddress.length > 0) {
       //remove duplicate
       stakerListAddress = stakerListAddress.filter(
@@ -425,9 +425,10 @@ export async function strategy({
         eoa.length === 1 &&
         (stakers.filter(
           x => x.token.id === '0xb0c8fef534223b891d4a430e49537143829c4817'
-        )[0]?.cumulativeBalance === '0'||stakers.filter(
-          x => x.token.id === '0xb0c8fef534223b891d4a430e49537143829c4817'
-        )[0]?.cumulativeBalance ===undefined)
+        )[0]?.cumulativeBalance === '0' ||
+          stakers.filter(
+            x => x.token.id === '0xb0c8fef534223b891d4a430e49537143829c4817'
+          )[0]?.cumulativeBalance === undefined)
       ) {
         return [{ action: false, eoa, params: {} }];
       } else {
@@ -444,7 +445,14 @@ export async function strategy({
           if (mainTier !== 0) {
             return { mainTier, volumeTier, tokenTier, stakingTier, claimer: x };
           } else {
-            return { action: false, eoa, params: {} };
+            //no suspend level 0 for across badge staking
+            return {
+              mainTier: 1,
+              volumeTier: 1,
+              tokenTier: 1,
+              stakingTier: 1,
+              claimer: x,
+            };
           }
         });
         const results = await Promise.all(
@@ -465,8 +473,12 @@ export async function strategy({
             });
           })
         );
-        return results
-        // return eoa.length>1?results:results.filter((x:any) => x.action !== false && x.action !== 'false');
+
+        return eoa.length === 1
+          ? results
+          : results.filter(
+              (x: any) => x.action !== false && x.action !== 'false'
+            );
       }
     } else {
       return [{ action: false, eoa, params: {} }];
