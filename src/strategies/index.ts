@@ -11,6 +11,7 @@ import * as rep3BulkMembershipUri from './rep3/membership-bulk-update';
 import * as acrossStrategy from './across-strategy';
 import * as premiaStrategy from './premia-strategy';
 import * as contractStrategy from './contract-strategy';
+import * as discordStrategy from './discord-strategy';
 
 const strategies: Record<string, StrategyType> = {
   'rep3-is-member': rep3IsMember,
@@ -24,7 +25,8 @@ const strategies: Record<string, StrategyType> = {
 };
 
 const multipleStrategies: Record<string, any> = {
-  'contract-strategy': contractStrategy
+  'contract-strategy': contractStrategy,
+  'discord-strategy':discordStrategy
 };
 
 Object.keys(strategies).forEach(function(strategyName) {

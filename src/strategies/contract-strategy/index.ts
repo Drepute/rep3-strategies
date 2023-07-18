@@ -6,5 +6,4 @@ export async function strategy({
   options,
 }: contractAdapterStrategy) {
   console.log('contract address', contractAddress, eoa, options);
-  // return await buildStrategyFromOptions(eoa[0]);
 }

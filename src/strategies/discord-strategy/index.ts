@@ -27,7 +27,7 @@ export async function strategy({
   eoa,
   options,
 }: discordAdapterStrategy) {
-  console.log('contract address', contractAddress, eoa, options);
+  console.log(contractAddress, eoa);
   const executionResult = await getFunctionOnType(options.type, options);
   return executionResult;
 }
