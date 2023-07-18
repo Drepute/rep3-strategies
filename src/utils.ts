@@ -8,19 +8,7 @@ import {
 import { ActionOnTypeV2 } from './actions/utils/type';
 import ActionCallerV2 from './actions/v2';
 
-async function callStrategy({
-  strategy,
-  contractAddress,
-  eoa,
-  options,
-}: CallStrategyParamsType) {
-  const res: boolean = await _strategies[strategy].strategy({
-    contractAddress,
-    eoa,
-    options,
-  });
-  return res;
-}
+// UTILS //
 const getCurrentParams = async (
   contractAddress: string,
   eoa: string,
@@ -34,6 +22,21 @@ const getCurrentParams = async (
   );
   return await action.calculateActionParams();
 };
+
+// STRATEGY CALLER //
+async function callStrategy({
+  strategy,
+  contractAddress,
+  eoa,
+  options,
+}: CallStrategyParamsType) {
+  const res: boolean = await _strategies[strategy].strategy({
+    contractAddress,
+    eoa,
+    options,
+  });
+  return res;
+}
 
 async function multipleCallStrategy<T extends AdapterNames>(
   contractAddress: string,
