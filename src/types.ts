@@ -3,27 +3,6 @@ export interface StrategyParamsType {
   eoa: [string];
   options: object | any;
 }
-export interface contractAdapterStrategy {
-  contractAddress: string;
-  eoa: [string];
-  network: 'mainnet' | 'testnet';
-  options: AdapterWithVariables['contractViewAdapter'];
-}
-export interface discordAdapterStrategy {
-  contractAddress: string;
-  eoa: [string];
-  network: 'mainnet' | 'testnet';
-  options: AdapterWithVariables['discordAdapter'];
-}
-export interface CallStrategyParamsType extends StrategyParamsType {
-  strategy: string;
-}
-
-export interface StrategyType {
-  strategy: ({ ...args }: StrategyParamsType) => Promise<any>;
-  example?: CallStrategyParamsType | null;
-  about?: string;
-}
 export type AdapterWithVariables = {
   contractViewAdapter: {
     contractAddress: string;
@@ -43,3 +22,24 @@ export type AdapterWithVariables = {
   };
 };
 export type AdapterNames = keyof AdapterWithVariables;
+export interface contractAdapterStrategy {
+  contractAddress: string;
+  eoa: [string];
+  network: 'mainnet' | 'testnet';
+  options: AdapterWithVariables['contractViewAdapter'];
+}
+export interface discordAdapterStrategy {
+  contractAddress: string;
+  eoa: [string];
+  network: 'mainnet' | 'testnet';
+  options: {variable:AdapterWithVariables['discordAdapter'],tier:number};
+}
+export interface CallStrategyParamsType extends StrategyParamsType {
+  strategy: string;
+}
+
+export interface StrategyType {
+  strategy: ({ ...args }: StrategyParamsType) => Promise<any>;
+  example?: CallStrategyParamsType | null;
+  about?: string;
+}

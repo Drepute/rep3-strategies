@@ -52,7 +52,7 @@ async function multipleCallStrategy<T extends AdapterNames>(
       strategy: string;
       options: { variable: AdapterWithVariables[T]; tier: number };
     }) => {
-      const res: boolean = await multipleStrategies[x.strategy].genericStrategy(
+      const res: boolean = await multipleStrategies[x.strategy].strategy(
         {
           contractAddress: contractAddress,
           eoa: eoa[0],

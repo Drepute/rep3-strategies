@@ -53,5 +53,6 @@ Object.keys(strategies).forEach(function(strategyName) {
   strategies[strategyName].example = example;
   strategies[strategyName].about = about;
 });
+
 export { multipleStrategies };
 export default strategies;
