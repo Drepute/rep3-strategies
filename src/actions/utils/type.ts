@@ -4,7 +4,7 @@ export enum ActionOnType {
   badge = 'badge',
   expiry = 'expiry',
   updateUri = 'updateUri',
-  category='categoryLevel'
+  category = 'categoryLevel',
 }
 
 export enum MembershipActions {
@@ -16,6 +16,8 @@ export enum MembershipActions {
 }
 export enum ActionOnTypeV2 {
   badge = 'badge',
+  dynamicBadge = 'dynamicBadge',
+  currentParams = 'currentParams',
 }
 export enum MembershipActionsV2 {
   badgeMint = 'mint',

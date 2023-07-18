@@ -441,7 +441,7 @@ export async function strategy({
           tierClaimerList.map(async (x: any) => {
             const actions = new ActionCallerV2(
               contractAddress,
-              ActionOnTypeV2.badge,
+              ActionOnTypeV2.dynamicBadge,
               x.claimer,
               options.network === 'mainnet' ? 137 : 80001,
               {

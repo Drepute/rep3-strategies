@@ -1,13 +1,10 @@
-import {
-  adapterStrategy,
-} from '../../types';
-
+import { contractAdapterStrategy } from '../../types';
 
 export async function strategy({
   contractAddress,
   eoa,
   options,
-}: adapterStrategy) {
-  console.log('contract address', contractAddress,eoa,options);
+}: contractAdapterStrategy) {
+  console.log('contract address', contractAddress, eoa, options);
   // return await buildStrategyFromOptions(eoa[0]);
 }
