@@ -26,7 +26,7 @@ export interface contractAdapterStrategy {
   contractAddress: string;
   eoa: [string];
   network: 'mainnet' | 'testnet';
-  options: AdapterWithVariables['contractViewAdapter'];
+  options: {variable:AdapterWithVariables['contractViewAdapter'],tier:number};
 }
 export interface discordAdapterStrategy {
   contractAddress: string;

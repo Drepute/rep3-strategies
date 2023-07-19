@@ -1,4 +1,4 @@
-export const erc1155 = [
+export const erc1155Abi = [
   {
     anonymous: false,
     inputs: [

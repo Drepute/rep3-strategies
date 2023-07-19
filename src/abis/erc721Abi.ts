@@ -1,4 +1,4 @@
-export const erc721 = [
+export const erc721Abi = [
   {
     constant: false,
     inputs: [

@@ -58,7 +58,7 @@ async function multipleCallStrategy<T extends AdapterNames>(
       const res: boolean = await multipleStrategies[x.strategy].strategy(
         {
           contractAddress: contractAddress,
-          eoa: eoa[0],
+          eoa: eoa,
           options: x.options,
         }
       );

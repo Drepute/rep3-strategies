@@ -1,3 +1,4 @@
+import { viewAdapter } from '../../adapters/contract';
 import { contractAdapterStrategy } from '../../types';
 
 export async function strategy({
@@ -5,5 +6,7 @@ export async function strategy({
   eoa,
   options,
 }: contractAdapterStrategy) {
-  console.log('contract address', contractAddress, eoa, options);
+  console.log('contract adapter', contractAddress, eoa, options);
+  const executionResult:boolean = await viewAdapter(eoa[0],options.variable)
+  return executionResult
 }

@@ -1,9 +1,9 @@
 import { ethers } from 'ethers';
 import { network } from '../../network.js';
 import { AdapterWithVariables } from '../../types.js';
-import erc1155Abi from '../../../abis/erc1155Abi.js';
-import erc20Abi from '../../../abis/erc20Abi.js';
-import erc721Abi from '../../../abis/erc721Abi.js';
+import {erc1155Abi} from '../../abis/erc1155Abi.js';
+import {erc20Abi} from '../../abis/erc20Abi.js';
+import {erc721Abi} from '../../abis/erc721Abi.js';
 
 const genericViewCall = async (
   address: string,
@@ -12,6 +12,7 @@ const genericViewCall = async (
   params: any[],
   chainId: number
 ) => {
+  console.log("paramsss",address,functionName,params)
   const provider = new ethers.providers.JsonRpcProvider(network[chainId].rpc);
   const nftContract = new ethers.Contract(address, abi, provider);
   const res = await nftContract[functionName](...params);
@@ -19,6 +20,7 @@ const genericViewCall = async (
 };
 
 const arithmeticOperand = (a: number, b: number, op: string) => {
+  console.log(a,b,op)
   if (op === '===') {
     return a === b;
   } else if (op === '>=') {
@@ -77,8 +79,8 @@ export const viewAdapter = async (
     );
   }
   return arithmeticOperand(
-    functionParams.balanceThreshold,
     parseInt(response.toString()),
+    functionParams.balanceThreshold,
     functionParams.operator
   );
 };
