@@ -370,7 +370,7 @@ export async function strategy({
       console.log('all members', allMembers.length);
       stakerListAddress = allMembers
         // .slice()
-        // .slice(pageNumber !== 0 ? addressLimit - 50 : 0, addressLimit)
+        .slice(pageNumber !== 0 ? addressLimit - 50 : 0, addressLimit)
         .map(x => x.claimer);
       console.log('here', stakerListAddress.length);
       const promises = poolInfo
