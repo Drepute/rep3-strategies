@@ -1,7 +1,7 @@
-import ActionCallerV1 from '../../actions/v1';
-import { ActionOnType } from '../../actions/utils/type';
-import { StrategyParamsType } from '../../types';
-import { getAllAssociationBadges } from '../../utils/rep3';
+import ActionCallerV1 from '../../../../actions/v1';
+import { ActionOnType } from '../../../../actions/utils/type';
+import { StrategyParamsType } from '../../../../types';
+import { getAllAssociationBadges } from '../../../../utils/rep3';
 
 const getInfoOnMonth = (months: number) => {
   //console.log('current month', months);

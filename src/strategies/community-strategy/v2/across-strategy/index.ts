@@ -1,11 +1,11 @@
-import ActionCallerV2 from '../../actions/v2';
-import { ActionOnTypeV2 } from '../../actions/utils/type';
-import { StrategyParamsType } from '../../types';
-import { subgraph } from '../../utils';
+import ActionCallerV2 from '../../../../actions/v2';
+import { ActionOnTypeV2 } from '../../../../actions/utils/type';
+import { StrategyParamsType } from '../../../../types';
+import { subgraph } from '../../../../utils';
 import fetch from 'cross-fetch';
 import { ethers } from 'ethers';
-import { network } from '../../network';
-import { getAllClaimedMembers } from '../../actions/utils/helperFunctionsV2';
+import { network } from '../../../../network';
+import { getAllClaimedMembers } from '../../../../actions/utils/helperFunctionsV2';
 import { createClient } from 'redis';
 let redisClient: any;
 const redisInitialize = async () => {

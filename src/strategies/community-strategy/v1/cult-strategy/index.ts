@@ -1,11 +1,11 @@
-import ActionCallerV1 from '../../actions/v1';
-import { ActionOnType } from '../../actions/utils/type';
-import { StrategyParamsType } from '../../types';
-import { subgraph } from '../../utils';
-import { network } from '../../network';
+import ActionCallerV1 from '../../../../actions/v1';
+import { ActionOnType } from '../../../../actions/utils/type';
+import { StrategyParamsType } from '../../../../types';
+import { subgraph } from '../../../../utils';
+import { network } from '../../../../network';
 import { createClient } from 'redis';
 
-let redisClient:any;
+let redisClient: any;
 const initialize = async () => {
   redisClient = createClient({
     password: 'CW4xB0fi22GN6Enp8z6P4PUJt3cVRP30',
@@ -373,24 +373,24 @@ export async function strategy({
       options.event.event === 'ProposalExecuted' ||
       options.event.event === 'ProposalCanceled'
     ) {
-
       let allTargetAddress = await getAllMembers(
         network[networks === 'mainnet' ? 137 : 80001].subgraph,
         contractAddress
       );
-      await initialize()
+      await initialize();
       const pageNumber = parseInt(await redisClient.get('cult-strategy'));
       const addressLimit = pageNumber !== 0 ? pageNumber * 50 : 50;
-      allTargetAddress = allTargetAddress.map((x: any) => x.claimer.toLowerCase());
+      allTargetAddress = allTargetAddress.map((x: any) =>
+        x.claimer.toLowerCase()
+      );
       allTargetAddress = allTargetAddress.filter((c, index) => {
         return allTargetAddress.indexOf(c) === index;
       });
-      targetAddress = allTargetAddress
-      .slice(
+      targetAddress = allTargetAddress.slice(
         pageNumber !== 0 ? addressLimit - 50 : 0,
         addressLimit
       );
-      console.log(allTargetAddress.length , addressLimit,pageNumber);
+      console.log(allTargetAddress.length, addressLimit, pageNumber);
       if (allTargetAddress.length <= addressLimit) {
         await redisClient.set('cult-strategy', 0);
       } else {
@@ -406,15 +406,15 @@ export async function strategy({
   }
   if (targetAddress.length > 0) {
     // if (targetAddress.length > 1) {
-      // const pageNumber = parseInt(await redisClient.get('premia-strategy'));
-      // const addressLimit = pageNumber !== 0 ? pageNumber * 50 : 50;
-      
-      // console.log(addressLimit, pageNumber);
-      // if (targetAddress.length <= addressLimit) {
-      //   await redisClient.set('cult-strategy', 0);
-      // } else {
-      //   await redisClient.set('cult-strategy', pageNumber + 1);
-      // }
+    // const pageNumber = parseInt(await redisClient.get('premia-strategy'));
+    // const addressLimit = pageNumber !== 0 ? pageNumber * 50 : 50;
+
+    // console.log(addressLimit, pageNumber);
+    // if (targetAddress.length <= addressLimit) {
+    //   await redisClient.set('cult-strategy', 0);
+    // } else {
+    //   await redisClient.set('cult-strategy', pageNumber + 1);
+    // }
     // }
     const results = await Promise.all(
       targetAddress.map(async (x: string) => {

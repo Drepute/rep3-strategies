@@ -2,14 +2,14 @@ import { readFileSync } from 'fs';
 import path from 'path';
 
 import { StrategyType } from '../types';
-import * as rep3IsMember from './rep3/rep3-is-member';
-import * as erc20BalanceOf from './erc20-balance-of';
-import * as cultGov from './cult-strategy';
-import * as readyPlayerDao from './ready-player-dao';
-import * as rep3BadgeExpiry from './rep3/rep3-badge-expiry';
-import * as rep3BulkMembershipUri from './rep3/membership-bulk-update';
-import * as acrossStrategy from './across-strategy';
-import * as premiaStrategy from './premia-strategy';
+import * as rep3IsMember from './community-strategy/v1/rep3-platform/rep3-is-member';
+import * as erc20BalanceOf from './community-strategy/v1/erc20-balance-of';
+import * as cultGov from './community-strategy/v1/cult-strategy';
+import * as readyPlayerDao from './community-strategy/v1/ready-player-dao';
+import * as rep3BadgeExpiry from './community-strategy/v1/rep3-platform/rep3-badge-expiry';
+import * as rep3BulkMembershipUri from './community-strategy/v1/rep3-platform/membership-bulk-update';
+import * as acrossStrategy from './community-strategy/v2/across-strategy';
+import * as premiaStrategy from './community-strategy/v1/premia-strategy';
 import * as contractStrategy from './contract-strategy';
 import * as discordStrategy from './discord-strategy';
 
@@ -26,7 +26,7 @@ const strategies: Record<string, StrategyType> = {
 
 const multipleStrategies: Record<string, any> = {
   'contract-strategy': contractStrategy,
-  'discord-strategy':discordStrategy
+  'discord-strategy': discordStrategy,
 };
 
 Object.keys(strategies).forEach(function(strategyName) {

@@ -7,10 +7,10 @@ export type AdapterWithVariables = {
   contractViewAdapter: {
     contractAddress: string;
     type: 'erc1155' | 'erc721' | 'erc20' | 'custom';
-    operator: '===' | '>=' | '<=' | '<' | '>';
     chainId: number;
     balanceThreshold: number;
-    functionFragment?: string;
+    operator: '===' | '>=' | '<=' | '<' | '>';
+    functionName?: string;
     abi?: any[];
   };
   discordAdapter: {
@@ -26,13 +26,16 @@ export interface contractAdapterStrategy {
   contractAddress: string;
   eoa: [string];
   network: 'mainnet' | 'testnet';
-  options: {variable:AdapterWithVariables['contractViewAdapter'],tier:number};
+  options: {
+    variable: AdapterWithVariables['contractViewAdapter'];
+    tier: number;
+  };
 }
 export interface discordAdapterStrategy {
   contractAddress: string;
   eoa: [string];
   network: 'mainnet' | 'testnet';
-  options: {variable:AdapterWithVariables['discordAdapter'],tier:number};
+  options: { variable: AdapterWithVariables['discordAdapter']; tier: number };
 }
 export interface CallStrategyParamsType extends StrategyParamsType {
   strategy: string;
