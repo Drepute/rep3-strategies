@@ -73,7 +73,11 @@ async function multipleCallStrategy<T extends AdapterNames>(
     eoa[0],
     network
   );
-  return [results, currentParams];
+  const resultObj = results.reduce(
+    (acc, cur) => ({ ...acc, [cur.tier]: cur.executionResult }),
+    {}
+  );
+  return { tierMatrix: resultObj, currentParams };
 }
 
 export const { subgraph } = utils;

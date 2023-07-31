@@ -30,11 +30,10 @@ export async function strategy({
   eoa,
   options,
 }: discordAdapterStrategy) {
-  console.log('Here ====>', contractAddress, eoa, options);
+  console.log('discord strategy', contractAddress, eoa);
   const executionResult = await getFunctionOnType(
     options.variable.type,
     options.variable
   );
-  console.log('execution', executionResult);
   return executionResult;
 }
