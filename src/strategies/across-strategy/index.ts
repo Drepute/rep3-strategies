@@ -5,23 +5,22 @@ import { subgraph } from '../../utils';
 import fetch from 'cross-fetch';
 import { ethers } from 'ethers';
 import { network } from '../../network';
-// import { createClient } from 'redis';
 import { getAllClaimedMembers } from '../../actions/utils/helperFunctionsV2';
-// let redisClient;
-// (async () => {
-//   redisClient = createClient({
-//     password: 'CW4xB0fi22GN6Enp8z6P4PUJt3cVRP30',
-//     socket: {
-//       host: 'redis-12292.c15.us-east-1-2.ec2.cloud.redislabs.com',
-//       port: 12292,
-//     },
-//   });
+import { createClient } from 'redis';
+let redisClient: any;
+const redisInitialize = async () => {
+  redisClient = createClient({
+    password: 'CW4xB0fi22GN6Enp8z6P4PUJt3cVRP30',
+    socket: {
+      host: 'redis-12292.c15.us-east-1-2.ec2.cloud.redislabs.com',
+      port: 12292,
+    },
+  });
 
-//   redisClient.on('error', error => console.error(`Error : ${error}`));
+  redisClient.on('error', error => console.error(`Error : ${error}`));
 
-//   await redisClient.connect();
-// })();
-
+  await redisClient.connect();
+};
 const getAllPaginatedStakers = async (
   url: string,
   tokensId: any,
@@ -116,31 +115,6 @@ const getAllStakers = async (
     );
   }
 };
-
-// const getAllTokenInfo = async (
-//   url: string,
-//   page = 0,
-//   allTokens: any[] = []
-// ) => {
-//   const stakers = await subgraph.subgraphRequest(url, {
-//     stakedTokenInfos: {
-//       __args: {
-//         skip: page * 100,
-//       },
-//       id: true,
-//       cumulativeStaked: true,
-//     },
-//   });
-//   const all = allTokens.concat(stakers.stakedTokenInfos);
-
-//   if (stakers.stakedTokenInfos.length === 100) {
-//     page = page + 1;
-//     const res: any[] | undefined = await getAllTokenInfo(url, page, all);
-//     return res;
-//   } else {
-//     return all;
-//   }
-// };
 
 const getPriceOfToken = async (tokenSymbol: string) => {
   try {
@@ -248,6 +222,7 @@ const calculateTiers = (holderInfo: any[], poolInfo: any[]) => {
     };
   }
 };
+
 const geCurrentExchangeRate = async (tokenAddress: string) => {
   const provider = new ethers.providers.JsonRpcProvider(network['1'].rpc);
   const hubpool = new ethers.Contract(
@@ -302,6 +277,7 @@ const geCurrentExchangeRate = async (tokenAddress: string) => {
       parseInt(pooledToken.undistributedLpFees.toString()));
   return numerator / totalSupply;
 };
+
 export async function strategy({
   contractAddress,
   eoa,
@@ -381,8 +357,9 @@ export async function strategy({
       await Promise.all(promises);
       stakerListAddress = stakers.map(x => x.address);
     } else {
-      // const pageNumber = parseInt(await redisClient.get('across-strategy'));
-      // const addressLimit = pageNumber !== 0 ? pageNumber * 50 : 50;
+      await redisInitialize();
+      const pageNumber = parseInt(await redisClient.get('across-strategy'));
+      const addressLimit = pageNumber !== 0 ? pageNumber * 50 : 50;
       const allMembers = await getAllClaimedMembers(
         contractAddress,
         0,
@@ -390,7 +367,12 @@ export async function strategy({
         0,
         []
       );
-      stakerListAddress = allMembers.map(x => x.claimer);
+      console.log('all members', allMembers.length);
+      stakerListAddress = allMembers
+        // .slice()
+        .slice(pageNumber !== 0 ? addressLimit - 50 : 0, addressLimit)
+        .map(x => x.claimer);
+      console.log('here', stakerListAddress.length);
       const promises = poolInfo
         .filter(x => x.addr !== '0xc2fab88f215f62244d2e32c8a65e8f58da8415a5')
         .map(async (x: any) => {
@@ -408,11 +390,12 @@ export async function strategy({
           }
         });
       await Promise.all(promises);
-      // if (allMembers.length <= addressLimit) {
-      //   await redisClient.set('across-strategy', 0);
-      // } else {
-      //   await redisClient.set('across-strategy', pageNumber + 1);
-      // }
+      console.log(stakers);
+      if (allMembers.length <= addressLimit) {
+        await redisClient.set('across-strategy', 0);
+      } else {
+        await redisClient.set('across-strategy', pageNumber + 1);
+      }
     }
 
     if (stakerListAddress.length > 0) {
