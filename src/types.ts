@@ -4,9 +4,10 @@ export interface StrategyParamsType {
   options: object | any;
 }
 export type AdapterWithVariables = {
-  contractViewAdapter: {
+  contractAdapter: {
     contractAddress: string;
-    type: 'erc1155' | 'erc721' | 'erc20' | 'custom';
+    type: 'view' | 'events';
+    contractType: 'erc1155' | 'erc721' | 'erc20' | 'custom';
     chainId: number;
     balanceThreshold: number;
     operator: '===' | '>=' | '<=' | '<' | '>';
@@ -27,7 +28,7 @@ export interface contractAdapterStrategy {
   eoa: [string];
   network: 'mainnet' | 'testnet';
   options: {
-    variable: AdapterWithVariables['contractViewAdapter'];
+    variable: AdapterWithVariables['contractAdapter'];
     tier: number;
   };
 }

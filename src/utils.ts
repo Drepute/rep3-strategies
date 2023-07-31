@@ -23,7 +23,7 @@ const getCurrentParams = async (
   return await action.calculateActionParams();
 };
 
-// STRATEGY CALLER //
+// STRATEGY CALLERS //
 async function callStrategy({
   strategy,
   contractAddress,
@@ -37,7 +37,7 @@ async function callStrategy({
   });
   return res;
 }
-
+// MULTIPLE STRATEGY CALLERS //
 async function multipleCallStrategy<T extends AdapterNames>(
   contractAddress: string,
   eoa: [string],
@@ -55,13 +55,11 @@ async function multipleCallStrategy<T extends AdapterNames>(
       strategy: string;
       options: { variable: AdapterWithVariables[T]; tier: number };
     }) => {
-      const res: boolean = await multipleStrategies[x.strategy].strategy(
-        {
-          contractAddress: contractAddress,
-          eoa: eoa,
-          options: x.options,
-        }
-      );
+      const res: boolean = await multipleStrategies[x.strategy].strategy({
+        contractAddress: contractAddress,
+        eoa: eoa,
+        options: x.options,
+      });
       return {
         executionResult: res,
         tier: x.options.tier,

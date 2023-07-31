@@ -5,7 +5,6 @@ const getFunctionOnType = async (
   type: 'isMember',
   options: AdapterWithVariables['discordAdapter']
 ) => {
-    console.log("type here ==>", type)
   switch (type) {
     case 'isMember':
       try {
@@ -14,15 +13,15 @@ const getFunctionOnType = async (
             options.serviceConfig,
             options.discordUserTokens,
             options.guildId,
-            options.roleId && options.roleId
+            options.roleId
           );
         }
       } catch (error) {
         return false;
       }
-      break
+      break;
     default:
-        return false
+      return false;
   }
 };
 
@@ -31,8 +30,11 @@ export async function strategy({
   eoa,
   options,
 }: discordAdapterStrategy) {
-  console.log("Here ====>", contractAddress, eoa, options);
-  const executionResult = await getFunctionOnType(options.variable.type, options.variable);
-  console.log("execution",executionResult)
+  console.log('Here ====>', contractAddress, eoa, options);
+  const executionResult = await getFunctionOnType(
+    options.variable.type,
+    options.variable
+  );
+  console.log('execution', executionResult);
   return executionResult;
 }

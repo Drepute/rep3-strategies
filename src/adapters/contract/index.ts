@@ -48,11 +48,11 @@ const getAbiOnType = (type: 'erc1155' | 'erc721' | 'erc20' | 'custom') => {
 };
 export const viewAdapter = async (
   holder: string,
-  functionParams: AdapterWithVariables['contractViewAdapter']
+  functionParams: AdapterWithVariables['contractAdapter']
 ) => {
   let response;
   if (
-    functionParams.type === 'custom' &&
+    functionParams.contractType === 'custom' &&
     functionParams.abi &&
     functionParams.functionName
   ) {
@@ -64,14 +64,14 @@ export const viewAdapter = async (
       functionParams.chainId
     );
   } else if (
-    (functionParams.type === 'erc1155' ||
-      functionParams.type === 'erc20' ||
-      functionParams.type === 'erc721') &&
+    (functionParams.contractType === 'erc1155' ||
+      functionParams.contractType === 'erc20' ||
+      functionParams.contractType === 'erc721') &&
     functionParams.functionName
   ) {
     response = await genericViewCall(
       functionParams.contractAddress,
-      getAbiOnType(functionParams.type),
+      getAbiOnType(functionParams.contractType),
       functionParams.functionName,
       [holder],
       functionParams.chainId
