@@ -145,7 +145,7 @@ export const getCourseFinished = async (
     const courses = await response.json();
     const categories = Object.keys(listOfCourses);
     const levelCategory = categories.map(x => {
-      return getLevelCategory([...courses.courses, 'op-exam'], x);
+      return getLevelCategory([...courses.courses], x);
     });
     return levelCategory;
   } catch (error) {
