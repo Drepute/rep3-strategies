@@ -203,15 +203,7 @@ export async function strategy({
   }
 
   const results: any = [];
-  console.log(
-    'addresses',
-    pageNumber,
-    addressLimit,
-    targetAddress.length,
-    targetAddress.slice(pageNumber !== 0 ? addressLimit - 50 : 0, addressLimit)
-      .length,
-    targetAddress.slice(pageNumber !== 0 ? addressLimit - 50 : 0, addressLimit)
-  );
+
   await Promise.all(
     targetAddress
       .slice(pageNumber !== 0 ? addressLimit - 50 : 0, addressLimit)
