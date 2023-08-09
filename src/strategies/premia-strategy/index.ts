@@ -3,7 +3,6 @@ import ActionCallerV1 from '../../actions/v1';
 import { ActionOnType } from '../../actions/utils/type';
 import { StrategyParamsType } from '../../types';
 import { subgraph } from '../../utils';
-// import { network } from '../../utils/contract/network';
 import fetch from 'cross-fetch';
 import { createClient } from 'redis';
 
@@ -11,8 +10,10 @@ const listOfCourses = {
   '0': ['1.5-exam', '2.5-exam', '3.5-exam', '4.5-exam', '5.5-exam'],
   '1': ['tc-exam'],
   '2': ['1.5-strat-exam', '2.5-strat-exam', '3.5-strat-exam'],
+  '3': ['op-exam'],
 };
-let redisClient:any;
+
+let redisClient: any;
 const initialize = async () => {
   redisClient = createClient({
     password: 'CW4xB0fi22GN6Enp8z6P4PUJt3cVRP30',
@@ -114,16 +115,15 @@ const getLevelCategory = (courses: any[], category: string) => {
   newArray = newArray.reduce((x, y) => x.filter(z => y.includes(z)));
   if (newArray.length > 0) {
     if (category === '0') {
-      console.log('categories 0', newArray);
       newArray = newArray.map((x: any) => parseInt(x[0]) + 1);
       return { level: Math.max(...newArray), category: 0 };
     } else if (category === '1') {
-      console.log('categories 1', newArray);
       return { level: 1, category: 1 };
     } else if (category === '2') {
-      console.log('categories 2', newArray);
       newArray = newArray.map((x: any) => parseInt(x[0]));
       return { level: Math.max(...newArray), category: 2 };
+    } else if (category === '3') {
+      return { level: newArray.length, category: 3 };
     } else {
       return { level: false, category: false };
     }
@@ -145,7 +145,7 @@ export const getCourseFinished = async (
     const courses = await response.json();
     const categories = Object.keys(listOfCourses);
     const levelCategory = categories.map(x => {
-      return getLevelCategory(courses.courses, x);
+      return getLevelCategory([...courses.courses, 'op-exam'], x);
     });
     return levelCategory;
   } catch (error) {
@@ -196,16 +196,26 @@ export async function strategy({
   if (eoa.length > 0) {
     targetAddress = eoa;
   } else {
-    await initialize()
+    await initialize();
     pageNumber = parseInt(await redisClient.get('premia-strategy'));
     addressLimit = pageNumber !== 0 ? pageNumber * 50 : 50;
     targetAddress = await getAllPremiaUser();
   }
-  
+
   const results: any = [];
-  console.log("addresses",pageNumber,addressLimit,targetAddress.length,targetAddress.slice(pageNumber !== 0 ? addressLimit - 50 : 0, addressLimit).length,targetAddress.slice(pageNumber !== 0 ? addressLimit - 50 : 0, addressLimit))
+  console.log(
+    'addresses',
+    pageNumber,
+    addressLimit,
+    targetAddress.length,
+    targetAddress.slice(pageNumber !== 0 ? addressLimit - 50 : 0, addressLimit)
+      .length,
+    targetAddress.slice(pageNumber !== 0 ? addressLimit - 50 : 0, addressLimit)
+  );
   await Promise.all(
-    targetAddress.slice(pageNumber !== 0 ? addressLimit - 50 : 0, addressLimit).map(async (x: string) => {
+    targetAddress
+      .slice(pageNumber !== 0 ? addressLimit - 50 : 0, addressLimit)
+      .map(async (x: string) => {
         const res: any = await getActionOnEOA(
           x,
           contractAddress,
@@ -215,6 +225,7 @@ export async function strategy({
         res.forEach((x: any) => results.push(x));
       })
   );
+
   const nonNullResult = results.filter(x => x !== null && x !== undefined);
   if (targetAddress.length <= addressLimit) {
     await redisClient.set('premia-strategy', 0);
