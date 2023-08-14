@@ -47,13 +47,14 @@ async function multipleCallStrategy<T extends AdapterNames>(
     options: {
       variable: AdapterWithVariables[T];
       tier: number;
+      task_id: number;
     };
   }[]
 ) {
   const promiseResults = strategiesConfig.map(
     async (x: {
       strategy: string;
-      options: { variable: AdapterWithVariables[T]; tier: number };
+      options: { variable: AdapterWithVariables[T]; tier: number;task_id:number };
     }) => {
       const res: boolean = await multipleStrategies[x.strategy].strategy({
         contractAddress: contractAddress,
@@ -63,21 +64,24 @@ async function multipleCallStrategy<T extends AdapterNames>(
       return {
         executionResult: res,
         tier: x.options.tier,
+        id:x.options.task_id,
         strategy: x.strategy,
       };
     }
   );
-  const results = await Promise.all(promiseResults);
+  let results = await Promise.all(promiseResults);
+  results = results.filter(x=>x.executionResult!==false)
+  console.log("res",results)
   const currentParams = await getCurrentParams(
     contractAddress,
     eoa[0],
     network
   );
   const resultObj = results.reduce(
-    (acc, cur) => ({ ...acc, [cur.tier]: cur.executionResult }),
+    (acc, cur) => ({ ...acc, [cur.tier]:[ {"executionResult": cur.executionResult, "task_id": cur.id}] }),
     {}
   );
-  return { tierMatrix: resultObj, currentParams };
+  return { tierMatrix: resultObj, params: currentParams };
 }
 
 export const { subgraph } = utils;
