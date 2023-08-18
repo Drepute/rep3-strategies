@@ -25,7 +25,7 @@ export default class ActionCallerV2 {
     this.actionType = actionType;
     this.eoa = eoa;
     this.network = network;
-    if (actionType === ActionOnTypeV2.badge) {
+    if (actionType === ActionOnTypeV2.badge || ActionOnTypeV2.dynamicBadge) {
       this.membershipOptions = options;
     }
   }

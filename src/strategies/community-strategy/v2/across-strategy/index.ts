@@ -403,6 +403,7 @@ export async function strategy({
       stakerListAddress = stakerListAddress.filter(
         (c, index) => stakerListAddress.indexOf(c) === index
       );
+
       if (
         eoa.length === 1 &&
         (stakers.filter(
@@ -425,6 +426,7 @@ export async function strategy({
             poolInfoWithUsd
           );
           if (mainTier !== 0) {
+            console.log(mainTier, volumeTier, tokenTier, stakingTier);
             return { mainTier, volumeTier, tokenTier, stakingTier, claimer: x };
           } else {
             //no suspend level 0 for across badge staking
@@ -437,6 +439,7 @@ export async function strategy({
             };
           }
         });
+        console.log('tierClaimerList', tierClaimerList);
         const results = await Promise.all(
           tierClaimerList.map(async (x: any) => {
             const actions = new ActionCallerV2(
@@ -448,11 +451,13 @@ export async function strategy({
                 changingLevel: x.mainTier,
               }
             );
-            return await actions.calculateActionParams({
+
+            const res = await actions.calculateActionParams({
               amount: x.volumeTier,
               tokenStaked: x.tokenTier,
               isDaysStaked: x.stakingTier,
             });
+            return res;
           })
         );
         //removing false action from update result

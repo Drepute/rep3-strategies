@@ -51,37 +51,82 @@ async function multipleCallStrategy<T extends AdapterNames>(
     };
   }[]
 ) {
-  const promiseResults = strategiesConfig.map(
-    async (x: {
-      strategy: string;
-      options: { variable: AdapterWithVariables[T]; tier: number;task_id:number };
-    }) => {
-      const res: boolean = await multipleStrategies[x.strategy].strategy({
-        contractAddress: contractAddress,
-        eoa: eoa,
-        options: x.options,
-      });
-      return {
-        executionResult: res,
-        tier: x.options.tier,
-        id:x.options.task_id,
-        strategy: x.strategy,
-      };
+  if (
+    strategiesConfig?.[0]?.strategy === 'contract-strategy' &&
+    strategiesConfig?.[0]?.options.variable.type === 'across'
+  ) {
+    const res = await _strategies['across-strategy'].strategy({
+      contractAddress,
+      eoa,
+      options: { network: network },
+    });
+    if (res.length > 0) {
+      const resultObj = res.reduce(
+        (acc, cur) => ({
+          ...acc,
+          [cur.params.upgradeTier.tier]: [
+            {
+              executionResult: true,
+              task_id: strategiesConfig.filter(
+                x => x.options.tier === cur.params.upgradeTier.tier
+              )?.[0]?.options?.task_id,
+            },
+          ],
+        }),
+        {}
+      );
+
+      if (res[0].action) {
+        const response = {
+          tierMatrix: resultObj,
+          params: { metaData: res[0].metaData, action: res[0].action },
+        };
+        return response;
+      } else {
+        return {};
+      }
+    } else {
+      return {};
     }
-  );
-  let results = await Promise.all(promiseResults);
-  results = results.filter(x=>x.executionResult!==false)
-  console.log("res",results)
-  const currentParams = await getCurrentParams(
-    contractAddress,
-    eoa[0],
-    network
-  );
-  const resultObj = results.reduce(
-    (acc, cur) => ({ ...acc, [cur.tier]:[ {"executionResult": cur.executionResult, "task_id": cur.id}] }),
-    {}
-  );
-  return { tierMatrix: resultObj, params: currentParams };
+  } else {
+    const promiseResults = strategiesConfig.map(
+      async (x: {
+        strategy: string;
+        options: {
+          variable: AdapterWithVariables[T];
+          tier: number;
+          task_id: number;
+        };
+      }) => {
+        const res: boolean = await multipleStrategies[x.strategy].strategy({
+          contractAddress: contractAddress,
+          eoa: eoa,
+          options: x.options,
+        });
+        return {
+          executionResult: res,
+          tier: x.options.tier,
+          id: x.options.task_id,
+          strategy: x.strategy,
+        };
+      }
+    );
+    let results = await Promise.all(promiseResults);
+    results = results.filter(x => x.executionResult !== false);
+    const currentParams = await getCurrentParams(
+      contractAddress,
+      eoa[0],
+      network
+    );
+    const resultObj = results.reduce(
+      (acc, cur) => ({
+        ...acc,
+        [cur.tier]: [{ executionResult: cur.executionResult, task_id: cur.id }],
+      }),
+      {}
+    );
+    return { tierMatrix: resultObj, params: currentParams };
+  }
 }
 
 export const { subgraph } = utils;

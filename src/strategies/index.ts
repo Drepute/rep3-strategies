@@ -25,7 +25,7 @@ const strategies: Record<string, StrategyType> = {
 };
 
 const multipleStrategies: Record<string, any> = {
-  'contract-strategy': contractStrategy,
+  'smart-contract-strategy': contractStrategy,
   'discord-strategy': discordStrategy,
 };
 
