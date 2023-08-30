@@ -52,7 +52,7 @@ async function multipleCallStrategy<T extends AdapterNames>(
   }[]
 ) {
   if (
-    strategiesConfig?.[0]?.strategy === 'contract-strategy' &&
+    strategiesConfig?.[0]?.strategy === 'smart-contract-strategy' &&
     strategiesConfig?.[0]?.options.variable.type === 'across'
   ) {
     const res = await _strategies['across-strategy'].strategy({
@@ -60,7 +60,7 @@ async function multipleCallStrategy<T extends AdapterNames>(
       eoa,
       options: { network: network },
     });
-    if (res.length > 0) {
+    if (res.length > 0 && res[0]?.action) {
       const resultObj = res.reduce(
         (acc, cur) => ({
           ...acc,
