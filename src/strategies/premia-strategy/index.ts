@@ -11,6 +11,7 @@ const listOfCourses = {
   '1': ['tc-exam'],
   '2': ['1.5-strat-exam', '2.5-strat-exam', '3.5-strat-exam'],
   '3': ['op-exam'],
+  '4': ['masterclass-exam-1'],
 };
 
 let redisClient: any;
@@ -124,6 +125,8 @@ const getLevelCategory = (courses: any[], category: string) => {
       return { level: Math.max(...newArray), category: 2 };
     } else if (category === '3') {
       return { level: newArray.length, category: 3 };
+    } else if (category === '4') {
+      return { level: newArray.length, category: 4 };
     } else {
       return { level: false, category: false };
     }
