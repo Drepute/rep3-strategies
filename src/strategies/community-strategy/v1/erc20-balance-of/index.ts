@@ -1,7 +1,7 @@
-import ActionCallerV1 from '../../actions/v1';
-import { ActionOnType } from '../../actions/utils/type';
-import { StrategyParamsType } from '../../types';
-import ContractCaller from '../../utils/contract';
+import ActionCallerV1 from '../../../../actions/v1';
+import { ActionOnType } from '../../../../actions/utils/type';
+import { StrategyParamsType } from '../../../../types';
+import ContractCaller from '../../../../utils/contract';
 
 export async function strategy({
   contractAddress,
@@ -24,7 +24,7 @@ export async function strategy({
       ActionOnType.membership,
       eoa[0],
       options.network,
-      { changingLevel: 2,isVoucher:true }
+      { changingLevel: 2, isVoucher: true }
     );
     const final = await actions.calculateActionParams();
     return final;

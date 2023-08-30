@@ -5,7 +5,25 @@ import {
   AdapterWithVariables,
   CallStrategyParamsType,
 } from './types';
+import { ActionOnTypeV2 } from './actions/utils/type';
+import ActionCallerV2 from './actions/v2';
 
+// UTILS //
+const getCurrentParams = async (
+  contractAddress: string,
+  eoa: string,
+  network: 'mainnet' | 'testnet'
+) => {
+  const action = new ActionCallerV2(
+    contractAddress,
+    ActionOnTypeV2.currentParams,
+    eoa,
+    network === 'mainnet' ? 137 : 80001
+  );
+  return await action.calculateActionParams();
+};
+
+// STRATEGY CALLERS //
 async function callStrategy({
   strategy,
   contractAddress,
@@ -19,42 +37,96 @@ async function callStrategy({
   });
   return res;
 }
-
+// MULTIPLE STRATEGY CALLERS //
 async function multipleCallStrategy<T extends AdapterNames>(
-  strategiesCofig: {
+  contractAddress: string,
+  eoa: [string],
+  network: 'mainnet' | 'testnet',
+  strategiesConfig: {
     strategy: string;
-    contractAddress: string;
-    eoa: [string];
     options: {
-      name: T;
       variable: AdapterWithVariables[T];
       tier: number;
+      task_id: number;
     };
   }[]
 ) {
-  const promiseResults = strategiesCofig.map(
-    async (x: {
-      strategy: string;
-      contractAddress: string;
-      eoa: [string];
-      options: { name: T; variable: AdapterWithVariables[T]; tier: number };
-    }) => {
-      const res: boolean = await multipleStrategies[x.strategy].genericStrategy(
-        {
-          contractAddress: x.contractAddress,
-          eoa: x.eoa,
-          options: x.options,
-        }
+  if (
+    strategiesConfig?.[0]?.strategy === 'smart-contract-strategy' &&
+    strategiesConfig?.[0]?.options.variable.type === 'across'
+  ) {
+    const res = await _strategies['across-strategy'].strategy({
+      contractAddress,
+      eoa,
+      options: { network: network },
+    });
+    if (res.length > 0 && res[0]?.action) {
+      const resultObj = res.reduce(
+        (acc, cur) => ({
+          ...acc,
+          [cur.params.upgradeTier.tier]: [
+            {
+              executionResult: true,
+              task_id: strategiesConfig.filter(
+                x => x.options.tier === cur.params.upgradeTier.tier
+              )?.[0]?.options?.task_id,
+            },
+          ],
+        }),
+        {}
       );
-      return {
-        executionResult: res,
-        tier: x.options.tier,
-        strategy: x.strategy,
-      }; //{boolean,tier,strategy,currentParams}
+
+      if (res[0].action) {
+        const response = {
+          tierMatrix: resultObj,
+          params: { metaData: res[0].metaData, action: res[0].action },
+        };
+        return response;
+      } else {
+        return {};
+      }
+    } else {
+      return {};
     }
-  );
-  const results = await Promise.all(promiseResults);
-  console.log('results.......', results);
+  } else {
+    const promiseResults = strategiesConfig.map(
+      async (x: {
+        strategy: string;
+        options: {
+          variable: AdapterWithVariables[T];
+          tier: number;
+          task_id: number;
+        };
+      }) => {
+        const res: boolean = await multipleStrategies[x.strategy].strategy({
+          contractAddress: contractAddress,
+          eoa: eoa,
+          options: x.options,
+        });
+        return {
+          executionResult: res,
+          tier: x.options.tier,
+          id: x.options.task_id,
+          strategy: x.strategy,
+        };
+      }
+    );
+    let results = await Promise.all(promiseResults);
+    results = results.filter(x => x.executionResult !== false);
+    const currentParams = await getCurrentParams(
+      contractAddress,
+      eoa[0],
+      network
+    );
+    const resultObj = results.reduce(
+      (acc, cur) => ({
+        ...acc,
+        [cur.tier]: [{ executionResult: cur.executionResult, task_id: cur.id }],
+      }),
+      {}
+    );
+    return { tierMatrix: resultObj, params: currentParams };
+  }
 }
 
 export const { subgraph } = utils;

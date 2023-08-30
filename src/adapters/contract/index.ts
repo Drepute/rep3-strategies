@@ -1,6 +1,9 @@
 import { ethers } from 'ethers';
 import { network } from '../../network.js';
 import { AdapterWithVariables } from '../../types.js';
+import { erc1155Abi } from '../../abis/erc1155Abi.js';
+import { erc20Abi } from '../../abis/erc20Abi.js';
+import { erc721Abi } from '../../abis/erc721Abi.js';
 
 const genericViewCall = async (
   address: string,
@@ -16,6 +19,7 @@ const genericViewCall = async (
 };
 
 const arithmeticOperand = (a: number, b: number, op: string) => {
+  console.log(a, b, op);
   if (op === '===') {
     return a === b;
   } else if (op === '>=') {
@@ -30,28 +34,52 @@ const arithmeticOperand = (a: number, b: number, op: string) => {
     return false;
   }
 };
-const getAbiOnType = () => {
-  
-}
+const getAbiOnType = (type: 'erc1155' | 'erc721' | 'erc20' | 'custom') => {
+  switch (type) {
+    case 'erc1155':
+      return erc1155Abi;
+    case 'erc721':
+      return erc721Abi;
+    case 'erc20':
+      return erc20Abi;
+    default:
+      return erc20Abi;
+  }
+};
 export const viewAdapter = async (
   holder: string,
-  functionParams: AdapterWithVariables['contractViewAdapter']
+  functionParams: AdapterWithVariables['contractAdapter']
 ) => {
-  let response
-  if(functionParams.type==='custom'&&functionParams.abi&&functionParams.functionFragment){
+  let response;
+  if (
+    functionParams.contractType === 'custom' &&
+    functionParams.abi &&
+    functionParams.functionName
+  ) {
     response = await genericViewCall(
-      functionParams.contractAddress,functionParams.abi,functionParams.functionFragment,[holder],functionParams.chainId
-    )
-  }else if (functionParams.type==='erc1155'||functionParams.type==='erc20'||functionParams.type==='erc721'){
+      functionParams.contractAddress,
+      functionParams.abi,
+      functionParams.functionName,
+      [holder],
+      functionParams.chainId
+    );
+  } else if (
+    (functionParams.contractType === 'erc1155' ||
+      functionParams.contractType === 'erc20' ||
+      functionParams.contractType === 'erc721') &&
+    functionParams.functionName
+  ) {
     response = await genericViewCall(
-      functionParams.contractAddress,functionParams.abi,functionParams.functionFragment,[holder],functionParams.chainId
-    )
+      functionParams.contractAddress,
+      getAbiOnType(functionParams.contractType),
+      functionParams.functionName,
+      [holder],
+      functionParams.chainId
+    );
   }
   return arithmeticOperand(
-    functionParams.balanceThreshold,
     parseInt(response.toString()),
+    functionParams.balanceThreshold,
     functionParams.operator
   );
 };
-
-

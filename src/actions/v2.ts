@@ -1,4 +1,7 @@
-import { createOrUpdateBadgeV2WithMetadata } from './utils/helperFunctionsV2';
+import {
+  createOrUpdateBadgeV2WithMetadata,
+  getCurrentParams,
+} from './utils/helperFunctionsV2';
 import { ActionOnTypeV2, BadgeActions } from './utils/type';
 
 export default class ActionCallerV2 {
@@ -13,7 +16,7 @@ export default class ActionCallerV2 {
     actionType: ActionOnTypeV2,
     eoa: string,
     network: number,
-    options:
+    options?:
       | { changingLevel: number }
       | { badgeType: number; actionType: BadgeActions }
       | { tokenId: number; badgeType: number; metadataUri: string }
@@ -22,25 +25,38 @@ export default class ActionCallerV2 {
     this.actionType = actionType;
     this.eoa = eoa;
     this.network = network;
-    if (actionType === ActionOnTypeV2.badge) {
+    if (actionType === ActionOnTypeV2.badge || ActionOnTypeV2.dynamicBadge) {
       this.membershipOptions = options;
     }
   }
 
-  calculateActionParams = async (metaDataOptions: {
+  calculateActionParams = async (metaDataOptions?: {
     amount: number;
     isDaysStaked: number;
     tokenStaked: number;
   }) => {
     switch (this.actionType) {
-      case ActionOnTypeV2.badge:
+      case ActionOnTypeV2.dynamicBadge:
         try {
-          return await createOrUpdateBadgeV2WithMetadata(
+          if (metaDataOptions) {
+            return await createOrUpdateBadgeV2WithMetadata(
+              this.contractAddress,
+              this.eoa,
+              this.network,
+              this?.membershipOptions?.changingLevel,
+              metaDataOptions
+            );
+          }
+          return null;
+        } catch (error) {
+          return error;
+        }
+      case ActionOnTypeV2.currentParams:
+        try {
+          return await getCurrentParams(
             this.contractAddress,
             this.eoa,
-            this.network,
-            this?.membershipOptions?.changingLevel,
-            metaDataOptions
+            this.network
           );
         } catch (error) {
           return error;

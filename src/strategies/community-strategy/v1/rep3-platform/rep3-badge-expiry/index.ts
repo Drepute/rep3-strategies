@@ -1,10 +1,10 @@
-import ActionCallerV1 from '../../../actions/v1';
-import { ActionOnType } from '../../../actions/utils/type';
-import { StrategyParamsType } from '../../../types';
+import ActionCallerV1 from '../../../../../actions/v1';
+import { ActionOnType } from '../../../../../actions/utils/type';
+import { StrategyParamsType } from '../../../../../types';
 import {
   getAllAssociationBadges,
   getAllMembershipNfts,
-} from '../../../utils/rep3';
+} from '../../../../../utils/rep3';
 
 //TODO: Membership differentiation from expiry
 

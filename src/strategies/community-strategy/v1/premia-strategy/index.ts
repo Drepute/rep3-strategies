@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import ActionCallerV1 from '../../actions/v1';
-import { ActionOnType } from '../../actions/utils/type';
-import { StrategyParamsType } from '../../types';
-import { subgraph } from '../../utils';
+import ActionCallerV1 from '../../../../actions/v1';
+import { ActionOnType } from '../../../../actions/utils/type';
+import { StrategyParamsType } from '../../../../types';
+import { subgraph } from '../../../../utils';
+// import { network } from '../../utils/contract/network';
 import fetch from 'cross-fetch';
 import { createClient } from 'redis';
 
@@ -206,7 +207,6 @@ export async function strategy({
   }
 
   const results: any = [];
-
   await Promise.all(
     targetAddress
       .slice(pageNumber !== 0 ? addressLimit - 50 : 0, addressLimit)
