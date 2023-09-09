@@ -13,6 +13,7 @@ const listOfCourses = {
   '2': ['1.5-strat-exam', '2.5-strat-exam', '3.5-strat-exam'],
   '3': ['op-exam'],
   '4': ['masterclass-exam-1'],
+  '5': ['arbitrum-exam'],
 };
 
 let redisClient: any;
@@ -120,14 +121,16 @@ const getLevelCategory = (courses: any[], category: string) => {
       newArray = newArray.map((x: any) => parseInt(x[0]) + 1);
       return { level: Math.max(...newArray), category: 0 };
     } else if (category === '1') {
-      return { level: 1, category: 1 };
+      return { level: 1, category: parseInt(category) };
     } else if (category === '2') {
       newArray = newArray.map((x: any) => parseInt(x[0]));
-      return { level: Math.max(...newArray), category: 2 };
+      return { level: Math.max(...newArray), category:parseInt(category) };
     } else if (category === '3') {
-      return { level: newArray.length, category: 3 };
+      return { level: newArray.length, category:parseInt(category) };
     } else if (category === '4') {
-      return { level: newArray.length, category: 4 };
+      return { level: newArray.length, category:parseInt(category) };
+    }else if (category === '5') {
+      return { level: newArray.length, category:parseInt(category) };
     } else {
       return { level: false, category: false };
     }
