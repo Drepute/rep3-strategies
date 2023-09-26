@@ -21,7 +21,7 @@ export async function strategy({
   eoa,
   options,
 }: contractAdapterStrategy) {
-  console.log('contract strategy', contractAddress);
+  console.log(contractAddress);
   const executionResult = await getFunctionOnType(eoa[0], options.variable);
   return executionResult;
 }

@@ -61,7 +61,7 @@ export const viewAdapter = async (
       functionParams.abi,
       functionParams.functionName,
       [holder],
-      functionParams.chainId
+      functionParams.chainId ?? 1
     );
   } else if (
     (functionParams.contractType === 'erc1155' ||
@@ -74,12 +74,12 @@ export const viewAdapter = async (
       getAbiOnType(functionParams.contractType),
       functionParams.functionName,
       [holder],
-      functionParams.chainId
+      functionParams.chainId ?? 1
     );
   }
   return arithmeticOperand(
     parseInt(response.toString()),
-    functionParams.balanceThreshold,
-    functionParams.operator
+    functionParams.balanceThreshold ?? eval(functionParams.thresholdEval ?? ''),
+    functionParams.operator ?? '=='
   );
 };

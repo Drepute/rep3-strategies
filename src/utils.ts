@@ -55,7 +55,9 @@ async function multipleCallStrategy<T extends AdapterNames>(
     strategiesConfig?.[0]?.strategy === 'smart-contract-strategy' &&
     strategiesConfig?.[0]?.options.variable.type === 'across'
   ) {
-    const res = await _strategies['across-strategy'].strategy({
+    const res = await _strategies[
+      `${strategiesConfig?.[0]?.options.variable.type}-strategy`
+    ].strategy({
       contractAddress,
       eoa,
       options: { network: network },
