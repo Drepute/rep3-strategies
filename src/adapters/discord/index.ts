@@ -8,7 +8,6 @@ export const isGuildMemberOrNot = async (
   guildId: string,
   roleId?: string
 ) => {
-  console.log(discordUserTokens);
   const url = roleId
     ? `${serviceConfig.url}/discord_bot/adapter/checkRole?accessToken=${discordUserTokens.accessToken}&refreshToken=${discordUserTokens.refreshToken}&guild_id=${guildId}&role_id=${roleId}`
     : `${serviceConfig.url}/discord_bot/adapter/isGuildMember?accessToken=${discordUserTokens.accessToken}&refreshToken=${discordUserTokens.refreshToken}&guild_id=${guildId}`;

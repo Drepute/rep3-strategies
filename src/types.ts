@@ -22,6 +22,15 @@ export type AdapterWithVariables = {
     guildId?: string;
     roleId?: string;
   };
+  twitterAdapter: {
+    type: 'like' | 'mention' | 'retweet' | 'replies';
+    serviceConfig: { url: string; authToken: string };
+    operator: '===' | '>=' | '<=' | '<' | '>';
+    countThreshold: number;
+    accountId?: string;
+    followingAccountId?: string;
+    dateInfo: { from: number; to: number };
+  };
 };
 export type AdapterNames = keyof AdapterWithVariables;
 export interface contractAdapterStrategy {
@@ -38,6 +47,12 @@ export interface discordAdapterStrategy {
   eoa: [string];
   network: 'mainnet' | 'testnet';
   options: { variable: AdapterWithVariables['discordAdapter']; tier: number };
+}
+export interface twitterStrategy {
+  contractAddress: string;
+  eoa: [string];
+  network: 'mainnet' | 'testnet';
+  options: { variable: AdapterWithVariables['twitterAdapter']; tier: number };
 }
 export interface CallStrategyParamsType extends StrategyParamsType {
   strategy: string;
