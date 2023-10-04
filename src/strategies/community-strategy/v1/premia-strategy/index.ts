@@ -124,13 +124,13 @@ const getLevelCategory = (courses: any[], category: string) => {
       return { level: 1, category: parseInt(category) };
     } else if (category === '2') {
       newArray = newArray.map((x: any) => parseInt(x[0]));
-      return { level: Math.max(...newArray), category:parseInt(category) };
+      return { level: Math.max(...newArray), category: parseInt(category) };
     } else if (category === '3') {
-      return { level: newArray.length, category:parseInt(category) };
+      return { level: newArray.length, category: parseInt(category) };
     } else if (category === '4') {
-      return { level: newArray.length, category:parseInt(category) };
-    }else if (category === '5') {
-      return { level: newArray.length, category:parseInt(category) };
+      return { level: newArray.length, category: parseInt(category) };
+    } else if (category === '5') {
+      return { level: newArray.length, category: parseInt(category) };
     } else {
       return { level: false, category: false };
     }
@@ -208,7 +208,7 @@ export async function strategy({
     addressLimit = pageNumber !== 0 ? pageNumber * 50 : 50;
     targetAddress = await getAllPremiaUser();
   }
-
+  console.log('target address', targetAddress);
   const results: any = [];
   await Promise.all(
     targetAddress

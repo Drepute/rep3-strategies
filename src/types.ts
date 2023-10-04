@@ -6,10 +6,11 @@ export interface StrategyParamsType {
 export type AdapterWithVariables = {
   contractAdapter: {
     contractAddress: string;
-    type: 'view' | 'events' | 'across';
+    type: 'view' | 'events' | 'across' | '88mph';
     contractType?: 'erc1155' | 'erc721' | 'erc20' | 'custom';
     chainId?: number;
     balanceThreshold?: number;
+    thresholdEval?: string;
     operator?: '===' | '>=' | '<=' | '<' | '>';
     functionName?: string;
     abi?: any[];
