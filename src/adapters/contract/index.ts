@@ -18,8 +18,7 @@ const genericViewCall = async (
   return res;
 };
 
-const arithmeticOperand = (a: number, b: number, op: string) => {
-  console.log(a, b, op);
+export const arithmeticOperand = (a: number, b: number, op: string) => {
   if (op === '===') {
     return a === b;
   } else if (op === '>=') {
