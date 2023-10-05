@@ -1,4 +1,4 @@
-import { isGuildMemberOrNot } from '../../adapters/discord';
+import { arithmeticOperand } from '../../adapters/contract';
 import { getTwitterMetrics } from '../../adapters/twitter';
 import { AdapterWithVariables, twitterStrategy } from '../../types';
 
@@ -6,57 +6,32 @@ const getFunctionOnType = async (
   type: 'like' | 'mention' | 'retweet' | 'replies',
   options: AdapterWithVariables['twitterAdapter']
 ) => {
-  switch (type) {
-    case 'like':
-      try {
-        const response = getTwitterMetrics(
-          options.serviceConfig,
-          options.type,
-          options.accountId,
-          options.followingAccountId
-        );
-      } catch (error) {
-        return false;
-      }
-      break;
-    case 'mention':
-      try {
-        const response = getTwitterMetrics(
-          options.serviceConfig,
-          options.type,
-          options.accountId,
-          options.followingAccountId
-        );
-      } catch (error) {
-        return false;
-      }
-      break;
-    case 'retweet':
-      try {
-        const response = getTwitterMetrics(
-          options.serviceConfig,
-          options.type,
-          options.accountId,
-          options.followingAccountId
-        );
-      } catch (error) {
-        return false;
-      }
-      break;
-    case 'replies':
-      try {
-        const response = getTwitterMetrics(
-          options.serviceConfig,
-          options.type,
-          options.accountId,
-          options.followingAccountId
-        );
-      } catch (error) {
-        return false;
-      }
-      break;
-    default:
+  if (
+    type === 'like' ||
+    type === 'mention' ||
+    type === 'retweet' ||
+    type === 'replies'
+  ) {
+    try {
+      const count = await getTwitterMetrics(
+        options.serviceConfig,
+        options.type,
+        options.accountId ?? '',
+        options.dateInfo,
+        options.followingAccountId
+      );
+      console.log(
+        'here..........',
+        count,
+        options.countThreshold,
+        options.operator
+      );
+      return arithmeticOperand(count, options.countThreshold, options.operator);
+    } catch (error) {
       return false;
+    }
+  } else {
+    return false;
   }
 };
 

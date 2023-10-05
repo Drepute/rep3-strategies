@@ -21,7 +21,7 @@ export const getTwitterMetrics = async (
     authToken: string;
   },
   type: 'like' | 'mention' | 'retweet' | 'replies',
-  accountId?: string,
+  accountId: string,
   dateInfo: { from: number; to: number },
   followingAccountId?: string
 ) => {
@@ -33,9 +33,9 @@ export const getTwitterMetrics = async (
   try {
     const response = await fetch(url);
     const res = await response.json();
-    console.log('metrics response', res);
-    // if (roleId) {
-    //   return res.role;
+    console.log('metrics response', res.data?.likes_count);
+
+    return res.data?.likes_count;
     // } else {
     //   return res.member;
     // }

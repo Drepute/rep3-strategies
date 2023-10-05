@@ -28,7 +28,7 @@ const strategies: Record<string, StrategyType> = {
 const multipleStrategies: Record<string, any> = {
   'smart-contract-strategy': contractStrategy,
   'discord-strategy': discordStrategy,
-  'twitter-strategy': discordStrategy,
+  'twitter-strategy': twitterStrategy,
 };
 
 Object.keys(strategies).forEach(function(strategyName) {
