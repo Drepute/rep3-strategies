@@ -1,15 +1,15 @@
 import fetch from 'cross-fetch';
 const getFetchRouteWithType = (
-  type: 'like' | 'mention' | 'retweet' | 'replies'
+  type: 'likeCount' | 'mentionCount' | 'retweetCount' | 'repliesCount'
 ) => {
   switch (type) {
-    case 'like':
+    case 'likeCount':
       return 'twitter_service/account/likes';
-    case 'mention':
+    case 'mentionCount':
       return 'twitter_service/account/mentions';
-    case 'retweet':
+    case 'retweetCount':
       return 'twitter_service/account/retweets';
-    case 'replies':
+    case 'repliesCount':
       return 'twitter_service/account/replies';
     default:
       return false;
@@ -20,7 +20,7 @@ export const getTwitterMetrics = async (
     url: string;
     authToken: string;
   },
-  type: 'like' | 'mention' | 'retweet' | 'replies',
+  type: 'likeCount' | 'mentionCount' | 'retweetCount' | 'repliesCount',
   accountId: string,
   dateInfo: { from: number; to: number },
   followingAccountId?: string
@@ -34,11 +34,7 @@ export const getTwitterMetrics = async (
     const response = await fetch(url);
     const res = await response.json();
     console.log('metrics response', res.data?.likes_count);
-
     return res.data?.likes_count;
-    // } else {
-    //   return res.member;
-    // }
   } catch (error) {
     return false;
   }

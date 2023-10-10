@@ -3,14 +3,14 @@ import { getTwitterMetrics } from '../../adapters/twitter';
 import { AdapterWithVariables, twitterStrategy } from '../../types';
 
 const getFunctionOnType = async (
-  type: 'like' | 'mention' | 'retweet' | 'replies',
+  type: 'likeCount' | 'mentionCount' | 'retweetCount' | 'repliesCount',
   options: AdapterWithVariables['twitterAdapter']
 ) => {
   if (
-    type === 'like' ||
-    type === 'mention' ||
-    type === 'retweet' ||
-    type === 'replies'
+    type === 'likeCount' ||
+    type === 'mentionCount' ||
+    type === 'retweetCount' ||
+    type === 'repliesCount'
   ) {
     try {
       const count = await getTwitterMetrics(

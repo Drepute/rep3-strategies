@@ -23,7 +23,7 @@ export type AdapterWithVariables = {
     roleId?: string;
   };
   twitterAdapter: {
-    type: 'like' | 'mention' | 'retweet' | 'replies';
+    type: 'likeCount' | 'mentionCount' | 'retweetCount' | 'repliesCount';
     serviceConfig: { url: string; authToken: string };
     operator: '===' | '>=' | '<=' | '<' | '>';
     countThreshold: number;
