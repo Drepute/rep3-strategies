@@ -6,7 +6,7 @@ export interface StrategyParamsType {
 export type AdapterWithVariables = {
   contractAdapter: {
     contractAddress: string;
-    type: 'view' | 'events' | 'across' | '88mph';
+    type: 'view' | 'events' | 'across' | '88mph' | 'bebop' | 'bebop-halloween';
     contractType?: 'erc1155' | 'erc721' | 'erc20' | 'custom';
     chainId?: number;
     balanceThreshold?: number;
@@ -14,6 +14,8 @@ export type AdapterWithVariables = {
     operator?: '===' | '>=' | '<=' | '<' | '>';
     functionName?: string;
     abi?: any[];
+    strategyOptions?: any;
+    functionParam?: any[];
   };
   discordAdapter: {
     type: 'isMember';
@@ -21,6 +23,7 @@ export type AdapterWithVariables = {
     discordUserTokens: { refreshToken: string; accessToken: string };
     guildId?: string;
     roleId?: string;
+    strategyOptions?: any;
   };
   twitterAdapter: {
     type: 'likeCount' | 'mentionCount' | 'retweetCount' | 'repliesCount';
@@ -30,6 +33,7 @@ export type AdapterWithVariables = {
     accountId?: string;
     followingAccountId?: string;
     dateInfo: { from: number; to: number };
+    strategyOptions?: any;
   };
 };
 export type AdapterNames = keyof AdapterWithVariables;

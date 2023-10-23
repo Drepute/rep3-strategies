@@ -90,6 +90,41 @@ async function multipleCallStrategy<T extends AdapterNames>(
     } else {
       return {};
     }
+  } else if (
+    strategiesConfig?.[0]?.strategy === 'smart-contract-strategy' &&
+    (strategiesConfig?.[0]?.options.variable.type === 'bebop' ||
+      strategiesConfig?.[0]?.options.variable.type === 'bebop-halloween')
+  ) {
+    const res = await _strategies[
+      `${strategiesConfig?.[0]?.options.variable.type}-strategy`
+    ].strategy({
+      contractAddress,
+      eoa,
+      options: strategiesConfig?.[0]?.options.variable.strategyOptions,
+    });
+    console.log(res);
+    let results = [
+      {
+        executionResult: res,
+        tier: strategiesConfig?.[0]?.options.tier,
+        id: strategiesConfig?.[0]?.options.task_id,
+        strategy: strategiesConfig?.[0]?.strategy,
+      },
+    ];
+    results = results.filter(x => x.executionResult !== false);
+    const currentParams = await getCurrentParams(
+      contractAddress,
+      eoa[0],
+      network
+    );
+    const resultObj = results.reduce(
+      (acc, cur) => ({
+        ...acc,
+        [cur.tier]: [{ executionResult: cur.executionResult, task_id: cur.id }],
+      }),
+      {}
+    );
+    return { tierMatrix: resultObj, params: currentParams };
   } else {
     const promiseResults = strategiesConfig.map(
       async (x: {
