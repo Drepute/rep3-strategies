@@ -102,7 +102,6 @@ async function multipleCallStrategy<T extends AdapterNames>(
       eoa,
       options: strategiesConfig?.[0]?.options.variable.strategyOptions,
     });
-    console.log(res);
     let results = [
       {
         executionResult: res,

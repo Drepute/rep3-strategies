@@ -10,18 +10,22 @@ const getAllHalloweenTransaction = async (
   );
   const data = await res.json();
   let status = false;
-  data.results.map((x: any, i: number) => {
-    if (Object.keys(x.sellTokens).length > 1) {
-      console.log('done sell!!', i);
+  // data.results.map((x: any) => {
+  for (let i = 0; i < data.results.length; i++) {
+    if (Object.keys(data.results[i].sellTokens).length > 1) {
       status = true;
-      return;
+      console.log('sell break', i);
+      break;
+      // return;
     }
-    if (Object.keys(x.buyTokens).length > 1) {
-      console.log('done buy!!', i);
+    if (Object.keys(data.results[i].buyTokens).length > 1) {
       status = true;
-      return;
+      console.log('buy break', i);
+      break;
+      // return;
     }
-  });
+  }
+  // });
   console.log('done !!', status);
   return status;
 };
