@@ -59,7 +59,9 @@ export const viewAdapter = async (
       functionParams.contractAddress,
       functionParams.abi,
       functionParams.functionName,
-      [holder],
+      functionParams.functionParam
+        ? [holder, ...functionParams.functionParam]
+        : [holder],
       functionParams.chainId ?? 1
     );
   } else if (
@@ -72,10 +74,20 @@ export const viewAdapter = async (
       functionParams.contractAddress,
       getAbiOnType(functionParams.contractType),
       functionParams.functionName,
-      [holder],
+      functionParams.functionParam
+        ? [holder, ...functionParams.functionParam]
+        : [holder],
       functionParams.chainId ?? 1
     );
   }
+  console.log(
+    'response contract',
+    // arithmeticOperand(
+    parseInt(response.toString())
+    // functionParams.balanceThreshold ?? eval(functionParams.thresholdEval ?? ''),
+    // functionParams.operator ?? '=='
+    // )
+  );
   return arithmeticOperand(
     parseInt(response.toString()),
     functionParams.balanceThreshold ?? eval(functionParams.thresholdEval ?? ''),

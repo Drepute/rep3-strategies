@@ -22,19 +22,25 @@ export const getTwitterMetrics = async (
   },
   type: 'likeCount' | 'mentionCount' | 'retweetCount' | 'repliesCount',
   accountId: string,
-  dateInfo: { from: number; to: number },
+  dateInfo: { from: number; to?: number },
   followingAccountId?: string
 ) => {
   const url = `${serviceConfig.url}/${getFetchRouteWithType(
     type
-  )}/${accountId}/${followingAccountId}?from_timestamp=${
-    dateInfo?.from
-  }&to_timestamp=${dateInfo?.to}`;
+  )}/${accountId}/${followingAccountId}?from_timestamp=${dateInfo?.from}${
+    dateInfo?.to ? `&to_timestamp=${dateInfo?.to}` : ''
+  }`;
+
+  console.log('url....', url);
   try {
     const response = await fetch(url);
     const res = await response.json();
-    console.log('metrics response', res.data?.likes_count);
-    return res.data?.likes_count;
+    //change to generic function
+    if (type === 'likeCount') {
+      return res.data?.likes_count;
+    } else {
+      return res.data?.mentions_count;
+    }
   } catch (error) {
     return false;
   }

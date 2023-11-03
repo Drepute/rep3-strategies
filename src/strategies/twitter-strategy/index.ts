@@ -20,12 +20,7 @@ const getFunctionOnType = async (
         options.dateInfo,
         options.followingAccountId
       );
-      console.log(
-        'here..........',
-        count,
-        options.countThreshold,
-        options.operator
-      );
+      console.log(type, count, options.operator, options.countThreshold);
       return arithmeticOperand(count, options.countThreshold, options.operator);
     } catch (error) {
       return false;

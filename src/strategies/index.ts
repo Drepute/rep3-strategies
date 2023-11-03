@@ -9,10 +9,13 @@ import * as readyPlayerDao from './community-strategy/v1/ready-player-dao';
 import * as rep3BadgeExpiry from './community-strategy/v1/rep3-platform/rep3-badge-expiry';
 import * as rep3BulkMembershipUri from './community-strategy/v1/rep3-platform/membership-bulk-update';
 import * as acrossStrategy from './community-strategy/v2/across-strategy';
+import * as bebopStrategy from './community-strategy/v2/bebop-strategy';
+import * as bebopHalloweenStrategy from './community-strategy/v2/bebop-haloween-strategy';
 import * as premiaStrategy from './community-strategy/v1/premia-strategy';
 import * as contractStrategy from './contract-strategy';
 import * as discordStrategy from './discord-strategy';
 import * as twitterStrategy from './twitter-strategy';
+import * as csvStrategy from './csv-strategy';
 
 const strategies: Record<string, StrategyType> = {
   'rep3-is-member': rep3IsMember,
@@ -23,12 +26,15 @@ const strategies: Record<string, StrategyType> = {
   'ready-player-dao': readyPlayerDao,
   'across-strategy': acrossStrategy,
   'premia-strategy': premiaStrategy,
+  'bebop-strategy': bebopStrategy,
+  'bebopHalloween-strategy': bebopHalloweenStrategy,
 };
 
 const multipleStrategies: Record<string, any> = {
   'smart-contract-strategy': contractStrategy,
   'discord-strategy': discordStrategy,
   'twitter-strategy': twitterStrategy,
+  'csv-strategy': csvStrategy,
 };
 
 Object.keys(strategies).forEach(function(strategyName) {

@@ -90,6 +90,121 @@ async function multipleCallStrategy<T extends AdapterNames>(
     } else {
       return {};
     }
+  } else if (
+    strategiesConfig?.[0]?.strategy === 'smart-contract-strategy' &&
+    (strategiesConfig?.[0]?.options.variable.type === 'bebop' ||
+      strategiesConfig?.[0]?.options.variable.type === 'bebopHalloween')
+  ) {
+    const res = await _strategies[
+      `${strategiesConfig?.[0]?.options.variable.type}-strategy`
+    ].strategy({
+      contractAddress,
+      eoa,
+      options: strategiesConfig?.[0]?.options.variable.strategyOptions,
+    });
+    let results = [
+      {
+        executionResult: res,
+        tier: strategiesConfig?.[0]?.options.tier,
+        id: strategiesConfig?.[0]?.options.task_id,
+        strategy: strategiesConfig?.[0]?.strategy,
+      },
+    ];
+    results = results.filter(x => x.executionResult !== false);
+    const currentParams = await getCurrentParams(
+      contractAddress,
+      eoa[0],
+      network
+    );
+    const resultObj = results.reduce(
+      (acc, cur) => ({
+        ...acc,
+        [cur.tier]: [{ executionResult: cur.executionResult, task_id: cur.id }],
+      }),
+      {}
+    );
+    return { tierMatrix: resultObj, params: currentParams };
+  } else if (
+    strategiesConfig?.[0]?.strategy === 'smart-contract-strategy' &&
+    strategiesConfig?.[0]?.options.variable.type === 'csv' &&
+    strategiesConfig?.[0]?.options.variable.strategyOptions?.subType !==
+      'trader-joe'
+  ) {
+    const res = await _strategies[
+      `${strategiesConfig?.[0]?.options.variable.type}-strategy`
+    ].strategy({
+      contractAddress,
+      eoa,
+      options: strategiesConfig?.[0]?.options.variable.strategyOptions,
+    });
+    console.log(res);
+    let results = [
+      {
+        executionResult: res,
+        tier: strategiesConfig?.[0]?.options.tier,
+        id: strategiesConfig?.[0]?.options.task_id,
+        strategy: strategiesConfig?.[0]?.strategy,
+      },
+    ];
+    results = results.filter(x => x.executionResult !== false);
+    const currentParams = await getCurrentParams(
+      contractAddress,
+      eoa[0],
+      network
+    );
+    const resultObj = results.reduce(
+      (acc, cur) => ({
+        ...acc,
+        [cur.tier]: [{ executionResult: cur.executionResult, task_id: cur.id }],
+      }),
+      {}
+    );
+    return { tierMatrix: resultObj, params: currentParams };
+  } else if (
+    strategiesConfig?.[0]?.strategy === 'smart-contract-strategy' &&
+    strategiesConfig?.[0]?.options.variable.type === 'csv' &&
+    strategiesConfig?.[0]?.options.variable.strategyOptions?.subType ===
+      'trader-joe'
+  ) {
+    const res = await _strategies[
+      `${strategiesConfig?.[0]?.options.variable.type}-strategy`
+    ].strategy({
+      contractAddress,
+      eoa,
+      options: strategiesConfig?.[0]?.options.variable.strategyOptions,
+    });
+
+    if (res?.executionResult) {
+      let results = [
+        {
+          tier: res?.tier,
+          executionResult: res?.executionResult,
+          id: strategiesConfig.filter(x => x?.options.tier === res?.tier)[0]
+            ?.options?.task_id,
+          strategy: strategiesConfig?.[0]?.strategy,
+        },
+      ];
+      results = results.filter(x => x.executionResult !== false);
+      const currentParams = await getCurrentParams(
+        contractAddress,
+        eoa[0],
+        network
+      );
+
+      const resultObj = results.reduce(
+        (acc, cur) => ({
+          ...acc,
+          [cur.tier]: [
+            { executionResult: cur.executionResult, task_id: cur.id },
+          ],
+        }),
+        {}
+      );
+
+      return { tierMatrix: resultObj, params: currentParams };
+    } else {
+      return {};
+    }
   } else {
     const promiseResults = strategiesConfig.map(
       async (x: {
@@ -114,20 +229,29 @@ async function multipleCallStrategy<T extends AdapterNames>(
       }
     );
     let results = await Promise.all(promiseResults);
+
     results = results.filter(x => x.executionResult !== false);
     const currentParams = await getCurrentParams(
       contractAddress,
       eoa[0],
       network
     );
+    console.log(results);
     const resultObj = results.reduce(
       (acc, cur) => ({
         ...acc,
-        [cur.tier]: [{ executionResult: cur.executionResult, task_id: cur.id }],
+        [cur.tier]: results
+          .filter(x => x.tier === cur.tier)
+          .map(x => {
+            return { executionResult: x.executionResult, task_id: x.id };
+          }),
       }),
       {}
     );
-    return { tierMatrix: resultObj, params: currentParams };
+    return {
+      tierMatrix: resultObj,
+      params: currentParams,
+    };
   }
 }
 
