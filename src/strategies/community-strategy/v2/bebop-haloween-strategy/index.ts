@@ -1,4 +1,6 @@
+import fetch from 'cross-fetch';
 import { StrategyParamsType } from '../../../../types';
+import { viewAdapter } from '../../../../adapters/contract';
 
 const getAllHalloweenTransaction = async (
   walletAddr: string,
@@ -10,23 +12,18 @@ const getAllHalloweenTransaction = async (
   );
   const data = await res.json();
   let status = false;
-  // data.results.map((x: any) => {
   for (let i = 0; i < data.results.length; i++) {
     if (Object.keys(data.results[i].sellTokens).length > 1) {
       status = true;
       console.log('sell break', i);
       break;
-      // return;
     }
     if (Object.keys(data.results[i].buyTokens).length > 1) {
       status = true;
       console.log('buy break', i);
       break;
-      // return;
     }
   }
-  // });
-  console.log('done !!', status);
   return status;
 };
 
@@ -36,5 +33,19 @@ export async function strategy({ eoa, options }: StrategyParamsType) {
     options.startTime,
     options.endTime
   );
-  return res;
+  if (!res) {
+    const ethExecutionResult = await viewAdapter(eoa[0], {
+      contractAddress: options.ethAddress,
+      type: 'view',
+      contractType: 'erc1155',
+      balanceThreshold: 0,
+      chainId: 1,
+      operator: '>',
+      functionName: 'balanceOf',
+      functionParam: [options.ethTokenId],
+    });
+    return ethExecutionResult;
+  } else {
+    return res;
+  }
 }

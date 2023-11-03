@@ -82,12 +82,11 @@ export const viewAdapter = async (
   }
   console.log(
     'response contract',
-    arithmeticOperand(
-      parseInt(response.toString()),
-      functionParams.balanceThreshold ??
-        eval(functionParams.thresholdEval ?? ''),
-      functionParams.operator ?? '=='
-    )
+    // arithmeticOperand(
+    parseInt(response.toString())
+    // functionParams.balanceThreshold ?? eval(functionParams.thresholdEval ?? ''),
+    // functionParams.operator ?? '=='
+    // )
   );
   return arithmeticOperand(
     parseInt(response.toString()),

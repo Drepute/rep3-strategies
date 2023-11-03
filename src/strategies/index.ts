@@ -15,6 +15,7 @@ import * as premiaStrategy from './community-strategy/v1/premia-strategy';
 import * as contractStrategy from './contract-strategy';
 import * as discordStrategy from './discord-strategy';
 import * as twitterStrategy from './twitter-strategy';
+import * as csvStrategy from './csv-strategy';
 
 const strategies: Record<string, StrategyType> = {
   'rep3-is-member': rep3IsMember,
@@ -26,13 +27,14 @@ const strategies: Record<string, StrategyType> = {
   'across-strategy': acrossStrategy,
   'premia-strategy': premiaStrategy,
   'bebop-strategy': bebopStrategy,
-  'bebop-halloween-strategy': bebopHalloweenStrategy,
+  'bebopHalloween-strategy': bebopHalloweenStrategy,
 };
 
 const multipleStrategies: Record<string, any> = {
   'smart-contract-strategy': contractStrategy,
   'discord-strategy': discordStrategy,
   'twitter-strategy': twitterStrategy,
+  'csv-strategy': csvStrategy,
 };
 
 Object.keys(strategies).forEach(function(strategyName) {
