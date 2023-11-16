@@ -3,24 +3,52 @@ import { arithmeticOperand, viewAdapter } from '../../../../adapters/contract';
 
 const getSwapperTransactionCount = async (
   walletAddr: string,
-  startTime: string
+  startTime: string,
+  threshold: number,
+  currentLength: number,
+  endTimeStamp?: number
 ) => {
-  const endTIme = Math.floor(new Date().getTime() / 1000) * 1e9;
-  const res = await fetch(
-    `https://api.bebop.xyz/history/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTIme}&size=${100}`
-  );
-  const data = await res.json();
-  return data.metadata.results;
+  const endTime = endTimeStamp || Math.floor(new Date().getTime() / 1000) * 1e9;
+  try {
+    const res = await fetch(
+      `https://api.bebop.xyz/history/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTime}&size=${300}`
+    );
+    const data = await res.json();
+    let currentValidLength = currentLength;
+    data.results.forEach(element => {
+      if (element.volumeUsd > 22.5) {
+        currentValidLength = currentValidLength + 1;
+      }
+    });
+    if (data.nextAvailableTimestamp&& currentValidLength < threshold) {
+      return await getSwapperTransactionCount(
+        walletAddr,
+        startTime,
+        threshold,
+        currentValidLength,
+        data.nextAvailableTimestamp
+      );
+    } else {
+      return currentValidLength;
+    }
+  } catch (error) {
+    return 0;
+  }
 };
 const actionOnQuestType = async (
   type: string,
   eoa: string,
-  startTime: string
+  strategyOptions: any
 ) => {
   switch (type) {
     case 'swapper': {
       try {
-        const txCount = await getSwapperTransactionCount(eoa, startTime);
+        const txCount = await getSwapperTransactionCount(
+          eoa,
+          strategyOptions?.startTime,
+          strategyOptions?.threshold,
+          0
+        );
         return txCount;
       } catch (error) {
         return 0;
@@ -61,8 +89,9 @@ export async function strategy({ eoa, options }: StrategyParamsType) {
     const thresholdCount = await actionOnQuestType(
       options.questType,
       eoa[0],
-      options.startTime
+      options
     );
+
     return arithmeticOperand(
       thresholdCount,
       options.threshold,
