@@ -9,7 +9,6 @@ const getSwapperTransactionCount = async (
   endTimeStamp?: number
 ) => {
   const endTime = endTimeStamp || Math.floor(new Date().getTime() / 1000) * 1e9;
-  console.log('here', walletAddr, startTime, currentLength, endTime);
   try {
     const res = await fetch(
       `https://api.bebop.xyz/history/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTime}&size=${300}`
@@ -92,7 +91,7 @@ export async function strategy({ eoa, options }: StrategyParamsType) {
       eoa[0],
       options
     );
-    console.log('Threshold Count', thresholdCount);
+
     return arithmeticOperand(
       thresholdCount,
       options.threshold,
