@@ -1,5 +1,6 @@
 import { StrategyParamsType } from '../../../../types';
 import { arithmeticOperand, viewAdapter } from '../../../../adapters/contract';
+import fetch from 'cross-fetch';
 
 const getSwapperTransactionCount = async (
   walletAddr: string,
