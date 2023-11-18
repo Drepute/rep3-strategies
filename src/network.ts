@@ -7,7 +7,7 @@ export const network:  NetwrokObj = {
     chainId: 1,
     network: 'homestead',
     rpc:
-      'https://eth-mainnet.g.alchemy.com/v2/TjxOaj0jbq-FVA2jFK2p_h_KnrooFuHg',
+      'https://eth-mainnet.g.alchemy.com/v2/ppadjzXPF3e1iqEu3YZaBOqW-WaXGIH1',
     subgraph: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-matic',
     subgraphV2:"https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-v2-mumbai"
   },
@@ -16,7 +16,7 @@ export const network:  NetwrokObj = {
     chainId: 137,
     network: 'homestead',
     rpc:
-      'https://polygon-mainnet.g.alchemy.com/v2/gBoo6ihGnSUa3ObT49K36yHG6BdtyuVo',
+      'https://polygon-mainnet.g.alchemy.com/v2/cI1PchyLH0nUYm_Io2uMjZ0BgofUVIWx',
     subgraph: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-matic',
     subgraphV2:"https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-v2-matic"
   },
