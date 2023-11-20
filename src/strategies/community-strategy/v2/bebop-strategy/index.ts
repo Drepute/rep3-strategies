@@ -21,7 +21,7 @@ const getSwapperTransactionCount = async (
         currentValidLength = currentValidLength + 1;
       }
     });
-    if (data.nextAvailableTimestamp&& currentValidLength < threshold) {
+    if (data.nextAvailableTimestamp && currentValidLength < threshold) {
       return await getSwapperTransactionCount(
         walletAddr,
         startTime,
@@ -60,28 +60,41 @@ const actionOnQuestType = async (
   }
 };
 export async function strategy({ eoa, options }: StrategyParamsType) {
-  const ethExecutionResult = await viewAdapter(eoa[0], {
-    contractAddress: options.ethAddress,
-    type: 'view',
-    contractType: 'erc1155',
-    balanceThreshold: 0,
-    chainId: 1,
-    operator: '>',
-    functionName: 'balanceOf',
-    functionParam: [options.ethTokenId],
-  });
-  let maticExecutionResult = false;
-  if (ethExecutionResult) {
-    maticExecutionResult = await viewAdapter(eoa[0], {
-      contractAddress: options.maticAddress,
+  let ethExecutionResult = false;
+  for (let i = 0; i < options.ethTokenId.length; i++) {
+    ethExecutionResult = await viewAdapter(eoa[0], {
+      contractAddress: options.ethAddress,
       type: 'view',
       contractType: 'erc1155',
       balanceThreshold: 0,
-      chainId: 137,
+      chainId: 1,
       operator: '>',
       functionName: 'balanceOf',
-      functionParam: [options.maticTokenId],
+      functionParam: [options.ethTokenId[i]],
     });
+    console.log('eth', ethExecutionResult);
+    if (ethExecutionResult) {
+      break;
+    }
+  }
+  let maticExecutionResult = false;
+  if (!ethExecutionResult) {
+    for (let i = 0; i < options.maticTokenId.length; i++) {
+      maticExecutionResult = await viewAdapter(eoa[0], {
+        contractAddress: options.maticAddress,
+        type: 'view',
+        contractType: 'erc1155',
+        balanceThreshold: 0,
+        chainId: 137,
+        operator: '>',
+        functionName: 'balanceOf',
+        functionParam: [options.maticTokenId[i]],
+      });
+      console.log('matic', maticExecutionResult);
+      if (maticExecutionResult) {
+        break;
+      }
+    }
   }
 
   if (ethExecutionResult || maticExecutionResult) {
@@ -92,7 +105,7 @@ export async function strategy({ eoa, options }: StrategyParamsType) {
       eoa[0],
       options
     );
-
+    console.log('Trades', thresholdCount);
     return arithmeticOperand(
       thresholdCount,
       options.threshold,
