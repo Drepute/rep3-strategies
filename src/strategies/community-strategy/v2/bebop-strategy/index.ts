@@ -2,6 +2,42 @@ import { StrategyParamsType } from '../../../../types';
 import { arithmeticOperand, viewAdapter } from '../../../../adapters/contract';
 import fetch from 'cross-fetch';
 
+const getMultiSwapperTransactionCount = async (
+  walletAddr: string,
+  startTime: string,
+  threshold: number,
+  currentScore: number,
+  endTimeStamp?: number
+) => {
+  const endTime = endTimeStamp ?? Math.floor(new Date().getTime() / 1000) * 1e9;
+
+  const res = await fetch(
+    `https://api.bebop.xyz/history/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTime}&size=${300}`
+  );
+  const data = await res.json();
+  let currentValidScore = currentScore;
+  data.results.forEach(element => {
+    if (element.volumeUsd > 22.5) {
+      const swapLevel = Math.max(
+        Object.keys(element.sellTokens).length,
+        Object.keys(element.buyTokens).length
+      );
+      const currentTxSwapScore = swapLevel > 0 ? swapLevel - 1 : 0;
+      currentValidScore = currentValidScore + currentTxSwapScore;
+    }
+  });
+  if (data.nextAvailableTimestamp && currentValidScore < threshold) {
+    return await getMultiSwapperTransactionCount(
+      walletAddr,
+      startTime,
+      threshold,
+      currentValidScore,
+      data.nextAvailableTimestamp
+    );
+  } else {
+    return currentValidScore;
+  }
+};
 const getSwapperTransactionCount = async (
   walletAddr: string,
   startTime: string,
@@ -9,31 +45,28 @@ const getSwapperTransactionCount = async (
   currentLength: number,
   endTimeStamp?: number
 ) => {
-  const endTime = endTimeStamp || Math.floor(new Date().getTime() / 1000) * 1e9;
-  try {
-    const res = await fetch(
-      `https://api.bebop.xyz/history/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTime}&size=${300}`
-    );
-    const data = await res.json();
-    let currentValidLength = currentLength;
-    data.results.forEach(element => {
-      if (element.volumeUsd > 22.5) {
-        currentValidLength = currentValidLength + 1;
-      }
-    });
-    if (data.nextAvailableTimestamp && currentValidLength < threshold) {
-      return await getSwapperTransactionCount(
-        walletAddr,
-        startTime,
-        threshold,
-        currentValidLength,
-        data.nextAvailableTimestamp
-      );
-    } else {
-      return currentValidLength;
+  const endTime = endTimeStamp ?? Math.floor(new Date().getTime() / 1000) * 1e9;
+
+  const res = await fetch(
+    `https://api.bebop.xyz/history/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTime}&size=${300}`
+  );
+  const data = await res.json();
+  let currentValidLength = currentLength;
+  data.results.forEach(element => {
+    if (element.volumeUsd > 22.5) {
+      currentValidLength = currentValidLength + 1;
     }
-  } catch (error) {
-    return 0;
+  });
+  if (data.nextAvailableTimestamp && currentValidLength < threshold) {
+    return await getSwapperTransactionCount(
+      walletAddr,
+      startTime,
+      threshold,
+      currentValidLength,
+      data.nextAvailableTimestamp
+    );
+  } else {
+    return currentValidLength;
   }
 };
 const actionOnQuestType = async (
@@ -43,17 +76,22 @@ const actionOnQuestType = async (
 ) => {
   switch (type) {
     case 'swapper': {
-      try {
-        const txCount = await getSwapperTransactionCount(
-          eoa,
-          strategyOptions?.startTime,
-          strategyOptions?.threshold,
-          0
-        );
-        return txCount;
-      } catch (error) {
-        return 0;
-      }
+      const txCount = await getSwapperTransactionCount(
+        eoa,
+        strategyOptions?.startTime,
+        strategyOptions?.threshold,
+        0
+      );
+      return txCount;
+    }
+    case 'multiswapper': {
+      const txCount = await getMultiSwapperTransactionCount(
+        eoa,
+        strategyOptions?.startTime,
+        strategyOptions?.threshold,
+        0
+      );
+      return txCount;
     }
     default:
       return 0;
@@ -61,7 +99,7 @@ const actionOnQuestType = async (
 };
 export async function strategy({ eoa, options }: StrategyParamsType) {
   let ethExecutionResult = false;
-  for (let i = 0; i < options.ethTokenId.length; i++) {
+  for (const element of options.ethTokenId) {
     ethExecutionResult = await viewAdapter(eoa[0], {
       contractAddress: options.ethAddress,
       type: 'view',
@@ -70,16 +108,15 @@ export async function strategy({ eoa, options }: StrategyParamsType) {
       chainId: 1,
       operator: '>',
       functionName: 'balanceOf',
-      functionParam: [options.ethTokenId[i]],
+      functionParam: [element],
     });
-    console.log('eth', ethExecutionResult);
     if (ethExecutionResult) {
       break;
     }
   }
   let maticExecutionResult = false;
   if (!ethExecutionResult) {
-    for (let i = 0; i < options.maticTokenId.length; i++) {
+    for (const element of options.maticTokenId) {
       maticExecutionResult = await viewAdapter(eoa[0], {
         contractAddress: options.maticAddress,
         type: 'view',
@@ -88,9 +125,8 @@ export async function strategy({ eoa, options }: StrategyParamsType) {
         chainId: 137,
         operator: '>',
         functionName: 'balanceOf',
-        functionParam: [options.maticTokenId[i]],
+        functionParam: [element],
       });
-      console.log('matic', maticExecutionResult);
       if (maticExecutionResult) {
         break;
       }
@@ -105,7 +141,7 @@ export async function strategy({ eoa, options }: StrategyParamsType) {
       eoa[0],
       options
     );
-    console.log('Trades', thresholdCount);
+    console.log('threshold count', thresholdCount);
     return arithmeticOperand(
       thresholdCount,
       options.threshold,
