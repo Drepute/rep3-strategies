@@ -10,42 +10,32 @@ const getMultiSwapperTransactionCount = async (
   endTimeStamp?: number
 ) => {
   const endTime = endTimeStamp ?? Math.floor(new Date().getTime() / 1000) * 1e9;
-  try {
-    const res = await fetch(
-      `https://api.bebop.xyz/history/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTime}&size=${300}`
-    );
-    const data = await res.json();
-    let currentValidScore = currentScore;
-    data.results.forEach(element => {
-      if (element.volumeUsd > 22.5) {
-        const swapLevel = Math.max(
-          Object.keys(element.sellTokens).length,
-          Object.keys(element.buyTokens).length
-        );
-        const currentTxSwapScore = swapLevel > 0 ? swapLevel - 1 : 0;
-        console.log(
-          'current tx swap counts : ',
-          Object.keys(element.sellTokens).length,
-          Object.keys(element.buyTokens).length,
-          currentValidScore + currentTxSwapScore
-        );
-        currentValidScore = currentValidScore + currentTxSwapScore;
-      }
-    });
-    if (data.nextAvailableTimestamp && currentValidScore < threshold) {
-      console.log('one more call', currentValidScore);
-      return await getMultiSwapperTransactionCount(
-        walletAddr,
-        startTime,
-        threshold,
-        currentValidScore,
-        data.nextAvailableTimestamp
+
+  const res = await fetch(
+    `https://api.bebop.xyz/history/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTime}&size=${300}`
+  );
+  const data = await res.json();
+  let currentValidScore = currentScore;
+  data.results.forEach(element => {
+    if (element.volumeUsd > 22.5) {
+      const swapLevel = Math.max(
+        Object.keys(element.sellTokens).length,
+        Object.keys(element.buyTokens).length
       );
-    } else {
-      return currentValidScore;
+      const currentTxSwapScore = swapLevel > 0 ? swapLevel - 1 : 0;
+      currentValidScore = currentValidScore + currentTxSwapScore;
     }
-  } catch (error) {
-    return 0;
+  });
+  if (data.nextAvailableTimestamp && currentValidScore < threshold) {
+    return await getMultiSwapperTransactionCount(
+      walletAddr,
+      startTime,
+      threshold,
+      currentValidScore,
+      data.nextAvailableTimestamp
+    );
+  } else {
+    return currentValidScore;
   }
 };
 const getSwapperTransactionCount = async (
@@ -56,30 +46,27 @@ const getSwapperTransactionCount = async (
   endTimeStamp?: number
 ) => {
   const endTime = endTimeStamp ?? Math.floor(new Date().getTime() / 1000) * 1e9;
-  try {
-    const res = await fetch(
-      `https://api.bebop.xyz/history/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTime}&size=${300}`
-    );
-    const data = await res.json();
-    let currentValidLength = currentLength;
-    data.results.forEach(element => {
-      if (element.volumeUsd > 22.5) {
-        currentValidLength = currentValidLength + 1;
-      }
-    });
-    if (data.nextAvailableTimestamp && currentValidLength < threshold) {
-      return await getSwapperTransactionCount(
-        walletAddr,
-        startTime,
-        threshold,
-        currentValidLength,
-        data.nextAvailableTimestamp
-      );
-    } else {
-      return currentValidLength;
+
+  const res = await fetch(
+    `https://api.bebop.xyz/history/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTime}&size=${300}`
+  );
+  const data = await res.json();
+  let currentValidLength = currentLength;
+  data.results.forEach(element => {
+    if (element.volumeUsd > 22.5) {
+      currentValidLength = currentValidLength + 1;
     }
-  } catch (error) {
-    return 0;
+  });
+  if (data.nextAvailableTimestamp && currentValidLength < threshold) {
+    return await getSwapperTransactionCount(
+      walletAddr,
+      startTime,
+      threshold,
+      currentValidLength,
+      data.nextAvailableTimestamp
+    );
+  } else {
+    return currentValidLength;
   }
 };
 const actionOnQuestType = async (
@@ -89,30 +76,22 @@ const actionOnQuestType = async (
 ) => {
   switch (type) {
     case 'swapper': {
-      try {
-        const txCount = await getSwapperTransactionCount(
-          eoa,
-          strategyOptions?.startTime,
-          strategyOptions?.threshold,
-          0
-        );
-        return txCount;
-      } catch (error) {
-        return 0;
-      }
+      const txCount = await getSwapperTransactionCount(
+        eoa,
+        strategyOptions?.startTime,
+        strategyOptions?.threshold,
+        0
+      );
+      return txCount;
     }
     case 'multiswapper': {
-      try {
-        const txCount = await getMultiSwapperTransactionCount(
-          eoa,
-          strategyOptions?.startTime,
-          strategyOptions?.threshold,
-          0
-        );
-        return txCount;
-      } catch (error) {
-        return 0;
-      }
+      const txCount = await getMultiSwapperTransactionCount(
+        eoa,
+        strategyOptions?.startTime,
+        strategyOptions?.threshold,
+        0
+      );
+      return txCount;
     }
     default:
       return 0;
@@ -148,7 +127,6 @@ export async function strategy({ eoa, options }: StrategyParamsType) {
         functionName: 'balanceOf',
         functionParam: [element],
       });
-      console.log('matic', maticExecutionResult);
       if (maticExecutionResult) {
         break;
       }
