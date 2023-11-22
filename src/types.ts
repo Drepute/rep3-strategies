@@ -27,7 +27,11 @@ export type AdapterWithVariables = {
   discordAdapter: {
     type: 'isMember';
     serviceConfig: { url: string; authToken: string };
-    discordUserTokens: { refreshToken: string; accessToken: string };
+    discordUserTokens: {
+      refreshToken: string;
+      accessToken: string;
+      uuid: string;
+    };
     guildId?: string;
     roleId?: string;
     strategyOptions?: any;
