@@ -47,6 +47,7 @@ const getAbiOnType = (type: 'erc1155' | 'erc721' | 'erc20' | 'custom') => {
 };
 export const viewAdapter = async (
   holder: string,
+  onlyValue: boolean,
   functionParams: AdapterWithVariables['contractAdapter']
 ) => {
   let response;
@@ -80,17 +81,14 @@ export const viewAdapter = async (
       functionParams.chainId ?? 1
     );
   }
-  console.log(
-    'response contract',
-    // arithmeticOperand(
-    parseInt(response.toString())
-    // functionParams.balanceThreshold ?? eval(functionParams.thresholdEval ?? ''),
-    // functionParams.operator ?? '=='
-    // )
-  );
-  return arithmeticOperand(
-    parseInt(response.toString()),
-    functionParams.balanceThreshold ?? eval(functionParams.thresholdEval ?? ''),
-    functionParams.operator ?? '=='
-  );
+  if (onlyValue) {
+    return arithmeticOperand(
+      parseInt(response.toString()),
+      functionParams.balanceThreshold ??
+        eval(functionParams.thresholdEval ?? ''),
+      functionParams.operator ?? '=='
+    );
+  } else {
+    return response;
+  }
 };

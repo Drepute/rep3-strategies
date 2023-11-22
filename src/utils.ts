@@ -137,7 +137,6 @@ async function multipleCallStrategy<T extends AdapterNames>(
       eoa,
       options: strategiesConfig?.[0]?.options.variable.strategyOptions,
     });
-    console.log(res);
     let results = [
       {
         executionResult: res,
@@ -236,7 +235,6 @@ async function multipleCallStrategy<T extends AdapterNames>(
       eoa[0],
       network
     );
-    console.log(results);
     const resultObj = results.reduce(
       (acc, cur) => ({
         ...acc,
@@ -253,6 +251,9 @@ async function multipleCallStrategy<T extends AdapterNames>(
       params: currentParams,
     };
   }
+}
+async function multipleBatchCallStrateg(batchObj: any) {
+  console.log(batchObj);
 }
 
 export const { subgraph } = utils;

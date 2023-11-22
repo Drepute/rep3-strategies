@@ -19,7 +19,6 @@ export const isGuildMemberOrNot = async (
       },
     });
     const res = await response.json();
-    console.log('res......', res, url, roleId, guildId);
     if (roleId) {
       return res.role;
     } else {
