@@ -2,6 +2,35 @@ import { StrategyParamsType } from '../../../../types';
 import { arithmeticOperand, viewAdapter } from '../../../../adapters/contract';
 import fetch from 'cross-fetch';
 
+const getSizeIsSizeTransactionCount = async (
+  walletAddr: string,
+  startTime: string,
+  threshold: number,
+  currentVolume: number,
+  endTimeStamp?: number
+) => {
+  const endTime = endTimeStamp ?? Math.floor(new Date().getTime() / 1000) * 1e9;
+
+  const res = await fetch(
+    `https://api.bebop.xyz/history/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTime}&size=${300}`
+  );
+  const data = await res.json();
+  let currentValidVolume = currentVolume;
+  data.results.forEach(element => {
+    currentValidVolume = currentValidVolume + element.volumeUsd;
+  });
+  if (data.nextAvailableTimestamp && currentValidVolume < threshold) {
+    return await getSizeIsSizeTransactionCount(
+      walletAddr,
+      startTime,
+      threshold,
+      currentValidVolume,
+      data.nextAvailableTimestamp
+    );
+  } else {
+    return currentValidVolume;
+  }
+};
 const getMultiSwapperTransactionCount = async (
   walletAddr: string,
   startTime: string,
@@ -15,6 +44,7 @@ const getMultiSwapperTransactionCount = async (
     `https://api.bebop.xyz/history/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTime}&size=${300}`
   );
   const data = await res.json();
+
   let currentValidScore = currentScore;
   data.results.forEach(element => {
     if (element.volumeUsd > 22.5) {
@@ -51,6 +81,7 @@ const getSwapperTransactionCount = async (
     `https://api.bebop.xyz/history/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTime}&size=${300}`
   );
   const data = await res.json();
+
   let currentValidLength = currentLength;
   data.results.forEach(element => {
     if (element.volumeUsd > 22.5) {
@@ -86,6 +117,15 @@ const actionOnQuestType = async (
     }
     case 'multiswapper': {
       const txCount = await getMultiSwapperTransactionCount(
+        eoa,
+        strategyOptions?.startTime,
+        strategyOptions?.threshold,
+        0
+      );
+      return txCount;
+    }
+    case 'sizeIsSize': {
+      const txCount = await getSizeIsSizeTransactionCount(
         eoa,
         strategyOptions?.startTime,
         strategyOptions?.threshold,
@@ -141,7 +181,7 @@ export async function strategy({ eoa, options }: StrategyParamsType) {
       eoa[0],
       options
     );
-    console.log('threshold count', thresholdCount);
+
     return arithmeticOperand(
       thresholdCount,
       options.threshold,
