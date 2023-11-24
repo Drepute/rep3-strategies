@@ -7,6 +7,7 @@ import {
 } from './types';
 import { ActionOnTypeV2 } from './actions/utils/type';
 import ActionCallerV2 from './actions/v2';
+import { valid } from 'semver';
 
 // UTILS //
 const getCurrentParams = async (
@@ -252,8 +253,14 @@ async function multipleCallStrategy<T extends AdapterNames>(
     };
   }
 }
-async function multipleBatchCallStrateg(batchObj: any) {
-  console.log(batchObj);
+async function multipleBatchCallStrategy(batchObj: any) {
+  // console.log(batchObj);
+  // const res = await ;
+  let key: string;
+  let value: any;
+  for ([key, value] of Object.entries(batchObj)) {
+    // console.log(key, value);
+  }
 }
 
 export const { subgraph } = utils;
@@ -262,4 +269,5 @@ export default {
   subgraph,
   callStrategy,
   multipleCallStrategy,
+  multipleBatchCallStrategy,
 };
