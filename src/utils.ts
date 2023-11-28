@@ -7,7 +7,6 @@ import {
 } from './types';
 import { ActionOnTypeV2 } from './actions/utils/type';
 import ActionCallerV2 from './actions/v2';
-import { valid } from 'semver';
 
 // UTILS //
 const getCurrentParams = async (
@@ -253,13 +252,41 @@ async function multipleCallStrategy<T extends AdapterNames>(
     };
   }
 }
+const getKeyForConfig = (obj: any) => {
+  switch (obj.strategy) {
+    case 'twitter-strategy':
+      return `${obj.strategy}-${obj.options?.variable?.type}-${
+        obj?.options?.variable?.followingAccountId
+      }-${obj?.options?.variable?.accountId}-${
+        obj?.options?.variable?.dateInfo?.from
+      }${obj?.options?.variable?.dateInfo?.to || ''}`;
+    case 'contract-strategy':
+      if (obj.options?.variable?.type === 'view') {
+        return `${obj.strategy}-${obj.options?.variable?.type}-${
+          obj.options?.variable?.contractType
+        }-${obj.options?.variable?.contractAddress}-${
+          obj.options?.variable?.chainId
+        }-${obj?.options?.variable?.functionName || ''}-${obj?.options?.variable
+          ?.functionParam || ''}`;
+      } else {
+        return 'null';
+      }
+    default:
+      return 'null';
+  }
+};
 async function multipleBatchCallStrategy(batchObj: any) {
-  // console.log(batchObj);
-  // const res = await ;
   let key: string;
   let value: any;
   for ([key, value] of Object.entries(batchObj)) {
-    // console.log(key, value);
+    console.log(key, value);
+    const resultObject = value.reduce((acc, obj) => {
+      const key = getKeyForConfig(obj);
+      acc[key] = acc[key] || [];
+      acc[key].push(obj);
+      return acc;
+    }, {});
+    console.log('result', key, '=======>', JSON.stringify(resultObject));
   }
 }
 
