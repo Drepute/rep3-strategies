@@ -38,7 +38,7 @@ const multipleStrategies: Record<string, any> = {
   'twitter-strategy': twitterStrategy,
   'csv-strategy': csvStrategy,
 };
-
+export const communityStrategy = ['entangle', 'bebop'];
 Object.keys(strategies).forEach(function(strategyName) {
   let example = null;
   let about = '';
