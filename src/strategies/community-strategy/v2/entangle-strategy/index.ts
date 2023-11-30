@@ -13,9 +13,15 @@ const getTestTransactionCount = async (eoa: string, strategyOptions?: any) => {
     parseInt(totalStakingTransactionCount) +
       parseInt(totalDelegateTransactionCount)
   );
-  const xAxisTier = 1;
+  let xAxisTier = 0;
+  if (
+    parseInt(totalStakingTransactionCount) +
+      parseInt(totalDelegateTransactionCount) >
+    0
+  ) {
+    xAxisTier = totalStakingTransactionCount > 0 ? 2 : 1;
+  }
   const tier = 5 * (xAxisTier - 1) + yAxisTier;
-  console.log('tier', tier);
   return tier;
 };
 const calculateYaxisTxnTier = (totalTxns: number) => {
