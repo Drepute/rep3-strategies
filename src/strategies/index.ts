@@ -37,6 +37,7 @@ const multipleStrategies: Record<string, any> = {
   'discord-strategy': discordStrategy,
   'twitter-strategy': twitterStrategy,
   'csv-strategy': csvStrategy,
+  'community-strategy': contractStrategy,
 };
 export const communityStrategy = ['entangle', 'bebop'];
 Object.keys(strategies).forEach(function(strategyName) {
