@@ -13,6 +13,7 @@ export type AdapterWithVariables = {
       | '88mph'
       | 'bebop'
       | 'bebopHalloween'
+      | 'entangle'
       | 'csv';
     contractType?: 'erc1155' | 'erc721' | 'erc20' | 'custom';
     chainId?: number;
