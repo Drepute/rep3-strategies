@@ -128,7 +128,7 @@ async function multipleCallStrategy<T extends AdapterNames>(
     );
     return { tierMatrix: resultObj, params: currentParams };
   } else if (
-    strategiesConfig?.[0]?.strategy === 'community-strategy' &&
+    strategiesConfig?.[0]?.strategy === 'community-strategy-strategy' &&
     communityStrategy.includes(strategiesConfig?.[0]?.options.variable.type)
   ) {
     const res = await _strategies[
@@ -138,13 +138,13 @@ async function multipleCallStrategy<T extends AdapterNames>(
       eoa,
       options: strategiesConfig?.[0]?.options.variable.strategyOptions,
     });
-    console.log('res...', res);
 
     let results = [
       {
         executionResult: true,
         tier: res,
-        id: strategiesConfig?.[0]?.options.task_id,
+        id: strategiesConfig?.filter(x => x.options?.tier === parseInt(res))[0]
+          ?.options?.task_id,
         strategy: strategiesConfig?.[0]?.strategy,
       },
     ];

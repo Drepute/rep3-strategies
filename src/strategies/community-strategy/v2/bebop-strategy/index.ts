@@ -52,7 +52,7 @@ const getMultiSwapperTransactionCount = async (
         Object.keys(element.sellTokens).length,
         Object.keys(element.buyTokens).length
       );
-      const currentTxSwapScore = swapLevel > 1 ? swapLevel : 0;
+      const currentTxSwapScore = swapLevel > 1 ? 1 : 0;
       currentValidScore = currentValidScore + currentTxSwapScore;
     }
   });
