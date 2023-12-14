@@ -136,7 +136,7 @@ async function multipleCallStrategy<T extends AdapterNames>(
     ].strategy({
       contractAddress,
       eoa,
-      options: strategiesConfig?.[0]?.options.variable.strategyOptions,
+      options: strategiesConfig?.[0]?.options.variable,
     });
 
     let results = [
