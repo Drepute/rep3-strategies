@@ -108,8 +108,12 @@ const actionOnQuestType = async (
   }
 };
 export async function strategy({ eoa, options }: StrategyParamsType) {
-  console.log('quest', options.questType);
-  const tier = await actionOnQuestType(options.questType, eoa[0], options);
-  console.log('tier......', tier);
+  console.log('tier......', options);
+  const tier = await actionOnQuestType(
+    options?.strategyOptions.questType,
+    eoa[0],
+    options?.strategyOptions
+  );
+
   return tier;
 }
