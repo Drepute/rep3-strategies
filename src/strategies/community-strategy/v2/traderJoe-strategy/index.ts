@@ -3,7 +3,7 @@ import fetch from 'cross-fetch';
 
 const getSmashAndRockTypeCounts = async (options: any) => {
   const res = await fetch(
-    `https://api.peonnft.com/user/${options?.discordUserTokens?.userName}`
+    `https://api.peonnft.com/user/${options?.discordUserTokens?.username}`
   );
   const data = await res.json();
   console.log('api', options, data);
@@ -11,10 +11,10 @@ const getSmashAndRockTypeCounts = async (options: any) => {
     if (keyTracker.name === 'smash_count') {
       return data?.smash_count >= keyTracker.value;
     } else {
-      const currentKeyValue = data?.gems.filter(
+      const currentKeyValue = data?.gems?.filter(
         x => x.name === keyTracker.name
       );
-      return currentKeyValue.length > 0
+      return currentKeyValue?.length > 0
         ? currentKeyValue[0]?.count >= keyTracker.value
         : false;
     }
