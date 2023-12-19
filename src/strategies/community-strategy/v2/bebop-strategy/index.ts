@@ -170,7 +170,8 @@ const actionOnQuestType = async (
         eoa,
         strategyOptions?.startTime,
         strategyOptions?.threshold,
-        0
+        0,
+        strategyOptions?.endTime
       );
       return txCount;
     }
