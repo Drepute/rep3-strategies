@@ -13,6 +13,7 @@ export type AdapterWithVariables = {
       | '88mph'
       | 'bebop'
       | 'bebopHalloween'
+      | 'entangle'
       | 'csv';
     contractType?: 'erc1155' | 'erc721' | 'erc20' | 'custom';
     chainId?: number;
@@ -27,7 +28,11 @@ export type AdapterWithVariables = {
   discordAdapter: {
     type: 'isMember';
     serviceConfig: { url: string; authToken: string };
-    discordUserTokens: { refreshToken: string; accessToken: string };
+    discordUserTokens: {
+      refreshToken: string;
+      accessToken: string;
+      uuid: string;
+    };
     guildId?: string;
     roleId?: string;
     strategyOptions?: any;

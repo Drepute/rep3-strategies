@@ -47,12 +47,12 @@ const getMultiSwapperTransactionCount = async (
 
   let currentValidScore = currentScore;
   data.results.forEach(element => {
-    if (element.volumeUsd > 22.5) {
+    if (element.volumeUsd >= 22.5) {
       const swapLevel = Math.max(
         Object.keys(element.sellTokens).length,
         Object.keys(element.buyTokens).length
       );
-      const currentTxSwapScore = swapLevel > 0 ? swapLevel - 1 : 0;
+      const currentTxSwapScore = swapLevel > 1 ? 1 : 0;
       currentValidScore = currentValidScore + currentTxSwapScore;
     }
   });
@@ -84,7 +84,7 @@ const getSwapperTransactionCount = async (
 
   let currentValidLength = currentLength;
   data.results.forEach(element => {
-    if (element.volumeUsd > 22.5) {
+    if (element.volumeUsd >= 22.5) {
       currentValidLength = currentValidLength + 1;
     }
   });

@@ -11,6 +11,8 @@ import * as rep3BulkMembershipUri from './community-strategy/v1/rep3-platform/me
 import * as acrossStrategy from './community-strategy/v2/across-strategy';
 import * as bebopStrategy from './community-strategy/v2/bebop-strategy';
 import * as bebopHalloweenStrategy from './community-strategy/v2/bebop-haloween-strategy';
+import * as entangleStrategy from './community-strategy/v2/entangle-strategy';
+import * as traderJoeStrategy from './community-strategy/v2/traderJoe-strategy';
 import * as premiaStrategy from './community-strategy/v1/premia-strategy';
 import * as contractStrategy from './contract-strategy';
 import * as discordStrategy from './discord-strategy';
@@ -27,6 +29,8 @@ const strategies: Record<string, StrategyType> = {
   'across-strategy': acrossStrategy,
   'premia-strategy': premiaStrategy,
   'bebop-strategy': bebopStrategy,
+  'entangle-strategy': entangleStrategy,
+  'rich peon, poor peon-strategy': traderJoeStrategy,
   'bebopHalloween-strategy': bebopHalloweenStrategy,
 };
 
@@ -35,8 +39,9 @@ const multipleStrategies: Record<string, any> = {
   'discord-strategy': discordStrategy,
   'twitter-strategy': twitterStrategy,
   'csv-strategy': csvStrategy,
+  'community-strategy': contractStrategy,
 };
-
+export const communityStrategy = ['entangle', 'bebop', 'rich peon, poor peon'];
 Object.keys(strategies).forEach(function(strategyName) {
   let example = null;
   let about = '';
