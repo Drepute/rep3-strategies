@@ -9,6 +9,7 @@ const getFunctionOnType = async (
   switch (options.type) {
     case 'view':
       try {
+        console.log(eoa, onlyValue, options);
         return await viewAdapter(eoa, onlyValue, options);
       } catch (error) {
         return false;

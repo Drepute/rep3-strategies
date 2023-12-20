@@ -352,14 +352,26 @@ async function multipleBatchCallStrategy(batchObj: any) {
   let key: string;
   let value: any;
   for ([key, value] of Object.entries(batchObj)) {
-    console.log(key, value);
     const resultObject = value.reduce((acc, obj) => {
       const key = getKeyForConfig(obj);
       acc[key] = acc[key] || [];
       acc[key].push(obj);
       return acc;
     }, {});
-    console.log('result', key, '=======>', JSON.stringify(resultObject));
+    //single address
+    let configKeys: string;
+    let configValue: any;
+    for ([configKeys, configValue] of Object.entries(resultObject)) {
+      console.log('result',key,configKeys, configValue);
+      const strategyCompareValue = await multipleStrategies[
+        configValue[0].strategy
+      ].strategy(true, {
+        contractAddress: 'contractAddress',
+        eoa: [key],
+        options: configValue[0].options,
+      });
+      console.log('result', strategyCompareValue);
+    }
   }
 }
 

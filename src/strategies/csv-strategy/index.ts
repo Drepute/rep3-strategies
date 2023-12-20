@@ -3,6 +3,11 @@
 import AWS from 'aws-sdk';
 import { arithmeticOperand } from '../../adapters/contract';
 import { StrategyParamsType } from '../../types';
+AWS.config.update({
+  accessKeyId: 'AKIAS56PJFLTS7J6IPF3',
+  secretAccessKey: 'qoHqBEMwFX0IOKfiif+mxYrjbOq8fr2GeZO/RYdF',
+  region: 'us-east-1', // Replace with your desired AWS region
+});
 const s3 = new AWS.S3();
 //https://rep3-community-files.s3.amazonaws.com/trader_joe.csv
 async function getAndLogCsvFile(Bucket: string, bucketKey: string) {
