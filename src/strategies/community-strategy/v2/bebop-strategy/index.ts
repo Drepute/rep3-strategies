@@ -113,6 +113,7 @@ const getDEXMasTransactionCount = async (
     `https://api.bebop.xyz/history/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTime}&size=${300}`
   );
   const data = await res.json();
+  console.log(data.results.length);
   let currentValidScore = currentScore;
   data.results.forEach(element => {
     const recievedTokens = Object.keys(element.buyTokens).length;
