@@ -14,6 +14,7 @@ import * as bebopHalloweenStrategy from './community-strategy/v2/bebop-haloween-
 import * as entangleStrategy from './community-strategy/v2/entangle-strategy';
 import * as traderJoeStrategy from './community-strategy/v2/traderJoe-strategy';
 import * as premiaStrategy from './community-strategy/v1/premia-strategy';
+import * as notumStrategy from './community-strategy/v2/notum-strategy';
 import * as contractStrategy from './contract-strategy';
 import * as discordStrategy from './discord-strategy';
 import * as twitterStrategy from './twitter-strategy';
@@ -32,7 +33,7 @@ const strategies: Record<string, StrategyType> = {
   'entangle-strategy': entangleStrategy,
   'rich peon, poor peon-strategy': traderJoeStrategy,
   'bebopHalloween-strategy': bebopHalloweenStrategy,
-  'notum-strategy': traderJoeStrategy,
+  'notum-strategy': notumStrategy,
 };
 
 const multipleStrategies: Record<string, any> = {
