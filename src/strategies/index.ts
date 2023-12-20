@@ -18,7 +18,7 @@ import * as contractStrategy from './contract-strategy';
 import * as discordStrategy from './discord-strategy';
 import * as twitterStrategy from './twitter-strategy';
 import * as csvStrategy from './csv-strategy';
-
+//convert it to uuid mapping;
 const strategies: Record<string, StrategyType> = {
   'rep3-is-member': rep3IsMember,
   'erc-20-balance-of': erc20BalanceOf,
@@ -32,6 +32,7 @@ const strategies: Record<string, StrategyType> = {
   'entangle-strategy': entangleStrategy,
   'rich peon, poor peon-strategy': traderJoeStrategy,
   'bebopHalloween-strategy': bebopHalloweenStrategy,
+  'notum-strategy': traderJoeStrategy,
 };
 
 const multipleStrategies: Record<string, any> = {
@@ -41,7 +42,12 @@ const multipleStrategies: Record<string, any> = {
   'csv-strategy': csvStrategy,
   'community-strategy': contractStrategy,
 };
-export const communityStrategy = ['entangle', 'bebop', 'rich peon, poor peon'];
+export const communityStrategy = [
+  'entangle',
+  'bebop',
+  'rich peon, poor peon',
+  'notum',
+];
 Object.keys(strategies).forEach(function(strategyName) {
   let example = null;
   let about = '';
