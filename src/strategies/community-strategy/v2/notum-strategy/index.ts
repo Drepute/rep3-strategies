@@ -1,3 +1,4 @@
+import { ethers } from 'ethers';
 import { arithmeticOperand } from '../../../../adapters/contract';
 import { StrategyParamsType } from '../../../../types';
 import fetch from 'cross-fetch';
@@ -6,7 +7,7 @@ const getAggregateSum = async (eoa: string, strategyOptions?: any) => {
   const filterParameter = JSON.stringify({
     'args.partner': '0xF2F2FE93A744EcE90133F58F783f86C5b50FcF1B',
     'args.inputToken': '0x0000000000000000000000000000000000000000',
-    'args.sender': eoa,
+    'args.sender': ethers.utils.getAddress(eoa),
   });
   const sortOptions = JSON.stringify({ blockNumber: 1 });
   const transform_options = JSON.stringify({
