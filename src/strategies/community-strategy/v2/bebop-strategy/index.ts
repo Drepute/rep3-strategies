@@ -217,7 +217,7 @@ export async function strategy({ eoa, options }: StrategyParamsType) {
   }
 
   if (ethExecutionResult || maticExecutionResult) {
-    return ethExecutionResult || maticExecutionResult;
+    return 1;
   } else {
     const thresholdCount = await actionOnQuestType(
       strategyOptions.questType,
