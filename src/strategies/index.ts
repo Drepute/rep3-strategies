@@ -14,11 +14,12 @@ import * as bebopHalloweenStrategy from './community-strategy/v2/bebop-haloween-
 import * as entangleStrategy from './community-strategy/v2/entangle-strategy';
 import * as traderJoeStrategy from './community-strategy/v2/traderJoe-strategy';
 import * as premiaStrategy from './community-strategy/v1/premia-strategy';
+import * as notumStrategy from './community-strategy/v2/notum-strategy';
 import * as contractStrategy from './contract-strategy';
 import * as discordStrategy from './discord-strategy';
 import * as twitterStrategy from './twitter-strategy';
 import * as csvStrategy from './csv-strategy';
-
+//convert it to uuid mapping;
 const strategies: Record<string, StrategyType> = {
   'rep3-is-member': rep3IsMember,
   'erc-20-balance-of': erc20BalanceOf,
@@ -32,6 +33,7 @@ const strategies: Record<string, StrategyType> = {
   'entangle-strategy': entangleStrategy,
   'rich peon, poor peon-strategy': traderJoeStrategy,
   'bebopHalloween-strategy': bebopHalloweenStrategy,
+  'notum-strategy': notumStrategy,
 };
 
 const multipleStrategies: Record<string, any> = {
@@ -41,7 +43,12 @@ const multipleStrategies: Record<string, any> = {
   'csv-strategy': csvStrategy,
   'community-strategy': contractStrategy,
 };
-export const communityStrategy = ['entangle', 'bebop', 'rich peon, poor peon'];
+export const communityStrategy = [
+  'entangle',
+  'bebop',
+  'rich peon, poor peon',
+  'notum',
+];
 Object.keys(strategies).forEach(function(strategyName) {
   let example = null;
   let about = '';
