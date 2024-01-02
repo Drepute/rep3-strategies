@@ -81,7 +81,7 @@ export const viewAdapter = async (
       functionParams.chainId ?? 1
     );
   }
-  if (onlyValue) {
+  if (!onlyValue) {
     return arithmeticOperand(
       parseInt(response.toString()),
       functionParams.balanceThreshold ??
@@ -89,6 +89,6 @@ export const viewAdapter = async (
       functionParams.operator ?? '=='
     );
   } else {
-    return response;
+    return response.toString();
   }
 };

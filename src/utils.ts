@@ -10,6 +10,7 @@ import {
 } from './types';
 import { ActionOnTypeV2 } from './actions/utils/type';
 import ActionCallerV2 from './actions/v2';
+import { arithmeticOperand } from './adapters/contract';
 
 // UTILS //
 const getCurrentParams = async (
@@ -333,7 +334,7 @@ const getKeyForConfig = (obj: any) => {
       }-${obj?.options?.variable?.accountId}-${
         obj?.options?.variable?.dateInfo?.from
       }${obj?.options?.variable?.dateInfo?.to || ''}`;
-    case 'contract-strategy':
+    case 'smart-contract-strategy':
       if (obj.options?.variable?.type === 'view') {
         return `${obj.strategy}-${obj.options?.variable?.type}-${
           obj.options?.variable?.contractType
@@ -348,10 +349,34 @@ const getKeyForConfig = (obj: any) => {
       return 'null';
   }
 };
+const getOperandValueOnStrategy = (obj: any, strategyCompareValue: number) => {
+  switch (obj.strategy) {
+    case 'twitter-strategy':
+      return arithmeticOperand(
+        strategyCompareValue,
+        obj?.options?.variable?.countThreshold,
+        obj?.options?.variable?.operator
+      );
+    case 'smart-contract-strategy':
+      if (obj.options?.variable?.type === 'view') {
+        return arithmeticOperand(
+          strategyCompareValue,
+          obj?.options?.variable?.balanceThreshold,
+          obj?.options?.variable?.operator
+        );
+      } else {
+        return 'null';
+      }
+    default:
+      return 'null';
+  }
+};
 async function multipleBatchCallStrategy(batchObj: any) {
   let key: string;
   let value: any;
+  const executionObj = {};
   for ([key, value] of Object.entries(batchObj)) {
+    let executionArrayResult = [];
     const resultObject = value.reduce((acc, obj) => {
       const key = getKeyForConfig(obj);
       acc[key] = acc[key] || [];
@@ -362,7 +387,6 @@ async function multipleBatchCallStrategy(batchObj: any) {
     let configKeys: string;
     let configValue: any;
     for ([configKeys, configValue] of Object.entries(resultObject)) {
-      console.log('result',key,configKeys, configValue);
       const strategyCompareValue = await multipleStrategies[
         configValue[0].strategy
       ].strategy(true, {
@@ -370,9 +394,27 @@ async function multipleBatchCallStrategy(batchObj: any) {
         eoa: [key],
         options: configValue[0].options,
       });
-      console.log('result', strategyCompareValue);
+      console.log(strategyCompareValue);
+      const executionArray = configValue.map(x => {
+        return {
+          executionResult: getOperandValueOnStrategy(x, strategyCompareValue),
+          tier: x?.options?.tier,
+          id: x?.options?.task_id,
+          strategy: x?.strategy,
+        };
+      });
+      executionArrayResult = executionArrayResult.concat(executionArray);
+      // const executinresult = configValue.map(x=>{
+      //   executionResult: arithmeticOperand(strategyCompareValue,x?.options?.variable?.strategyOptions?.threshold,x?.options?.variable?.strategyOptions?.threshold)
+      //   tier: x?.options?.tier,
+      //   id: strategiesConfig?.filter(x => x.options?.tier === parseInt(res))[0]
+      //     ?.options?.task_id,
+      //   strategy: strategiesConfig?.[0]?.strategy,
+      // })
     }
+    executionObj[key] = executionArrayResult;
   }
+  console.log(executionObj);
 }
 
 export const { subgraph } = utils;

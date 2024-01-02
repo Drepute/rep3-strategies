@@ -85,7 +85,7 @@ const getTotalDelegateTransactionCount = async (eoa: string): Promise<any> => {
     }),
   });
   const response = await res.json();
-  console.log('txn', response?.data?.info);
+  // console.log('txn', response?.data?.info);
   let allDelegateTxCount = response?.data?.info?.map(x => x?.total_tx);
   allDelegateTxCount = allDelegateTxCount?.reduce(
     (partialSum, a) => partialSum + a,
