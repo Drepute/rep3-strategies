@@ -85,7 +85,6 @@ const getTotalDelegateTransactionCount = async (eoa: string): Promise<any> => {
     }),
   });
   const response = await res.json();
-  // console.log('txn', response?.data?.info);
   let allDelegateTxCount = response?.data?.info?.map(x => x?.total_tx);
   allDelegateTxCount = allDelegateTxCount?.reduce(
     (partialSum, a) => partialSum + a,
@@ -108,7 +107,6 @@ const actionOnQuestType = async (
   }
 };
 export async function strategy({ eoa, options }: StrategyParamsType) {
-  console.log('tier......', options);
   const tier = await actionOnQuestType(
     options?.strategyOptions.questType,
     eoa[0],

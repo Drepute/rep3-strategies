@@ -414,7 +414,7 @@ async function multipleBatchCallStrategy(batchObj: any) {
     }
     executionObj[key] = executionArrayResult;
   }
-  console.log(executionObj);
+  return executionObj;
 }
 
 export const { subgraph } = utils;
