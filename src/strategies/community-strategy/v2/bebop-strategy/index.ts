@@ -100,6 +100,38 @@ const getSwapperTransactionCount = async (
     return currentValidLength;
   }
 };
+const getDEXMasTransactionCount = async (
+  walletAddr: string,
+  startTime: string,
+  threshold: number,
+  currentScore: number,
+  endTimeStamp?: number
+) => {
+  const endTime = endTimeStamp ?? Math.floor(new Date().getTime() / 1000) * 1e9;
+
+  const res = await fetch(
+    `https://api.bebop.xyz/history/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTime}&size=${300}`
+  );
+  const data = await res.json();
+  console.log(data.results.length);
+  let currentValidScore = currentScore;
+  data.results.forEach(element => {
+    const recievedTokens = Object.keys(element.buyTokens).length;
+    const currentTxSwapScore = recievedTokens;
+    currentValidScore = currentValidScore + currentTxSwapScore;
+  });
+  if (data.nextAvailableTimestamp && currentValidScore < threshold) {
+    return await getDEXMasTransactionCount(
+      walletAddr,
+      startTime,
+      threshold,
+      currentValidScore,
+      data.nextAvailableTimestamp
+    );
+  } else {
+    return currentValidScore;
+  }
+};
 const actionOnQuestType = async (
   type: string,
   eoa: string,
@@ -112,6 +144,16 @@ const actionOnQuestType = async (
         strategyOptions?.startTime,
         strategyOptions?.threshold,
         0
+      );
+      return txCount;
+    }
+    case 'dexmas': {
+      const txCount = await getDEXMasTransactionCount(
+        eoa,
+        strategyOptions?.startTime,
+        strategyOptions?.threshold,
+        0,
+        strategyOptions?.endTime
       );
       return txCount;
     }
@@ -174,18 +216,20 @@ export async function strategy({ eoa, options }: StrategyParamsType) {
   }
 
   if (ethExecutionResult || maticExecutionResult) {
-    return ethExecutionResult || maticExecutionResult;
+    return 1;
   } else {
     const thresholdCount = await actionOnQuestType(
-      options.questType,
+      strategyOptions.questType,
       eoa[0],
-      options
+      strategyOptions
     );
 
     return arithmeticOperand(
       thresholdCount,
-      options.threshold,
-      options.operator
-    );
+      strategyOptions.threshold,
+      strategyOptions.operator
+    )
+      ? 1
+      : 0;
   }
 }

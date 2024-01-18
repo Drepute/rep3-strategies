@@ -1,6 +1,6 @@
 // import fetch from 'cross-fetch';
-
 import AWS from 'aws-sdk';
+
 import { arithmeticOperand } from '../../adapters/contract';
 import { StrategyParamsType } from '../../types';
 AWS.config.update({
