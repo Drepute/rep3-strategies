@@ -377,6 +377,7 @@ async function multipleBatchCallStrategy(batchObj: any) {
   const executionObj = {};
   for ([key, value] of Object.entries(batchObj)) {
     let executionArrayResult = [];
+    console.log('values config', value);
     const resultObject = value.reduce((acc, obj) => {
       const key = getKeyForConfig(obj);
       acc[key] = acc[key] || [];
@@ -394,7 +395,6 @@ async function multipleBatchCallStrategy(batchObj: any) {
         eoa: [key],
         options: configValue[0].options,
       });
-      console.log(strategyCompareValue);
       const executionArray = configValue.map(x => {
         return {
           executionResult: getOperandValueOnStrategy(x, strategyCompareValue),
@@ -404,13 +404,6 @@ async function multipleBatchCallStrategy(batchObj: any) {
         };
       });
       executionArrayResult = executionArrayResult.concat(executionArray);
-      // const executinresult = configValue.map(x=>{
-      //   executionResult: arithmeticOperand(strategyCompareValue,x?.options?.variable?.strategyOptions?.threshold,x?.options?.variable?.strategyOptions?.threshold)
-      //   tier: x?.options?.tier,
-      //   id: strategiesConfig?.filter(x => x.options?.tier === parseInt(res))[0]
-      //     ?.options?.task_id,
-      //   strategy: strategiesConfig?.[0]?.strategy,
-      // })
     }
     executionObj[key] = executionArrayResult;
   }
