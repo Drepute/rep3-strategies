@@ -1,7 +1,11 @@
 import { StrategyParamsType } from '../../../../types';
 import fetch from 'cross-fetch';
 import AWS from 'aws-sdk';
-
+AWS.config.update({
+  accessKeyId: 'AKIAS56PJFLT6MQENFOJ',
+  secretAccessKey: 'o8+PI9If2gLb9ZqyR/Fqfv+/LPZjB89LTMpKdjHP',
+  region: 'us-east-1', // Replace with your desired AWS region
+});
 const s3 = new AWS.S3();
 //https://rep3-community-files.s3.amazonaws.com/trader_joe.csv
 

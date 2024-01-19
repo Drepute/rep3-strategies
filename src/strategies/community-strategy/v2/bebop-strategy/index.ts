@@ -180,6 +180,7 @@ const actionOnQuestType = async (
   }
 };
 export async function strategy({ eoa, options }: StrategyParamsType) {
+  const strategyOptions = options?.strategyOptions;
   let ethExecutionResult = false;
   for (const element of options.ethTokenId) {
     ethExecutionResult = await viewAdapter(eoa[0], false, {

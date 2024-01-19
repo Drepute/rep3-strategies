@@ -174,7 +174,6 @@ async function multipleCallStrategy<T extends AdapterNames>(
       eoa,
       options: strategiesConfig?.[0]?.options.variable.strategyOptions,
     });
-    console.log('res...', res);
 
     let results = [
       {
@@ -377,33 +376,59 @@ async function multipleBatchCallStrategy(batchObj: any) {
   const executionObj = {};
   for ([key, value] of Object.entries(batchObj)) {
     let executionArrayResult = [];
-    console.log('values config', value);
-    const resultObject = value.reduce((acc, obj) => {
-      const key = getKeyForConfig(obj);
-      acc[key] = acc[key] || [];
-      acc[key].push(obj);
-      return acc;
-    }, {});
-    //single address
-    let configKeys: string;
-    let configValue: any;
-    for ([configKeys, configValue] of Object.entries(resultObject)) {
-      const strategyCompareValue = await multipleStrategies[
-        configValue[0].strategy
-      ].strategy(true, {
+    const communityStrategy = value.filter(
+      x => x.strategy === 'community-strategy-strategy'
+    );
+    const templateStrategy = value.filter(
+      x =>
+        x.strategy === 'twitter-strategy' ||
+        x.strategy === 'smart-contract-strategy'
+    );
+    // const csvStrategy = value.filter(
+    //   x => x.strategy === 'csv-strategy' || 'discord-strategy'
+    // );
+    console.log(
+      communityStrategy,
+      `${communityStrategy?.[0]?.options.variable.type}`
+    );
+    if (communityStrategy.length > 0) {
+      const res = await _strategies[
+        `${communityStrategy?.[0]?.options.variable.type}-strategy`
+      ].strategy({
         contractAddress: 'contractAddress',
         eoa: [key],
-        options: configValue[0].options,
+        options: communityStrategy?.[0]?.options.variable,
       });
-      const executionArray = configValue.map(x => {
-        return {
-          executionResult: getOperandValueOnStrategy(x, strategyCompareValue),
-          tier: x?.options?.tier,
-          id: x?.options?.task_id,
-          strategy: x?.strategy,
-        };
-      });
-      executionArrayResult = executionArrayResult.concat(executionArray);
+      console.log('response community', res);
+    }
+    if (templateStrategy.length > 0) {
+      const resultObject = templateStrategy.reduce((acc, obj) => {
+        const key = getKeyForConfig(obj);
+        acc[key] = acc[key] || [];
+        acc[key].push(obj);
+        return acc;
+      }, {});
+      let configKeys: string;
+      let configValue: any;
+      for ([configKeys, configValue] of Object.entries(resultObject)) {
+        const strategyCompareValue = await multipleStrategies[
+          configValue[0].strategy
+        ].strategy(true, {
+          contractAddress: 'contractAddress',
+          eoa: [key],
+          options: configValue[0].options,
+        });
+        const executionArray = configValue.map(x => {
+          return {
+            executionResult: getOperandValueOnStrategy(x, strategyCompareValue),
+            tier: x?.options?.tier,
+            id: x?.options?.task_id,
+            strategy: x?.strategy,
+          };
+        });
+        executionArrayResult = executionArrayResult.concat(executionArray);
+        console.log('execution result', executionArrayResult);
+      }
     }
     executionObj[key] = executionArrayResult;
   }

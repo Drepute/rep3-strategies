@@ -4,8 +4,8 @@ import AWS from 'aws-sdk';
 import { arithmeticOperand } from '../../adapters/contract';
 import { StrategyParamsType } from '../../types';
 AWS.config.update({
-  accessKeyId: 'AKIAS56PJFLTS7J6IPF3',
-  secretAccessKey: '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',
+  accessKeyId: 'AKIAS56PJFLT6MQENFOJ',
+  secretAccessKey: 'o8+PI9If2gLb9ZqyR/Fqfv+/LPZjB89LTMpKdjHP',
   region: 'us-east-1', // Replace with your desired AWS region
 });
 const s3 = new AWS.S3();
