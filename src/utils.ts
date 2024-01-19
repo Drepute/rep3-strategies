@@ -375,7 +375,7 @@ async function multipleBatchCallStrategy(batchObj: any) {
   let value: any;
   const executionObj = {};
   for ([key, value] of Object.entries(batchObj)) {
-    let executionArrayResult = [];
+    let executionArrayResult: any = [];
     const communityStrategy = value.filter(
       x => x.strategy === 'community-strategy-strategy'
     );
@@ -400,6 +400,16 @@ async function multipleBatchCallStrategy(batchObj: any) {
         options: communityStrategy?.[0]?.options.variable,
       });
       console.log('response community', res);
+
+      for (let i = 1; i <= res; i++) {
+        executionArrayResult.push({
+          executionResult: true,
+          tier: i,
+          id: communityStrategy.filter(x => x.options.tier === i)?.[0]?.options
+            ?.task_id,
+          strategy: 'community-strategy-strategy',
+        });
+      }
     }
     if (templateStrategy.length > 0) {
       const resultObject = templateStrategy.reduce((acc, obj) => {
@@ -430,6 +440,7 @@ async function multipleBatchCallStrategy(batchObj: any) {
         console.log('execution result', executionArrayResult);
       }
     }
+    console.log(executionArrayResult);
     executionObj[key] = executionArrayResult;
   }
   return executionObj;
