@@ -180,11 +180,11 @@ const actionOnQuestType = async (
   }
 };
 export async function strategy({ eoa, options }: StrategyParamsType) {
-  let ethExecutionResult = false;
   const strategyOptions = options?.strategyOptions;
-  for (const element of strategyOptions.ethTokenId) {
-    ethExecutionResult = await viewAdapter(eoa[0], {
-      contractAddress: strategyOptions.ethAddress,
+  let ethExecutionResult = false;
+  for (const element of options.ethTokenId) {
+    ethExecutionResult = await viewAdapter(eoa[0], false, {
+      contractAddress: options.ethAddress,
       type: 'view',
       contractType: 'erc1155',
       balanceThreshold: 0,
@@ -199,9 +199,9 @@ export async function strategy({ eoa, options }: StrategyParamsType) {
   }
   let maticExecutionResult = false;
   if (!ethExecutionResult) {
-    for (const element of strategyOptions.maticTokenId) {
-      maticExecutionResult = await viewAdapter(eoa[0], {
-        contractAddress: strategyOptions.maticAddress,
+    for (const element of options.maticTokenId) {
+      maticExecutionResult = await viewAdapter(eoa[0], false, {
+        contractAddress: options.maticAddress,
         type: 'view',
         contractType: 'erc1155',
         balanceThreshold: 0,

@@ -3,6 +3,11 @@ import AWS from 'aws-sdk';
 
 import { arithmeticOperand } from '../../adapters/contract';
 import { StrategyParamsType } from '../../types';
+AWS.config.update({
+  accessKeyId: 'AKIAS56PJFLT6MQENFOJ',
+  secretAccessKey: 'o8+PI9If2gLb9ZqyR/Fqfv+/LPZjB89LTMpKdjHP',
+  region: 'us-east-1', // Replace with your desired AWS region
+});
 const s3 = new AWS.S3();
 //https://rep3-community-files.s3.amazonaws.com/trader_joe.csv
 async function getAndLogCsvFile(Bucket: string, bucketKey: string) {
@@ -129,6 +134,7 @@ const computeDataOnType = async (
     case 'traderJoe': {
       const results = traderJoeCSVProcessing(csvRes);
       const executionResult = traderJoeTierCompute(eoa, results);
+      console.log('trader joe', tier);
       return tier
         ? arithmeticOperand(executionResult?.tier, tier, '===') || false
         : false;
@@ -138,6 +144,7 @@ const computeDataOnType = async (
   }
 };
 export async function strategy({ eoa, options }: StrategyParamsType) {
+  console.log('csv', options);
   const res = await getAndLogCsvFile(
     options?.variable?.strategyOptions?.csvBucketName,
     options?.variable?.strategyOptions?.csvKey

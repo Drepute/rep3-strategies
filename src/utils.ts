@@ -10,6 +10,7 @@ import {
 } from './types';
 import { ActionOnTypeV2 } from './actions/utils/type';
 import ActionCallerV2 from './actions/v2';
+import { arithmeticOperand } from './adapters/contract';
 
 // UTILS //
 const getCurrentParams = async (
@@ -173,7 +174,6 @@ async function multipleCallStrategy<T extends AdapterNames>(
       eoa,
       options: strategiesConfig?.[0]?.options.variable.strategyOptions,
     });
-    console.log('res...', res);
 
     let results = [
       {
@@ -210,7 +210,6 @@ async function multipleCallStrategy<T extends AdapterNames>(
       eoa,
       options: strategiesConfig?.[0]?.options.variable.strategyOptions,
     });
-    console.log(res);
     let results = [
       {
         executionResult: res,
@@ -309,7 +308,6 @@ async function multipleCallStrategy<T extends AdapterNames>(
       eoa[0],
       network
     );
-    console.log(results);
     const resultObj = results.reduce(
       (acc, cur) => ({
         ...acc,
@@ -327,6 +325,150 @@ async function multipleCallStrategy<T extends AdapterNames>(
     };
   }
 }
+const getKeyForConfig = (obj: any) => {
+  switch (obj.strategy) {
+    case 'twitter-strategy':
+      return `${obj.strategy}-${obj.options?.variable?.type}-${
+        obj?.options?.variable?.followingAccountId
+      }-${obj?.options?.variable?.accountId}-${
+        obj?.options?.variable?.dateInfo?.from
+      }${obj?.options?.variable?.dateInfo?.to || ''}`;
+    case 'smart-contract-strategy':
+      if (obj.options?.variable?.type === 'view') {
+        return `${obj.strategy}-${obj.options?.variable?.type}-${
+          obj.options?.variable?.contractType
+        }-${obj.options?.variable?.contractAddress}-${
+          obj.options?.variable?.chainId
+        }-${obj?.options?.variable?.functionName || ''}-${obj?.options?.variable
+          ?.functionParam || ''}`;
+      } else {
+        return 'null';
+      }
+    default:
+      return 'null';
+  }
+};
+const getOperandValueOnStrategy = (obj: any, strategyCompareValue: number) => {
+  switch (obj.strategy) {
+    case 'twitter-strategy':
+      return arithmeticOperand(
+        strategyCompareValue,
+        obj?.options?.variable?.countThreshold,
+        obj?.options?.variable?.operator
+      );
+    case 'smart-contract-strategy':
+      if (obj.options?.variable?.type === 'view') {
+        return arithmeticOperand(
+          strategyCompareValue,
+          obj?.options?.variable?.balanceThreshold,
+          obj?.options?.variable?.operator
+        );
+      } else {
+        return 'null';
+      }
+    default:
+      return 'null';
+  }
+};
+async function multipleBatchCallStrategy(batchObj: any) {
+  let key: string;
+  let value: any;
+  const executionObj = {};
+  for ([key, value] of Object.entries(batchObj)) {
+    let executionArrayResult: any = [];
+    const communityStrategy = value.filter(
+      x => x.strategy === 'community-strategy-strategy'
+    );
+    const templateStrategy = value.filter(
+      x =>
+        x.strategy === 'twitter-strategy' ||
+        x.strategy === 'smart-contract-strategy'
+    );
+    const csvStrategy = value.filter(
+      x => x.strategy === 'csv-strategy' || x.strategy === 'discord-strategy'
+    );
+    console.log(templateStrategy, communityStrategy, csvStrategy);
+    if (communityStrategy.length > 0) {
+      console.log('started !!!');
+      const res = await _strategies[
+        `${communityStrategy?.[0]?.options.variable.type}-strategy`
+      ].strategy({
+        contractAddress: 'contractAddress',
+        eoa: [key],
+        options: communityStrategy?.[0]?.options.variable,
+      });
+      console.log('response community', res);
+
+      for (let i = 1; i <= res; i++) {
+        executionArrayResult.push({
+          executionResult: true,
+          tier: i,
+          id: communityStrategy.filter(x => x.options.tier === i)?.[0]?.options
+            ?.task_id,
+          strategy: 'community-strategy-strategy',
+        });
+      }
+    }
+    if (csvStrategy.length > 0) {
+      console.log('started !!!');
+      const promiseResults = csvStrategy.map(async (x: any) => {
+        const res: boolean = await multipleStrategies[x.strategy].strategy({
+          contractAddress: 'contractAddress',
+          eoa: [key],
+          options: x.options,
+        });
+        console.log({
+          executionResult: res,
+          tier: x.options.tier,
+          id: x.options.task_id,
+          strategy: x.strategy,
+        });
+        return {
+          executionResult: res,
+          tier: x.options.tier,
+          id: x.options.task_id,
+          strategy: x.strategy,
+        };
+      });
+      const result = await Promise.all(promiseResults);
+      executionArrayResult = executionArrayResult.concat(result);
+    }
+    if (templateStrategy.length > 0) {
+      console.log('started !!!');
+      const resultObject = templateStrategy.reduce((acc, obj) => {
+        const key = getKeyForConfig(obj);
+        acc[key] = acc[key] || [];
+        acc[key].push(obj);
+        return acc;
+      }, {});
+      let configKeys: string;
+      let configValue: any;
+
+      for ([configKeys, configValue] of Object.entries(resultObject)) {
+        const strategyCompareValue = await multipleStrategies[
+          configValue[0].strategy
+        ].strategy(true, {
+          contractAddress: 'contractAddress',
+          eoa: [key],
+          options: configValue[0].options,
+        });
+        const executionArray = configValue.map(x => {
+          return {
+            executionResult: getOperandValueOnStrategy(x, strategyCompareValue),
+            tier: x?.options?.tier,
+            id: x?.options?.task_id,
+            strategy: x?.strategy,
+          };
+        });
+        executionArrayResult = executionArrayResult.concat(executionArray);
+        console.log('execution result', executionArrayResult);
+      }
+    }
+    console.log('results', executionArrayResult);
+    executionObj[key] = executionArrayResult;
+  }
+  return executionObj;
+}
 
 export const { subgraph } = utils;
 
@@ -334,4 +476,5 @@ export default {
   subgraph,
   callStrategy,
   multipleCallStrategy,
+  multipleBatchCallStrategy,
 };

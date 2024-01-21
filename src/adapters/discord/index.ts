@@ -12,7 +12,6 @@ export const isGuildMemberOrNot = async (
   const url = roleId
     ? `${serviceConfig.url}/discord_bot/adapter/checkRole?accessToken=${discordUserTokens.accessToken}&refreshToken=${discordUserTokens.refreshToken}&guild_id=${guildId}&role_id=${roleId}&uuid=${discordUserTokens.uuid}`
     : `${serviceConfig.url}/discord_bot/adapter/isGuildMember?accessToken=${discordUserTokens.accessToken}&refreshToken=${discordUserTokens.refreshToken}&guild_id=${guildId}&uuid=${discordUserTokens.uuid}`;
-  console.log('role......', url, roleId, guildId);
   try {
     const response = await fetch(url, {
       headers: {
@@ -20,7 +19,7 @@ export const isGuildMemberOrNot = async (
       },
     });
     const res = await response.json();
-    console.log('res......', res, url, roleId, guildId);
+    console.log('role......', res);
     if (roleId) {
       return res.role;
     } else {

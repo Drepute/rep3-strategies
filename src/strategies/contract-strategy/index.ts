@@ -3,12 +3,14 @@ import { AdapterWithVariables, contractAdapterStrategy } from '../../types';
 
 const getFunctionOnType = async (
   eoa: string,
+  onlyValue: boolean,
   options: AdapterWithVariables['contractAdapter']
 ) => {
   switch (options.type) {
     case 'view':
       try {
-        return await viewAdapter(eoa, options);
+        console.log(eoa, onlyValue, options);
+        return await viewAdapter(eoa, onlyValue, options);
       } catch (error) {
         return false;
       }
@@ -16,12 +18,15 @@ const getFunctionOnType = async (
       return false;
   }
 };
-export async function strategy({
-  contractAddress,
-  eoa,
-  options,
-}: contractAdapterStrategy) {
-  console.log(contractAddress);
-  const executionResult = await getFunctionOnType(eoa[0], options.variable);
+export async function strategy(
+  onlyValue: boolean,
+  { contractAddress, eoa, options }: contractAdapterStrategy
+) {
+  console.log('contract address', contractAddress);
+  const executionResult = await getFunctionOnType(
+    eoa[0],
+    onlyValue,
+    options.variable
+  );
   return executionResult;
 }

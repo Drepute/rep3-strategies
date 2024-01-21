@@ -35,5 +35,6 @@ export async function strategy({
     options.variable.type,
     options.variable
   );
+  console.log("hereeeeee",executionResult)
   return executionResult;
 }
