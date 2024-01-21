@@ -134,6 +134,7 @@ const computeDataOnType = async (
     case 'traderJoe': {
       const results = traderJoeCSVProcessing(csvRes);
       const executionResult = traderJoeTierCompute(eoa, results);
+      console.log('trader joe', tier);
       return tier
         ? arithmeticOperand(executionResult?.tier, tier, '===') || false
         : false;
@@ -143,6 +144,7 @@ const computeDataOnType = async (
   }
 };
 export async function strategy({ eoa, options }: StrategyParamsType) {
+  console.log('csv', options);
   const res = await getAndLogCsvFile(
     options?.variable?.strategyOptions?.csvBucketName,
     options?.variable?.strategyOptions?.csvKey

@@ -384,14 +384,12 @@ async function multipleBatchCallStrategy(batchObj: any) {
         x.strategy === 'twitter-strategy' ||
         x.strategy === 'smart-contract-strategy'
     );
-    // const csvStrategy = value.filter(
-    //   x => x.strategy === 'csv-strategy' || 'discord-strategy'
-    // );
-    console.log(
-      communityStrategy,
-      `${communityStrategy?.[0]?.options.variable.type}`
+    const csvStrategy = value.filter(
+      x => x.strategy === 'csv-strategy' || x.strategy === 'discord-strategy'
     );
+    console.log(templateStrategy, communityStrategy, csvStrategy);
     if (communityStrategy.length > 0) {
+      console.log('started !!!');
       const res = await _strategies[
         `${communityStrategy?.[0]?.options.variable.type}-strategy`
       ].strategy({
@@ -411,7 +409,32 @@ async function multipleBatchCallStrategy(batchObj: any) {
         });
       }
     }
+    if (csvStrategy.length > 0) {
+      console.log('started !!!');
+      const promiseResults = csvStrategy.map(async (x: any) => {
+        const res: boolean = await multipleStrategies[x.strategy].strategy({
+          contractAddress: 'contractAddress',
+          eoa: [key],
+          options: x.options,
+        });
+        console.log({
+          executionResult: res,
+          tier: x.options.tier,
+          id: x.options.task_id,
+          strategy: x.strategy,
+        });
+        return {
+          executionResult: res,
+          tier: x.options.tier,
+          id: x.options.task_id,
+          strategy: x.strategy,
+        };
+      });
+      const result = await Promise.all(promiseResults);
+      executionArrayResult = executionArrayResult.concat(result);
+    }
     if (templateStrategy.length > 0) {
+      console.log('started !!!');
       const resultObject = templateStrategy.reduce((acc, obj) => {
         const key = getKeyForConfig(obj);
         acc[key] = acc[key] || [];
@@ -420,6 +443,7 @@ async function multipleBatchCallStrategy(batchObj: any) {
       }, {});
       let configKeys: string;
       let configValue: any;
+
       for ([configKeys, configValue] of Object.entries(resultObject)) {
         const strategyCompareValue = await multipleStrategies[
           configValue[0].strategy
@@ -440,7 +464,7 @@ async function multipleBatchCallStrategy(batchObj: any) {
         console.log('execution result', executionArrayResult);
       }
     }
-    console.log(executionArrayResult);
+    console.log('results', executionArrayResult);
     executionObj[key] = executionArrayResult;
   }
   return executionObj;
