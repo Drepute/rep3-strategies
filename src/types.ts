@@ -26,7 +26,7 @@ export type AdapterWithVariables = {
     functionParam?: any[];
   };
   discordAdapter: {
-    type: 'isMember';
+    type: 'isMember' | 'haveRole';
     serviceConfig: { url: string; authToken: string };
     discordUserTokens: {
       refreshToken: string;
