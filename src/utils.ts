@@ -387,7 +387,7 @@ async function multipleBatchCallStrategy(batchObj: any) {
     const csvStrategy = value.filter(
       x => x.strategy === 'csv-strategy' || x.strategy === 'discord-strategy'
     );
-    console.log(templateStrategy, communityStrategy, csvStrategy);
+
     if (communityStrategy.length > 0) {
       console.log('started !!!');
       const res = await _strategies[
@@ -410,19 +410,13 @@ async function multipleBatchCallStrategy(batchObj: any) {
       }
     }
     if (csvStrategy.length > 0) {
-      console.log('started !!!');
       const promiseResults = csvStrategy.map(async (x: any) => {
         const res: boolean = await multipleStrategies[x.strategy].strategy({
           contractAddress: 'contractAddress',
           eoa: [key],
           options: x.options,
         });
-        console.log({
-          executionResult: res,
-          tier: x.options.tier,
-          id: x.options.task_id,
-          strategy: x.strategy,
-        });
+
         return {
           executionResult: res,
           tier: x.options.tier,
@@ -434,7 +428,6 @@ async function multipleBatchCallStrategy(batchObj: any) {
       executionArrayResult = executionArrayResult.concat(result);
     }
     if (templateStrategy.length > 0) {
-      console.log('started !!!');
       const resultObject = templateStrategy.reduce((acc, obj) => {
         const key = getKeyForConfig(obj);
         acc[key] = acc[key] || [];
@@ -461,10 +454,8 @@ async function multipleBatchCallStrategy(batchObj: any) {
           };
         });
         executionArrayResult = executionArrayResult.concat(executionArray);
-        console.log('execution result', executionArrayResult);
       }
     }
-    console.log('results', executionArrayResult);
     executionObj[key] = executionArrayResult;
   }
   return executionObj;
