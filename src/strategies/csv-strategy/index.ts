@@ -138,17 +138,20 @@ const computeDataOnType = async (
       return false;
   }
 };
-export async function strategy({ eoa, options }: StrategyParamsType) {
-  console.log('csv', options);
+export async function strategy(
+  onlyValue: boolean,
+  { contractAddress, eoa, options }: StrategyParamsType
+) {
+  console.log('csv', contractAddress, onlyValue, options);
   const res = await getAndLogCsvFile(
-    options?.variable?.strategyOptions?.csvBucketName,
-    options?.variable?.strategyOptions?.csvKey
+    options?.strategyOptions?.csvBucketName,
+    options?.strategyOptions?.csvKey
   );
   const result = await computeDataOnType(
-    options?.variable?.strategyOptions?.subType,
+    options?.strategyOptions?.subType,
     eoa[0],
     res,
-    options?.variable?.strategyOptions,
+    options?.strategyOptions,
     options?.tier
   );
   return result;
