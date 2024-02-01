@@ -24,7 +24,7 @@ const getSmashAndRockTypeCounts = async (options: any) => {
 };
 
 export async function strategy({ eoa, options }: StrategyParamsType) {
-  console.log(eoa, options);
+  console.log(eoa);
   const res = await getSmashAndRockTypeCounts(options);
   return !res?.includes(false) ? 1 : 0;
 }
