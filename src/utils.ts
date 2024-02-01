@@ -132,6 +132,15 @@ async function multipleCallStrategy<T extends AdapterNames>(
     strategiesConfig?.[0]?.strategy === 'community-strategy-strategy' &&
     communityStrategy.includes(strategiesConfig?.[0]?.options.variable.type)
   ) {
+    console.log(
+      'here.......',
+      `${strategiesConfig?.[0]?.options.variable.type}`,
+      {
+        contractAddress,
+        eoa,
+        options: strategiesConfig?.[0]?.options.variable,
+      }
+    );
     const res = await _strategies[
       `${strategiesConfig?.[0]?.options.variable.type}-strategy`
     ].strategy({

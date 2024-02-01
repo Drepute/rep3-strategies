@@ -180,11 +180,13 @@ const actionOnQuestType = async (
   }
 };
 export async function strategy({ eoa, options }: StrategyParamsType) {
+  console.log(eoa, options);
   const strategyOptions = options?.strategyOptions;
   let ethExecutionResult = false;
-  for (const element of options.ethTokenId) {
+  for (const element of strategyOptions.ethTokenId) {
+    console.log(element);
     ethExecutionResult = await viewAdapter(eoa[0], false, {
-      contractAddress: options.ethAddress,
+      contractAddress: strategyOptions.ethAddress,
       type: 'view',
       contractType: 'erc1155',
       balanceThreshold: 0,
@@ -199,9 +201,10 @@ export async function strategy({ eoa, options }: StrategyParamsType) {
   }
   let maticExecutionResult = false;
   if (!ethExecutionResult) {
-    for (const element of options.maticTokenId) {
+    for (const element of strategyOptions.maticTokenId) {
+      console.log(element, strategyOptions);
       maticExecutionResult = await viewAdapter(eoa[0], false, {
-        contractAddress: options.maticAddress,
+        contractAddress: strategyOptions.maticAddress,
         type: 'view',
         contractType: 'erc1155',
         balanceThreshold: 0,
@@ -216,21 +219,21 @@ export async function strategy({ eoa, options }: StrategyParamsType) {
     }
   }
 
-  if (ethExecutionResult || maticExecutionResult) {
-    return 1;
-  } else {
-    const thresholdCount = await actionOnQuestType(
-      strategyOptions.questType,
-      eoa[0],
-      strategyOptions
-    );
+  // if (ethExecutionResult || maticExecutionResult) {
+  //   return 1;
+  // } else {
+  const thresholdCount = await actionOnQuestType(
+    strategyOptions.questType,
+    eoa[0],
+    strategyOptions
+  );
 
-    return arithmeticOperand(
-      thresholdCount,
-      strategyOptions.threshold,
-      strategyOptions.operator
-    )
-      ? 1
-      : 0;
-  }
+  return arithmeticOperand(
+    thresholdCount,
+    strategyOptions.threshold,
+    strategyOptions.operator
+  )
+    ? 1
+    : 0;
 }
+// }
