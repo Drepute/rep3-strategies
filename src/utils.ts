@@ -287,6 +287,7 @@ async function multipleCallStrategy<T extends AdapterNames>(
       return {};
     }
   } else {
+    console.log('strategy length', strategiesConfig.length);
     const promiseResults = strategiesConfig.map(
       async (x: {
         strategy: string;
@@ -296,11 +297,14 @@ async function multipleCallStrategy<T extends AdapterNames>(
           task_id: number;
         };
       }) => {
-        const res: boolean = await multipleStrategies[x.strategy].strategy({
-          contractAddress: contractAddress,
-          eoa: eoa,
-          options: x.options,
-        });
+        const res: boolean = await multipleStrategies[x.strategy].strategy(
+          false,
+          {
+            contractAddress: contractAddress,
+            eoa: eoa,
+            options: x.options,
+          }
+        );
         return {
           executionResult: res,
           tier: x.options.tier,

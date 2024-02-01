@@ -12,7 +12,7 @@ const getSizeIsSizeTransactionCount = async (
   const endTime = endTimeStamp ?? Math.floor(new Date().getTime() / 1000) * 1e9;
 
   const res = await fetch(
-    `https://api.bebop.xyz/history/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTime}&size=${300}`
+    `https://api.bebop.xyz/history/v2/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTime}&size=${300}`
   );
   const data = await res.json();
   let currentValidVolume = currentVolume;
@@ -41,7 +41,7 @@ const getMultiSwapperTransactionCount = async (
   const endTime = endTimeStamp ?? Math.floor(new Date().getTime() / 1000) * 1e9;
 
   const res = await fetch(
-    `https://api.bebop.xyz/history/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTime}&size=${300}`
+    `https://api.bebop.xyz/history/v2/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTime}&size=${300}`
   );
   const data = await res.json();
 
@@ -78,7 +78,7 @@ const getSwapperTransactionCount = async (
   const endTime = endTimeStamp ?? Math.floor(new Date().getTime() / 1000) * 1e9;
 
   const res = await fetch(
-    `https://api.bebop.xyz/history/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTime}&size=${300}`
+    `https://api.bebop.xyz/history/v2/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTime}&size=${300}`
   );
   const data = await res.json();
 
@@ -110,7 +110,7 @@ const getDEXMasTransactionCount = async (
   const endTime = endTimeStamp ?? Math.floor(new Date().getTime() / 1000) * 1e9;
 
   const res = await fetch(
-    `https://api.bebop.xyz/history/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTime}&size=${300}`
+    `https://api.bebop.xyz/history/v2/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTime}&size=${300}`
   );
   const data = await res.json();
   console.log(data.results.length);
@@ -219,21 +219,21 @@ export async function strategy({ eoa, options }: StrategyParamsType) {
     }
   }
 
-  // if (ethExecutionResult || maticExecutionResult) {
-  //   return 1;
-  // } else {
-  const thresholdCount = await actionOnQuestType(
-    strategyOptions.questType,
-    eoa[0],
-    strategyOptions
-  );
-
-  return arithmeticOperand(
-    thresholdCount,
-    strategyOptions.threshold,
-    strategyOptions.operator
-  )
-    ? 1
-    : 0;
+  if (ethExecutionResult || maticExecutionResult) {
+    return 1;
+  } else {
+    const thresholdCount = await actionOnQuestType(
+      strategyOptions.questType,
+      eoa[0],
+      strategyOptions
+    );
+    console.log(thresholdCount);
+    return arithmeticOperand(
+      thresholdCount,
+      strategyOptions.threshold,
+      strategyOptions.operator
+    )
+      ? 1
+      : 0;
+  }
 }
-// }
