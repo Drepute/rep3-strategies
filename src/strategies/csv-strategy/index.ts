@@ -144,14 +144,15 @@ export async function strategy(
 ) {
   console.log('csv', contractAddress, onlyValue, options);
   const res = await getAndLogCsvFile(
-    options?.strategyOptions?.csvBucketName,
-    options?.strategyOptions?.csvKey
+    options?.variable?.strategyOptions?.csvBucketName,
+    options?.variable?.strategyOptions?.csvKey
   );
+
   const result = await computeDataOnType(
-    options?.strategyOptions?.subType,
+    options?.variable?.strategyOptions?.subType,
     eoa[0],
     res,
-    options?.strategyOptions,
+    options?.variable?.strategyOptions,
     options?.tier
   );
   return result;
