@@ -34,7 +34,7 @@ export async function strategy({ eoa, options }: StrategyParamsType) {
     options.endTime
   );
   if (!res) {
-    const ethExecutionResult = await viewAdapter(eoa[0], {
+    const ethExecutionResult = await viewAdapter(eoa[0], false, {
       contractAddress: options.ethAddress,
       type: 'view',
       contractType: 'erc1155',

@@ -12,7 +12,7 @@ const getSizeIsSizeTransactionCount = async (
   const endTime = endTimeStamp ?? Math.floor(new Date().getTime() / 1000) * 1e9;
 
   const res = await fetch(
-    `https://api.bebop.xyz/history/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTime}&size=${300}`
+    `https://api.bebop.xyz/history/v2/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTime}&size=${300}`
   );
   const data = await res.json();
   let currentValidVolume = currentVolume;
@@ -41,7 +41,7 @@ const getMultiSwapperTransactionCount = async (
   const endTime = endTimeStamp ?? Math.floor(new Date().getTime() / 1000) * 1e9;
 
   const res = await fetch(
-    `https://api.bebop.xyz/history/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTime}&size=${300}`
+    `https://api.bebop.xyz/history/v2/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTime}&size=${300}`
   );
   const data = await res.json();
 
@@ -78,7 +78,7 @@ const getSwapperTransactionCount = async (
   const endTime = endTimeStamp ?? Math.floor(new Date().getTime() / 1000) * 1e9;
 
   const res = await fetch(
-    `https://api.bebop.xyz/history/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTime}&size=${300}`
+    `https://api.bebop.xyz/history/v2/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTime}&size=${300}`
   );
   const data = await res.json();
 
@@ -110,7 +110,7 @@ const getDEXMasTransactionCount = async (
   const endTime = endTimeStamp ?? Math.floor(new Date().getTime() / 1000) * 1e9;
 
   const res = await fetch(
-    `https://api.bebop.xyz/history/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTime}&size=${300}`
+    `https://api.bebop.xyz/history/v2/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTime}&size=${300}`
   );
   const data = await res.json();
   console.log(data.results.length);
@@ -180,11 +180,13 @@ const actionOnQuestType = async (
   }
 };
 export async function strategy({ eoa, options }: StrategyParamsType) {
+  console.log(eoa, options);
   const strategyOptions = options?.strategyOptions;
   let ethExecutionResult = false;
-  for (const element of options.ethTokenId) {
+  for (const element of strategyOptions.ethTokenId) {
+    console.log(element);
     ethExecutionResult = await viewAdapter(eoa[0], false, {
-      contractAddress: options.ethAddress,
+      contractAddress: strategyOptions.ethAddress,
       type: 'view',
       contractType: 'erc1155',
       balanceThreshold: 0,
@@ -199,9 +201,10 @@ export async function strategy({ eoa, options }: StrategyParamsType) {
   }
   let maticExecutionResult = false;
   if (!ethExecutionResult) {
-    for (const element of options.maticTokenId) {
+    for (const element of strategyOptions.maticTokenId) {
+      console.log(element, strategyOptions);
       maticExecutionResult = await viewAdapter(eoa[0], false, {
-        contractAddress: options.maticAddress,
+        contractAddress: strategyOptions.maticAddress,
         type: 'view',
         contractType: 'erc1155',
         balanceThreshold: 0,
@@ -224,7 +227,7 @@ export async function strategy({ eoa, options }: StrategyParamsType) {
       eoa[0],
       strategyOptions
     );
-
+    console.log(thresholdCount);
     return arithmeticOperand(
       thresholdCount,
       strategyOptions.threshold,

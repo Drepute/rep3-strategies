@@ -40,7 +40,7 @@ export default class ActionCallerV2 {
         try {
           if (metaDataOptions) {
             return await createOrUpdateBadgeV2WithMetadata(
-              this.contractAddress,
+              this?.contractAddress || '',
               this.eoa,
               this.network,
               this?.membershipOptions?.changingLevel,
@@ -54,7 +54,7 @@ export default class ActionCallerV2 {
       case ActionOnTypeV2.currentParams:
         try {
           return await getCurrentParams(
-            this.contractAddress,
+            this?.contractAddress || '',
             this.eoa,
             this.network
           );

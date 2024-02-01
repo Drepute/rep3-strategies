@@ -39,12 +39,11 @@ const getFunctionOnType = async (
   }
 };
 
-export async function strategy({
-  contractAddress,
-  eoa,
-  options,
-}: discordAdapterStrategy) {
-  console.log(contractAddress, eoa);
+export async function strategy(
+  onlyValue: boolean,
+  { contractAddress, eoa, options }: discordAdapterStrategy
+) {
+  console.log(onlyValue, contractAddress, eoa);
   const executionResult = await getFunctionOnType(
     options.variable.type,
     options.variable
