@@ -14,6 +14,27 @@ const getFunctionOnType = async (
       } catch (error) {
         return false;
       }
+    case 'erc1155':
+      try {
+        console.log(eoa, onlyValue, options);
+        return await viewAdapter(eoa, onlyValue, options);
+      } catch (error) {
+        return false;
+      }
+    case 'erc20':
+      try {
+        console.log(eoa, onlyValue, options);
+        return await viewAdapter(eoa, onlyValue, options);
+      } catch (error) {
+        return false;
+      }
+    case 'erc721':
+      try {
+        console.log(eoa, onlyValue, options);
+        return await viewAdapter(eoa, onlyValue, options);
+      } catch (error) {
+        return false;
+      }
     default:
       return false;
   }
