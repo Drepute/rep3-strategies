@@ -22,49 +22,58 @@ async function getAndLogCsvFile(Bucket: string, bucketKey: string) {
 }
 const getTestTransactionCount = async (eoa: string, strategyOptions?: any) => {
   console.log(strategyOptions);
-  const totalStakingTransactionCount = await getTotalStakingTransactionCount(
-    eoa
+  // const totalStakingTransactionCount = await getTotalStakingTransactionCount(
+  //   eoa
+  // );
+  let streakOfTxn = 1;
+  let totalStakingTransactionCount = 0;
+  const res = await getAndLogCsvFile(
+    'rep3-community-files',
+    'entangle_testnet_reconcile.csv'
   );
+  if (res) {
+    res.forEach(x => {
+      const singleRow = x.split(',');
+      if (singleRow[0].toString().toLowerCase() === eoa.toLowerCase()) {
+        streakOfTxn = parseInt(singleRow[2]);
+        totalStakingTransactionCount = parseInt(singleRow[1]);
+      }
+    });
+  }
   const totalDelegateTransactionCount = await getTotalDelegateTransactionCount(
     eoa
   );
+
   const yAxisTier = await calculateYaxisTxnTier(
-    parseInt(totalStakingTransactionCount) +
-      parseInt(totalDelegateTransactionCount)
+    totalStakingTransactionCount + parseInt(totalDelegateTransactionCount)
   );
 
   let xAxisTier = 0;
   if (
-    parseInt(totalStakingTransactionCount) +
-      parseInt(totalDelegateTransactionCount) >
+    totalStakingTransactionCount + parseInt(totalDelegateTransactionCount) >
     0
   ) {
     xAxisTier =
       totalStakingTransactionCount > 0
-        ? await calculateXaxisTxnTier(totalStakingTransactionCount, eoa)
+        ? await calculateXaxisTxnTier(totalStakingTransactionCount, streakOfTxn)
         : 1;
   }
-  console.log('csv.....', xAxisTier);
+  console.log(
+    'csv.....',
+    yAxisTier,
+    totalDelegateTransactionCount,
+    totalStakingTransactionCount,
+    xAxisTier
+  );
   const tier = 5 * (xAxisTier - 1) + yAxisTier;
   return tier;
 };
-const calculateXaxisTxnTier = async (totalTxns: number, eoa: string) => {
-  const res = await getAndLogCsvFile(
-    'rep3-community-files',
-    'entangle_testnet.csv'
-  );
-  let streakOfTxn = 1;
+const calculateXaxisTxnTier = async (
+  totalTxns: number,
+  streakOfTxn: number
+) => {
   let xAxisTier = 1;
 
-  if (res) {
-    res.forEach(x => {
-      const singleRow = x.split(',');
-      console.log(singleRow[0], singleRow[1]);
-      if (singleRow[0].toString().toLowerCase() === eoa.toLowerCase()) {
-        streakOfTxn = parseInt(singleRow[1]);
-      }
-    });
-  }
   if (totalTxns > 0) {
     xAxisTier = 2;
   }
@@ -103,33 +112,33 @@ const calculateYaxisTxnTier = async (totalTxns: number) => {
     return 0;
   }
 };
-const getTotalStakingTransactionCount = async (eoa: string): Promise<any> => {
-  const query = `query ($address: String!) {
-    info(address: $address, eventName: "LPStaking") {
-      network
-      total_tx
-      data
-    }
-  }`;
-  const res = await fetch('https://entangle-graphql.entangle.fi/event', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      query,
-      variables: { address: eoa },
-    }),
-  });
-  const response = await res.json();
-  let allStakeTxCount = response?.data?.info?.map(x => x?.total_tx);
-  allStakeTxCount = allStakeTxCount?.reduce(
-    (partialSum, a) => partialSum + a,
-    0
-  );
-  console.log('txn', allStakeTxCount);
-  return allStakeTxCount;
-};
+// const getTotalStakingTransactionCount = async (eoa: string): Promise<any> => {
+//   const query = `query ($address: String!) {
+//     info(address: $address, eventName: "LPStaking") {
+//       network
+//       total_tx
+//       data
+//     }
+//   }`;
+//   const res = await fetch('https://entangle-graphql.entangle.fi/event', {
+//     method: 'POST',
+//     headers: {
+//       'Content-Type': 'application/json',
+//     },
+//     body: JSON.stringify({
+//       query,
+//       variables: { address: eoa },
+//     }),
+//   });
+//   const response = await res.json();
+//   let allStakeTxCount = response?.data?.info?.map(x => x?.total_tx);
+//   allStakeTxCount = allStakeTxCount?.reduce(
+//     (partialSum, a) => partialSum + a,
+//     0
+//   );
+//   console.log('txn', allStakeTxCount);
+//   return allStakeTxCount;
+// };
 const getTotalDelegateTransactionCount = async (eoa: string): Promise<any> => {
   const query = `query ($address: String!) {
     info(address: $address, eventName: "Delegate") {
