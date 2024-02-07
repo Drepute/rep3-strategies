@@ -14,6 +14,9 @@ export type AdapterWithVariables = {
       | 'bebop'
       | 'bebopHalloween'
       | 'entangle'
+      | 'erc1155'
+      | 'erc20'
+      | 'erc721'
       | 'csv';
     contractType?: 'erc1155' | 'erc721' | 'erc20' | 'custom';
     chainId?: number;

@@ -8,8 +8,11 @@ const getFunctionOnType = async (
 ) => {
   switch (options.type) {
     case 'view':
+    case 'erc1155':
+    case 'erc20':
+    case 'erc721':
       try {
-        console.log(eoa, onlyValue, options);
+        console.log('view adapter', eoa, onlyValue, options);
         return await viewAdapter(eoa, onlyValue, options);
       } catch (error) {
         return false;

@@ -14,6 +14,7 @@ const getSmashAndRockTypeCounts = async (options: any) => {
       const currentKeyValue = data?.gems?.filter(
         x => x.name === keyTracker.name
       );
+      console.log(currentKeyValue, keyTracker);
       return currentKeyValue?.length > 0
         ? currentKeyValue[0]?.count >= keyTracker.value
         : false;
