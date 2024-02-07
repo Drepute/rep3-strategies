@@ -81,7 +81,7 @@ export const viewAdapter = async (
         : [holder],
       functionParams.chainId ?? 1
     );
-    console.log('here started!!!!', response);
+    console.log('here started!!!!', parseInt(response.toString()));
   }
   if (!onlyValue) {
     return arithmeticOperand(
