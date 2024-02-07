@@ -132,6 +132,72 @@ const getDEXMasTransactionCount = async (
     return currentValidScore;
   }
 };
+const checkTheTotalVolumeUsd = (
+  result: any[],
+  startIndex: number,
+  endIndex: number,
+  totalSwapVolume: number
+) => {
+  let start = startIndex;
+  let end = endIndex;
+  console.log(start, end, totalSwapVolume);
+  if (start - end === 8 && totalSwapVolume < 888 && end <= result.length) {
+    let currentSwapVolume = 0;
+    result.slice(startIndex, endIndex).forEach(ele => {
+      currentSwapVolume = currentSwapVolume + ele.volumeUsd;
+    });
+    start = start + 1;
+    end = end + 1;
+    console.log(start, end, totalSwapVolume);
+    return checkTheTotalVolumeUsd(result, start, end, currentSwapVolume);
+  } else {
+    return totalSwapVolume;
+  }
+
+  // }
+};
+const getOctaSwapperTransactionCount = async (
+  walletAddr: string,
+  startTime: string,
+  threshold: number,
+  currentNumberOfSwaps: number,
+  endTimeStamp?: number
+) => {
+  const endTime = endTimeStamp ?? Math.floor(new Date().getTime() / 1000) * 1e9;
+
+  const res = await fetch(
+    `https://api.bebop.xyz/history/v2/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTime}&size=${300}`
+  );
+  const data = await res.json();
+  console.log('data:===', threshold, currentNumberOfSwaps);
+  // let currentValidVolume = currentVolume;
+  let numberOfSwapWithIndividualVolume = currentNumberOfSwaps;
+  // const numberOfSwapWithAccumulateVolume = 0;
+  // check 88+ swaps
+  data.results.forEach(element => {
+    if (element.volumeUsd > 88) {
+      numberOfSwapWithIndividualVolume = numberOfSwapWithIndividualVolume + 1;
+      console.log(element);
+    }
+  });
+  // check 888+ swaps
+  const count = checkTheTotalVolumeUsd(data.results, 0, 8, 0);
+  console.log('tx count', count);
+  if (
+    data.nextAvailableTimestamp &&
+    numberOfSwapWithIndividualVolume < threshold
+  ) {
+    return await getOctaSwapperTransactionCount(
+      walletAddr,
+      startTime,
+      threshold,
+      numberOfSwapWithIndividualVolume,
+      data.nextAvailableTimestamp
+    );
+  } else {
+    return numberOfSwapWithIndividualVolume;
+  }
+};
 const actionOnQuestType = async (
   type: string,
   eoa: string,
@@ -168,6 +234,15 @@ const actionOnQuestType = async (
     }
     case 'sizeIsSize': {
       const txCount = await getSizeIsSizeTransactionCount(
+        eoa,
+        strategyOptions?.startTime,
+        strategyOptions?.threshold,
+        0
+      );
+      return txCount;
+    }
+    case 'octaSwapper': {
+      const txCount = await getOctaSwapperTransactionCount(
         eoa,
         strategyOptions?.startTime,
         strategyOptions?.threshold,
