@@ -140,15 +140,14 @@ const checkTheTotalVolumeUsd = (
 ) => {
   let start = startIndex;
   let end = endIndex;
-  console.log(start, end, totalSwapVolume);
-  if (start - end === 8 && totalSwapVolume < 888 && end <= result.length) {
+  if (end - start === 8 && totalSwapVolume < 888 && end <= result.length) {
     let currentSwapVolume = 0;
     result.slice(startIndex, endIndex).forEach(ele => {
       currentSwapVolume = currentSwapVolume + ele.volumeUsd;
     });
     start = start + 1;
     end = end + 1;
-    console.log(start, end, totalSwapVolume);
+    console.log('finallll', start, end, currentSwapVolume);
     return checkTheTotalVolumeUsd(result, start, end, currentSwapVolume);
   } else {
     return totalSwapVolume;
@@ -156,46 +155,43 @@ const checkTheTotalVolumeUsd = (
 
   // }
 };
-const getOctaSwapperTransactionCount = async (
+const getFlyingDragonTransactionCount = async (
   walletAddr: string,
   startTime: string,
-  threshold: number,
   currentNumberOfSwaps: number,
   endTimeStamp?: number
 ) => {
-  const endTime = endTimeStamp ?? Math.floor(new Date().getTime() / 1000) * 1e9;
-
+  const endTime = endTimeStamp;
   const res = await fetch(
     `https://api.bebop.xyz/history/v2/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTime}&size=${300}`
   );
   const data = await res.json();
-  console.log('data:===', threshold, currentNumberOfSwaps);
-  // let currentValidVolume = currentVolume;
+  console.log('data length', data.length);
   let numberOfSwapWithIndividualVolume = currentNumberOfSwaps;
-  // const numberOfSwapWithAccumulateVolume = 0;
+  let volumeOfSwapWithCombinedSwaps = 0;
   // check 88+ swaps
-  data.results.forEach(element => {
+  data.results.forEach((element: { volumeUsd: number }) => {
     if (element.volumeUsd > 88) {
       numberOfSwapWithIndividualVolume = numberOfSwapWithIndividualVolume + 1;
-      console.log(element);
     }
   });
   // check 888+ swaps
-  const count = checkTheTotalVolumeUsd(data.results, 0, 8, 0);
-  console.log('tx count', count);
-  if (
-    data.nextAvailableTimestamp &&
-    numberOfSwapWithIndividualVolume < threshold
-  ) {
-    return await getOctaSwapperTransactionCount(
-      walletAddr,
-      startTime,
-      threshold,
-      numberOfSwapWithIndividualVolume,
-      data.nextAvailableTimestamp
+  if (numberOfSwapWithIndividualVolume < 8) {
+    volumeOfSwapWithCombinedSwaps = checkTheTotalVolumeUsd(
+      data.results,
+      0,
+      8,
+      0
     );
+  }
+
+  if (
+    numberOfSwapWithIndividualVolume >= 8 ||
+    volumeOfSwapWithCombinedSwaps > 888
+  ) {
+    return 1;
   } else {
-    return numberOfSwapWithIndividualVolume;
+    return 0;
   }
 };
 const actionOnQuestType = async (
@@ -241,12 +237,12 @@ const actionOnQuestType = async (
       );
       return txCount;
     }
-    case 'octaSwapper': {
-      const txCount = await getOctaSwapperTransactionCount(
+    case 'flyingDragon': {
+      const txCount = await getFlyingDragonTransactionCount(
         eoa,
         strategyOptions?.startTime,
-        strategyOptions?.threshold,
-        0
+        0,
+        strategyOptions?.endTimeStamp
       );
       return txCount;
     }
@@ -255,11 +251,9 @@ const actionOnQuestType = async (
   }
 };
 export async function strategy({ eoa, options }: StrategyParamsType) {
-  console.log(eoa, options);
   const strategyOptions = options?.strategyOptions;
   let ethExecutionResult = false;
   for (const element of strategyOptions.ethTokenId) {
-    console.log(element);
     ethExecutionResult = await viewAdapter(eoa[0], false, {
       contractAddress: strategyOptions.ethAddress,
       type: 'view',
@@ -302,13 +296,16 @@ export async function strategy({ eoa, options }: StrategyParamsType) {
       eoa[0],
       strategyOptions
     );
-    console.log(thresholdCount);
-    return arithmeticOperand(
-      thresholdCount,
-      strategyOptions.threshold,
-      strategyOptions.operator
-    )
-      ? 1
-      : 0;
+    if (strategyOptions.questType === 'flyingDragon') {
+      return thresholdCount;
+    } else {
+      return arithmeticOperand(
+        thresholdCount,
+        strategyOptions.threshold,
+        strategyOptions.operator
+      )
+        ? 1
+        : 0;
+    }
   }
 }
