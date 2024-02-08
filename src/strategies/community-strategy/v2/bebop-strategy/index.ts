@@ -132,6 +132,72 @@ const getDEXMasTransactionCount = async (
     return currentValidScore;
   }
 };
+const checkTheTotalVolumeUsd = (
+  result: any[],
+  startIndex: number,
+  endIndex: number,
+  totalSwapVolume: number
+) => {
+  let start = startIndex;
+  let end = endIndex;
+  if (end - start === 8 && totalSwapVolume < 888 && end <= result.length) {
+    let currentSwapVolume = 0;
+    result.slice(startIndex, endIndex).forEach(ele => {
+      currentSwapVolume = currentSwapVolume + ele.volumeUsd;
+    });
+    start = start + 1;
+    end = end + 1;
+    console.log('finallll', start, end, currentSwapVolume);
+    return checkTheTotalVolumeUsd(result, start, end, currentSwapVolume);
+  } else {
+    return totalSwapVolume;
+  }
+
+  // }
+};
+const getFlyingDragonTransactionCount = async (
+  walletAddr: string,
+  startTime: string,
+  currentNumberOfSwaps: number,
+  endTimeStamp?: number
+) => {
+  const endTime = endTimeStamp;
+  const res = await fetch(
+    `https://api.bebop.xyz/history/v2/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTime}&size=${300}`
+  );
+  const data = await res.json();
+  console.log('data length', data.length);
+  let numberOfSwapWithIndividualVolume = currentNumberOfSwaps;
+  let volumeOfSwapWithCombinedSwaps = 0;
+  // check 88+ swaps
+  data.results.forEach((element: { volumeUsd: number }) => {
+    if (element.volumeUsd > 88) {
+      numberOfSwapWithIndividualVolume = numberOfSwapWithIndividualVolume + 1;
+    }
+  });
+  // check 888+ swaps
+  if (numberOfSwapWithIndividualVolume < 8 && data.results.length > 7) {
+    const arrayWithAllUSDValue = data.results.map(x => x.volumeUsd);
+    volumeOfSwapWithCombinedSwaps = arrayWithAllUSDValue.reduce(
+      (accumulator, currentValue) => accumulator + currentValue,
+      0
+    ); // volumeOfSwapWithCombinedSwaps = checkTheTotalVolumeUsd(
+    //   data.results,
+    //   0,
+    //   8,
+    //   0
+    // );
+  }
+
+  if (
+    numberOfSwapWithIndividualVolume >= 8 ||
+    volumeOfSwapWithCombinedSwaps > 888
+  ) {
+    return 1;
+  } else {
+    return 0;
+  }
+};
 const actionOnQuestType = async (
   type: string,
   eoa: string,
@@ -175,16 +241,23 @@ const actionOnQuestType = async (
       );
       return txCount;
     }
+    case 'flyingDragon': {
+      const txCount = await getFlyingDragonTransactionCount(
+        eoa,
+        strategyOptions?.startTime,
+        0,
+        strategyOptions?.endTimeStamp
+      );
+      return txCount;
+    }
     default:
       return 0;
   }
 };
 export async function strategy({ eoa, options }: StrategyParamsType) {
-  console.log(eoa, options);
   const strategyOptions = options?.strategyOptions;
   let ethExecutionResult = false;
   for (const element of strategyOptions.ethTokenId) {
-    console.log(element);
     ethExecutionResult = await viewAdapter(eoa[0], false, {
       contractAddress: strategyOptions.ethAddress,
       type: 'view',
@@ -227,13 +300,16 @@ export async function strategy({ eoa, options }: StrategyParamsType) {
       eoa[0],
       strategyOptions
     );
-    console.log(thresholdCount);
-    return arithmeticOperand(
-      thresholdCount,
-      strategyOptions.threshold,
-      strategyOptions.operator
-    )
-      ? 1
-      : 0;
+    if (strategyOptions.questType === 'flyingDragon') {
+      return thresholdCount;
+    } else {
+      return arithmeticOperand(
+        thresholdCount,
+        strategyOptions.threshold,
+        strategyOptions.operator
+      )
+        ? 1
+        : 0;
+    }
   }
 }
