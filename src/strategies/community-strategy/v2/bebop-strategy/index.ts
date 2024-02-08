@@ -176,13 +176,17 @@ const getFlyingDragonTransactionCount = async (
     }
   });
   // check 888+ swaps
-  if (numberOfSwapWithIndividualVolume < 8) {
-    volumeOfSwapWithCombinedSwaps = checkTheTotalVolumeUsd(
-      data.results,
-      0,
-      8,
+  if (numberOfSwapWithIndividualVolume < 8 && data.results.length > 7) {
+    const arrayWithAllUSDValue = data.results.map(x => x.volumeUsd);
+    volumeOfSwapWithCombinedSwaps = arrayWithAllUSDValue.reduce(
+      (accumulator, currentValue) => accumulator + currentValue,
       0
-    );
+    ); // volumeOfSwapWithCombinedSwaps = checkTheTotalVolumeUsd(
+    //   data.results,
+    //   0,
+    //   8,
+    //   0
+    // );
   }
 
   if (
