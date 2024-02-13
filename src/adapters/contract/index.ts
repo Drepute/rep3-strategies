@@ -14,7 +14,6 @@ const genericViewCall = async (
 ) => {
   const provider = new ethers.providers.JsonRpcProvider(network[chainId].rpc);
   const nftContract = new ethers.Contract(address, abi, provider);
-  console.log('checkkkk', nftContract, params);
   if (params.length > 0) {
     const res = await nftContract[functionName](...params);
     console.log('checkkkk', res);
