@@ -176,7 +176,7 @@ const getFlyingDragonTransactionCount = async (
     }
   });
   // check 888+ swaps
-  if (numberOfSwapWithIndividualVolume < 8 && data.results.length > 7) {
+  if (numberOfSwapWithIndividualVolume < 8) {
     const arrayWithAllUSDValue = data.results.map(x => x.volumeUsd);
     volumeOfSwapWithCombinedSwaps = arrayWithAllUSDValue.reduce(
       (accumulator, currentValue) => accumulator + currentValue,
