@@ -14,8 +14,15 @@ const genericViewCall = async (
 ) => {
   const provider = new ethers.providers.JsonRpcProvider(network[chainId].rpc);
   const nftContract = new ethers.Contract(address, abi, provider);
-  const res = await nftContract[functionName](...params);
-  return res;
+  if (params.length > 0) {
+    const res = await nftContract[functionName](...params);
+    // console.log('checkkkk', res, params);
+    return res;
+  } else {
+    const res = await nftContract[functionName]();
+
+    return res;
+  }
 };
 
 export const arithmeticOperand = (a: number, b: number, op: string) => {
@@ -56,22 +63,36 @@ export const viewAdapter = async (
     functionParams.abi &&
     functionParams.functionName
   ) {
-    response = await genericViewCall(
-      functionParams.contractAddress,
-      functionParams.abi,
-      functionParams.functionName,
-      functionParams.functionParam
-        ? [holder, ...functionParams.functionParam]
-        : [holder],
-      functionParams.chainId ?? 1
-    );
+    if (
+      functionParams.functionParam &&
+      functionParams.functionParam?.length > 0
+    ) {
+      const params = functionParams.functionParam;
+      const indexOfUserAddress = params.indexOf('<USER_ADDRESS>');
+      params.splice(indexOfUserAddress, 1, holder);
+      response = await genericViewCall(
+        functionParams.contractAddress,
+        functionParams.abi,
+        functionParams.functionName,
+        params,
+        functionParams.chainId ?? 1
+      );
+    } else {
+      console.log('hereeeeee', functionParams.abi);
+      response = await genericViewCall(
+        functionParams.contractAddress,
+        functionParams.abi,
+        functionParams.functionName,
+        [],
+        functionParams.chainId ?? 1
+      );
+    }
   } else if (
     (functionParams.contractType === 'erc1155' ||
       functionParams.contractType === 'erc20' ||
       functionParams.contractType === 'erc721') &&
     functionParams.functionName
   ) {
-    console.log('here started!!!!');
     response = await genericViewCall(
       functionParams.contractAddress,
       getAbiOnType(functionParams.contractType),

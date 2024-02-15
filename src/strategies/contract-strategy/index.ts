@@ -12,7 +12,6 @@ const getFunctionOnType = async (
     case 'erc20':
     case 'erc721':
       try {
-        console.log('view adapter', eoa, onlyValue, options);
         return await viewAdapter(eoa, onlyValue, options);
       } catch (error) {
         return false;
