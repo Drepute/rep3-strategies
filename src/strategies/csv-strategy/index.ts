@@ -25,7 +25,7 @@ const traderJoeCSVProcessing = (res: any) => {
     const singleRow = x.split(',');
     return {
       addr: singleRow[0],
-      value: parseFloat(singleRow[2]),
+      percentile: parseFloat(singleRow[2]),
       epoches: singleRow[1],
     };
   });
@@ -49,18 +49,35 @@ const calculateTraderJoeEpochTier = (epoches: number) => {
     return 0;
   }
 };
-const calculateTraderJoeValueTier = (value: number) => {
-  if (value < 250) {
+// const calculateTraderJoePercentileTier = (percentile: number) => {
+//   if (percentile >= 11) {
+//     return 6;
+//   } else if (percentile >= 9) {
+//     return 5;
+//   } else if (percentile >= 7) {
+//     return 4;
+//   } else if (percentile >= 5) {
+//     return 3;
+//   } else if (percentile >= 3) {
+//     return 2;
+//   } else if (percentile >= 20) {
+//     return 1;
+//   } else {
+//     return 0;
+//   }
+// };
+const calculateTraderJoePercentileTier = (percentile: number) => {
+  if (percentile < 20) {
     return 1;
-  } else if (value > 250 && value < 500) {
+  } else if (percentile >= 20 && percentile < 40) {
     return 2;
-  } else if (value > 500 && value < 1000) {
+  } else if (percentile >= 40 && percentile < 60) {
     return 3;
-  } else if (value > 1000 && value < 2500) {
+  } else if (percentile >= 60 && percentile < 80) {
     return 4;
-  } else if (value > 2500 && value < 5000) {
+  } else if (percentile >= 80 && percentile < 98) {
     return 5;
-  } else if (value > 5000) {
+  } else if (percentile >= 98) {
     return 6;
   } else {
     return 1;
@@ -71,8 +88,8 @@ const traderJoeTierCompute = (eoa: string, processedArray: any[]) => {
     x => x.addr.toLowerCase() === eoa.toLowerCase()
   );
   if (currentEoaArray.length > 0) {
-    const currentValueTier = calculateTraderJoeValueTier(
-      currentEoaArray?.[0]?.value
+    const currentPercentileTier = calculateTraderJoePercentileTier(
+      currentEoaArray?.[0]?.percentile
     );
     const currentEpochTier = calculateTraderJoeEpochTier(
       parseInt(currentEoaArray?.[0]?.epoches)
@@ -81,8 +98,8 @@ const traderJoeTierCompute = (eoa: string, processedArray: any[]) => {
     return {
       executionResult: true,
       tier:
-        currentValueTier && currentEpochTier
-          ? 6 * (currentValueTier - 1) + currentEpochTier
+        currentPercentileTier && currentEpochTier
+          ? 6 * (currentPercentileTier - 1) + currentEpochTier
           : 1,
     };
   } else {
