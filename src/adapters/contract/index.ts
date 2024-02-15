@@ -16,7 +16,6 @@ const genericViewCall = async (
   const nftContract = new ethers.Contract(address, abi, provider);
   if (params.length > 0) {
     const res = await nftContract[functionName](...params);
-    // console.log('checkkkk', res, params);
     return res;
   } else {
     const res = await nftContract[functionName]();
