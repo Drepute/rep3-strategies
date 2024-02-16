@@ -35,7 +35,7 @@ const strategies: Record<string, StrategyType> = {
   'rich peon, poor peon-strategy': traderJoeStrategy,
   'bebopHalloween-strategy': bebopHalloweenStrategy,
   'notum-strategy': notumStrategy,
-  'avax-strategy': avaxStrategy,
+  'avalanche-strategy': avaxStrategy,
 };
 
 const multipleStrategies: Record<string, any> = {
@@ -50,7 +50,7 @@ export const communityStrategy = [
   'bebop',
   'rich peon, poor peon',
   'notum',
-  'avax',
+  'avalanche',
 ];
 Object.keys(strategies).forEach(function(strategyName) {
   let example = null;

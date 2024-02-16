@@ -1,42 +1,33 @@
+import { arithmeticOperand } from '../../../../adapters/contract';
 import { StrategyParamsType } from '../../../../types';
 // import { arithmeticOperand, viewAdapter } from '../../../../adapters/contract';
 // import fetch from 'cross-fetch';
 import { subgraph } from '../../../../utils';
 const structSwapCounts = async (userAddress: string, strategyOptions: any) => {
-  if (strategyOptions?.questTier === 'struct_tier1') {
-    const depositeds = await subgraph.subgraphRequest(
-      'https://subgraph.satsuma-prod.com/structfinance/struct-finance-factory/version/1.8.5/api',
-      {
-        depositeds: {
-          __args: {
-            where: {
-              userAddress,
-            },
-          },
-          id: true,
-          depositAmount: true,
-          totalDeposited: true,
-        },
+  if (strategyOptions?.questTier === 1) {
+    const query = `query ($userAddress: String!) {
+      depositeds(where:{userAddress: $userAddress}) {
+        id
+        depositAmount
+        totalDeposited
       }
+    }`;
+    const subgraphData = await subgraph.getSubgraphFetchCall(
+      'https://api.thegraph.com/subgraphs/name/hirako2000/struct-finance-factory',
+      query,
+      { userAddress }
     );
-    return depositeds.length;
-  } else if (strategyOptions?.questTier === 'struct_tier2') {
-    const depositeds = await subgraph.subgraphRequest(
-      'https://subgraph.satsuma-prod.com/structfinance/struct-finance-factory/version/1.8.5/api',
-      {
-        depositeds: {
-          __args: {
-            where: {
-              userAddress,
-            },
-          },
-          id: true,
-          depositAmount: true,
-          totalDeposited: true,
-        },
-      }
-    );
-    return depositeds.length;
+    if (subgraphData?.depositeds.length) {
+      return arithmeticOperand(
+        subgraphData?.depositeds.length,
+        strategyOptions.threshold,
+        strategyOptions.operator
+      )
+        ? strategyOptions?.questTier
+        : 0;
+    } else {
+      return 0;
+    }
   }
 };
 const actionOnQuestType = async (
@@ -62,5 +53,6 @@ export async function strategy({ eoa, options }: StrategyParamsType) {
     eoa[0],
     strategyOptions
   );
-  console.log(thresholdCount);
+  console.log('eligible tier', thresholdCount);
+  return thresholdCount;
 }
