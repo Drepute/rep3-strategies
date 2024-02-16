@@ -14,7 +14,6 @@ export async function subgraphRequest(
         Accept: 'application/json',
         'Content-Type': 'application/json',
         'User-Agent': 'Node',
-        // ...options?.headers,
       },
       body: JSON.stringify({
         query: jsonToGraphQLQuery({ query }, { pretty: true }),
@@ -53,4 +52,31 @@ export async function subgraphRequestWithClient(
     console.log('Error fetching data: ', error);
     throw error;
   }
+}
+export async function getSubgraphFetchCall(
+  url: string,
+  query: string,
+  variables: any
+) {
+  console.log(url, query, variables);
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      query,
+      variables,
+      // variables: { address: eoa },
+    }),
+  });
+  const response = await res.json();
+  console.log(response);
+  return response?.data;
+  // let allDelegateTxCount = response?.data?.info?.map(x => x?.total_tx);
+  // allDelegateTxCount = allDelegateTxCount?.reduce(
+  //   (partialSum, a) => partialSum + a,
+  //   0
+  // );
+  // return allDelegateTxCount;
 }

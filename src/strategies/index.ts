@@ -15,6 +15,7 @@ import * as entangleStrategy from './community-strategy/v2/entangle-strategy';
 import * as traderJoeStrategy from './community-strategy/v2/traderJoe-strategy';
 import * as premiaStrategy from './community-strategy/v1/premia-strategy';
 import * as notumStrategy from './community-strategy/v2/notum-strategy';
+import * as avaxStrategy from './community-strategy/v2/avax-strategy';
 import * as contractStrategy from './contract-strategy';
 import * as discordStrategy from './discord-strategy';
 import * as twitterStrategy from './twitter-strategy';
@@ -34,6 +35,7 @@ const strategies: Record<string, StrategyType> = {
   'rich peon, poor peon-strategy': traderJoeStrategy,
   'bebopHalloween-strategy': bebopHalloweenStrategy,
   'notum-strategy': notumStrategy,
+  'avalanche-strategy': avaxStrategy,
 };
 
 const multipleStrategies: Record<string, any> = {
@@ -48,6 +50,7 @@ export const communityStrategy = [
   'bebop',
   'rich peon, poor peon',
   'notum',
+  'avalanche',
 ];
 Object.keys(strategies).forEach(function(strategyName) {
   let example = null;
