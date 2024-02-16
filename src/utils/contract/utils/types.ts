@@ -14,6 +14,6 @@ interface NetworkInfos {
   subgraphV2: string;
 }
 
-export interface NetwrokObj {
+export interface NetworkObj {
   [key: string]: NetworkInfos;
 }
