@@ -7,15 +7,15 @@ const getAggregateSum = async (eoa: string, strategyOptions?: any) => {
   const filterParameter = JSON.stringify({
     'args.partner': '0xF2F2FE93A744EcE90133F58F783f86C5b50FcF1B',
     'args.inputToken': '0x0000000000000000000000000000000000000000',
-    'args.sender': ethers.utils.getAddress(eoa),
+    'args.sender': ethers.utils.getAddress(eoa), // only from
   });
   const sortOptions = JSON.stringify({ blockNumber: 1 });
   const transform_options = JSON.stringify({
     adapters: [{ name: 'usd_volume' }],
     params_list: [{ symbol: 'MATIC', decimals: 18, frequency: 60 }],
-  });
-  const key = 'inputAmount';
-  const aggregator = 'sum';
+  }); //empty obj
+  const key = 'inputAmount'; //from
+  const aggregator = 'sum'; // count
   const url = `${strategyOptions.baseUrl}/contract_service/event/aggregate?collection_name=${collectionName}&key=${key}&aggregator=${aggregator}&filter_options=${filterParameter}&sort_options=${sortOptions}&transform_options=${transform_options}`;
   console.log(url);
   const response = await fetch(url);

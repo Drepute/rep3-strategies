@@ -1,3 +1,4 @@
+import { ethers } from 'ethers';
 import { arithmeticOperand } from '../../../../adapters/contract';
 import { StrategyParamsType } from '../../../../types';
 // import { arithmeticOperand, viewAdapter } from '../../../../adapters/contract';
@@ -30,6 +31,33 @@ const structSwapCounts = async (userAddress: string, strategyOptions: any) => {
     }
   }
 };
+const getWoofiEventTotalCount = async (eoa: string, strategyOptions?: any) => {
+  if (strategyOptions?.questTier === 1) {
+    const collectionName = `${strategyOptions.contractAddress}-${strategyOptions.chainId}-${strategyOptions.topic}`;
+    const filterParameter = JSON.stringify({
+      'args.from': ethers.utils.getAddress(eoa), // only from
+    });
+    const sortOptions = JSON.stringify({ blockNumber: 1 });
+    const transform_options = JSON.stringify({}); //empty obj
+    const key = 'from'; //from
+    const aggregator = 'count'; // count
+    const url = `${strategyOptions.baseUrl}/contract_service/event/aggregate?collection_name=${collectionName}&key=${key}&aggregator=${aggregator}&filter_options=${filterParameter}&sort_options=${sortOptions}&transform_options=${transform_options}`;
+    console.log(url);
+    const response = await fetch(url);
+    const res = await response.json();
+    console.log('hereee', JSON.stringify(res?.data?.result));
+    if (res?.data?.result) {
+      // return res?.data?.result;
+      return arithmeticOperand(
+        parseInt(res?.data?.result),
+        strategyOptions.threshold,
+        strategyOptions.operator
+      )
+        ? strategyOptions?.questTier
+        : 0;
+    }
+  }
+};
 const actionOnQuestType = async (
   type: string,
   eoa: string,
@@ -39,6 +67,10 @@ const actionOnQuestType = async (
   switch (type) {
     case 'struct': {
       const txCount = await structSwapCounts(eoa, strategyOptions);
+      return txCount;
+    }
+    case 'woofi': {
+      const txCount = await getWoofiEventTotalCount(eoa, strategyOptions);
       return txCount;
     }
     default:
