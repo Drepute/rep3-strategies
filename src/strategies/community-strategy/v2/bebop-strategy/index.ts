@@ -198,6 +198,40 @@ const getFlyingDragonTransactionCount = async (
     return 0;
   }
 };
+const getBlockchainTransactionCount = async (
+  walletAddr: string,
+  chainId: number,
+  startTime: string,
+  threshold: number,
+  currentLength: number,
+  endTimeStamp?: number
+) => {
+  const endTime = endTimeStamp ?? Math.floor(new Date().getTime() / 1000) * 1e9;
+
+  const res = await fetch(
+    `https://api.bebop.xyz/history/v2/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTime}&size=${300}`
+  );
+  const data = await res.json();
+
+  let currentValidLength = currentLength;
+  data.results.forEach(element => {
+    if (element.volumeUsd >= 22.5 && element.chain_id === chainId) {
+      currentValidLength = currentValidLength + 1;
+    }
+  });
+  if (data.nextAvailableTimestamp && currentValidLength < threshold) {
+    return await getBlockchainTransactionCount(
+      walletAddr,
+      chainId,
+      startTime,
+      threshold,
+      currentValidLength,
+      data.nextAvailableTimestamp
+    );
+  } else {
+    return currentValidLength;
+  }
+};
 const actionOnQuestType = async (
   type: string,
   eoa: string,
@@ -247,6 +281,16 @@ const actionOnQuestType = async (
         strategyOptions?.startTime,
         0,
         strategyOptions?.endTimeStamp
+      );
+      return txCount;
+    }
+    case 'block': {
+      const txCount = await getBlockchainTransactionCount(
+        eoa,
+        strategyOptions?.chainId,
+        strategyOptions?.startTime,
+        strategyOptions?.threshold,
+        0
       );
       return txCount;
     }
