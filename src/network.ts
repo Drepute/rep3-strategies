@@ -37,6 +37,7 @@ export const network: NetworkObj = {
     network: 'homestead',
     rpc:
       'https://avalanche-mainnet.infura.io/v3/ae505d933166471ba6ad5e92d7f71b00',
+    // ,
     subgraph: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-mumbai',
     subgraphV2:
       'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-v2-mumbai',
