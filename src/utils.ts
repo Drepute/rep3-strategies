@@ -130,17 +130,10 @@ async function multipleCallStrategy<T extends AdapterNames>(
     return { tierMatrix: resultObj, params: currentParams };
   } else if (
     strategiesConfig?.[0]?.strategy === 'community-strategy-strategy' &&
-    communityStrategy.includes(strategiesConfig?.[0]?.options.variable.type)
+    communityStrategy.includes(strategiesConfig?.[0]?.options.variable.type) &&
+    strategiesConfig?.[0]?.options?.variable?.strategyOptions?.questType !==
+      'struct'
   ) {
-    console.log(
-      'here.......',
-      `${strategiesConfig?.[0]?.options.variable.type}`,
-      {
-        contractAddress,
-        eoa,
-        options: strategiesConfig?.[0]?.options.variable,
-      }
-    );
     const res = await _strategies[
       `${strategiesConfig?.[0]?.options.variable.type}-strategy`
     ].strategy({
@@ -286,6 +279,62 @@ async function multipleCallStrategy<T extends AdapterNames>(
     } else {
       return {};
     }
+  } else if (
+    strategiesConfig?.[0]?.strategy === 'community-strategy-strategy' &&
+    strategiesConfig?.[1]?.strategy === 'discord-strategy' &&
+    strategiesConfig?.[0]?.options?.variable?.strategyOptions?.questType ===
+      'struct'
+  ) {
+    const res = await _strategies[
+      `${strategiesConfig?.[0]?.options.variable.type}-strategy`
+    ].strategy({
+      contractAddress,
+      eoa,
+      options: strategiesConfig?.[0]?.options.variable,
+    });
+
+    let results = [
+      {
+        executionResult: true,
+        tier: res,
+        id: strategiesConfig?.filter(x => x.options?.tier === parseInt(res))[0]
+          ?.options?.task_id,
+        strategy: strategiesConfig?.[0]?.strategy,
+      },
+    ];
+    results = results.filter(x => x.executionResult !== false);
+    const promiseResults = strategiesConfig
+      .filter(x => x.strategy !== 'community-strategy-strategy')
+      .map(
+        async (x: {
+          strategy: string;
+          options: {
+            variable: AdapterWithVariables[T];
+            tier: number;
+            task_id: number;
+          };
+        }) => {
+          const res: boolean = await multipleStrategies[x.strategy].strategy(
+            false,
+            {
+              contractAddress: contractAddress,
+              eoa: eoa,
+              options: x.options,
+            }
+          );
+          return {
+            executionResult: res,
+            tier: x.options.tier,
+            id: x.options.task_id,
+            strategy: x.strategy,
+          };
+        }
+      );
+    let discordResults = await Promise.all(promiseResults);
+
+    discordResults = discordResults.filter(x => x.executionResult !== false);
+    console.log('hereeeeeee!!!!!', discordResults, results);
+    return discordResults.concat(results);
   } else {
     console.log('strategy length', strategiesConfig.length);
     const promiseResults = strategiesConfig.map(

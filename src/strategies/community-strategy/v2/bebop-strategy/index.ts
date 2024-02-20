@@ -214,11 +214,13 @@ const getBlockchainTransactionCount = async (
   const data = await res.json();
 
   let currentValidLength = currentLength;
+
   data.results.forEach(element => {
     if (element.volumeUsd >= 22.5 && element.chain_id === chainId) {
       currentValidLength = currentValidLength + 1;
     }
   });
+  console.log(currentValidLength < threshold, currentValidLength, threshold);
   if (data.nextAvailableTimestamp && currentValidLength < threshold) {
     return await getBlockchainTransactionCount(
       walletAddr,

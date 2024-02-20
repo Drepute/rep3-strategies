@@ -2,7 +2,7 @@ import { ethers } from 'ethers';
 import { arithmeticOperand } from '../../../../adapters/contract';
 import { StrategyParamsType } from '../../../../types';
 // import { arithmeticOperand, viewAdapter } from '../../../../adapters/contract';
-// import fetch from 'cross-fetch';
+import fetch from 'cross-fetch';
 import { subgraph } from '../../../../utils';
 const structSwapCounts = async (userAddress: string, strategyOptions: any) => {
   if (strategyOptions?.questTier === 1) {
