@@ -334,33 +334,24 @@ async function multipleCallStrategy<T extends AdapterNames>(
 
     discordResults = discordResults.filter(x => x.executionResult !== false);
     const finalResult = discordResults.concat(results);
-    // const resultObj = finalResult.reduce(
-    //   (acc, cur) => ({
-    //     ...acc,
-    //     [cur.tier]: results
-    //       .filter(x => x.tier === cur.tier)
-    //       .map(x => {
-    //         return { executionResult: x.executionResult, task_id: x.id };
-    //       }),
-    //   }),
-    //   {}
-    // );
-    console.log('hereeeeeee!!!!!', finalResult);
+    const resultObj = finalResult.reduce(
+      (acc, cur) => ({
+        ...acc,
+        [cur.tier]: finalResult
+          .filter(x => x.tier === cur.tier)
+          .map(x => {
+            return { executionResult: x.executionResult, task_id: x.id };
+          }),
+      }),
+      {}
+    );
     const currentParams = await getCurrentParams(
       contractAddress,
       eoa[0],
       network
     );
-    console.log('strategy length', {
-      tierMatrix: finalResult?.map(x => {
-        return { executionResult: x?.executionResult, task_id: x?.id };
-      }),
-      params: currentParams,
-    });
     return {
-      tierMatrix: finalResult?.map(x => {
-        return { executionResult: x?.executionResult, task_id: x?.id };
-      }),
+      tierMatrix: resultObj,
       params: currentParams,
     };
   } else {
