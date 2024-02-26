@@ -61,9 +61,9 @@ async function multipleCallStrategy<T extends AdapterNames>(
   const nonCommunityStrategy = strategiesConfig.filter(
     x => x.strategy !== 'community-strategy-strategy'
   );
-  let communityExecutionResult;
-  let nonCommunityExecutionResult;
-  console.log('community-strategy', communityStrategy);
+  let communityExecutionResult: any = [];
+  let nonCommunityExecutionResult: any = [];
+  console.log('community-strategy', nonCommunityStrategy, communityStrategy);
   if (
     strategiesConfig?.[0]?.strategy === 'smart-contract-strategy' &&
     strategiesConfig?.[0]?.options.variable.type === 'across'
@@ -129,18 +129,6 @@ async function multipleCallStrategy<T extends AdapterNames>(
         },
       ];
       results = results.filter(x => x.executionResult !== false);
-      const currentParams = await getCurrentParams(
-        contractAddress,
-        eoa[0],
-        network
-      );
-      // const resultObj = results.reduce(
-      //   (acc, cur) => ({
-      //     ...acc,
-      //     [res]: [{ executionResult: cur.executionResult, task_id: cur.id }],
-      //   }),
-      //   {}
-      // );
       communityExecutionResult = results.map(x => {
         return {
           executionResult: true,
@@ -148,18 +136,11 @@ async function multipleCallStrategy<T extends AdapterNames>(
           id: x.id,
           strategy: x.strategy,
         };
-      }); // const r:
-      // {
-      //   executionResult: boolean;
-      //   tier: number;
-      //   id: number;
-      //   strategy: string;
-      // }
-      // //[]=;
-      // // return { tierMatrix: resultObj, params: currentParams };
+      });
     }
     if (nonCommunityStrategy.length > 0) {
-      const promiseResults = strategiesConfig.map(
+      console.log('here csv discord twitter smart contract.........');
+      const promiseResults = nonCommunityStrategy.map(
         async (x: {
           strategy: string;
           options: {
@@ -204,6 +185,11 @@ async function multipleCallStrategy<T extends AdapterNames>(
       //   params: currentParams,
       // };
     }
+    console.log(
+      'execution results',
+      communityExecutionResult,
+      nonCommunityExecutionResult
+    );
     if (
       communityExecutionResult?.length > 0 ||
       nonCommunityExecutionResult?.length > 0
@@ -231,6 +217,8 @@ async function multipleCallStrategy<T extends AdapterNames>(
         tierMatrix: resultObj,
         params: currentParams,
       };
+    } else {
+      return {};
     }
   }
 }
