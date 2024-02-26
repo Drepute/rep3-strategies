@@ -107,28 +107,29 @@ async function multipleCallStrategy<T extends AdapterNames>(
     if (
       communityStrategy?.[0]?.strategy === 'community-strategy-strategy' &&
       communityEnabledStrategy.includes(
-        strategiesConfig?.[0]?.options.variable.type
+        communityStrategy?.[0]?.options.variable.type
       )
     ) {
       const res = await _strategies[
-        `${strategiesConfig?.[0]?.options.variable.type}-strategy`
+        `${communityStrategy?.[0]?.options.variable.type}-strategy`
       ].strategy({
         contractAddress,
         eoa,
-        options: strategiesConfig?.[0]?.options.variable,
+        options: communityStrategy?.[0]?.options.variable,
       });
-
+      console.log('here community.........', res);
       let results = [
         {
           executionResult: true,
           tier: res,
-          id: strategiesConfig?.filter(
+          id: communityStrategy?.filter(
             x => x.options?.tier === parseInt(res)
           )[0]?.options?.task_id,
-          strategy: strategiesConfig?.[0]?.strategy,
+          strategy: communityStrategy?.[0]?.strategy,
         },
       ];
       results = results.filter(x => x.executionResult !== false);
+      console.log('Community.....', results);
       communityExecutionResult = results.map(x => {
         return {
           executionResult: true,
