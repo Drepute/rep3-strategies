@@ -5,32 +5,52 @@ import { StrategyParamsType } from '../../../../types';
 import fetch from 'cross-fetch';
 import { subgraph } from '../../../../utils';
 const structSwapCounts = async (userAddress: string, strategyOptions: any) => {
-  if (strategyOptions?.questTier === 1) {
-    const query = `query ($userAddress: String!) {
+  console.log('strategy......', strategyOptions);
+  const query1 = `query ($userAddress: String!) {
       depositeds(where:{userAddress: $userAddress}) {
         id
         depositAmount
         totalDeposited
       }
     }`;
-    const subgraphData = await subgraph.getSubgraphFetchCall(
-      'https://api.thegraph.com/subgraphs/name/hirako2000/struct-finance-factory',
-      query,
-      { userAddress }
-    );
-    if (subgraphData?.depositeds.length) {
-      return arithmeticOperand(
+  let resultForTier1: boolean | number = false;
+  let resultForTier2: boolean | number = false;
+  const subgraphData = await subgraph.getSubgraphFetchCall(
+    'https://api.thegraph.com/subgraphs/name/hirako2000/struct-finance-factory',
+    query1,
+    { userAddress }
+  );
+  if (subgraphData?.depositeds.length) {
+    resultForTier1 = arithmeticOperand(subgraphData?.depositeds.length, 2, '>=')
+      ? 1
+      : 0;
+    if (resultForTier1) {
+      const query2 = `query ($userAddress: String!) {
+      depositeds(where:{userAddress: $userAddress,depositAmount_gte:1000000}) {
+        id
+        depositAmount
+        totalDeposited
+      }
+    }`;
+      const subgraphData = await subgraph.getSubgraphFetchCall(
+        'https://api.thegraph.com/subgraphs/name/hirako2000/struct-finance-factory',
+        query2,
+        { userAddress }
+      );
+      resultForTier2 = arithmeticOperand(
         subgraphData?.depositeds.length,
-        strategyOptions.threshold,
-        strategyOptions.operator
+        1,
+        '>='
       )
-        ? strategyOptions?.questTier
-        : 0;
-    } else {
-      return 0;
+        ? 2
+        : resultForTier1;
+      return resultForTier2;
     }
+  } else {
+    return 0;
   }
 };
+// };
 const getWoofiEventTotalCount = async (eoa: string, strategyOptions?: any) => {
   if (strategyOptions?.questTier === 1) {
     const collectionName = `${strategyOptions.contractAddress}-${strategyOptions.chainId}-${strategyOptions.topic}`;

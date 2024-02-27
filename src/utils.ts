@@ -118,26 +118,54 @@ async function multipleCallStrategy<T extends AdapterNames>(
         options: communityStrategy?.[0]?.options.variable,
       });
       console.log('here community.........', res);
-      let results = [
-        {
-          executionResult: true,
-          tier: res,
-          id: communityStrategy?.filter(
-            x => x.options?.tier === parseInt(res)
-          )[0]?.options?.task_id,
-          strategy: communityStrategy?.[0]?.strategy,
-        },
-      ];
+      let results: any = [];
+      if (
+        communityStrategy?.[0]?.options.variable?.strategyOptions?.questType ===
+          'struct' &&
+        res
+      ) {
+        for (let i = 1; i <= res; i++) {
+          results.push({
+            executionResult: true,
+            tier: i,
+            id: communityStrategy?.filter(x => x.options?.tier === i)[0]
+              ?.options?.task_id,
+            strategy: communityStrategy?.[0]?.strategy,
+          });
+        }
+      } else {
+        results = [
+          {
+            executionResult: true,
+            tier: res,
+            id: communityStrategy?.filter(
+              x => x.options?.tier === parseInt(res)
+            )[0]?.options?.task_id,
+            strategy: communityStrategy?.[0]?.strategy,
+          },
+        ];
+      }
+      // results = [
+      //   {
+      //     executionResult: true,
+      //     tier: res,
+      //     id: communityStrategy?.filter(
+      //       x => x.options?.tier === parseInt(res)
+      //     )[0]?.options?.task_id,
+      //     strategy: communityStrategy?.[0]?.strategy,
+      //   },
+      // ];
       results = results.filter(x => x.executionResult !== false);
       console.log('Community.....', results);
-      communityExecutionResult = results.map(x => {
-        return {
-          executionResult: true,
-          tier: res,
-          id: x.id,
-          strategy: x.strategy,
-        };
-      });
+      communityExecutionResult = results;
+      // communityExecutionResult = results.map(x => {
+      //   return {
+      //     executionResult: true,
+      //     tier: x.,
+      //     id: x.id,
+      //     strategy: x.strategy,
+      //   };
+      // });
     }
     if (nonCommunityStrategy.length > 0) {
       console.log('here csv discord twitter smart contract.........');
@@ -170,6 +198,7 @@ async function multipleCallStrategy<T extends AdapterNames>(
 
       results = results.filter(x => x.executionResult !== false);
       nonCommunityExecutionResult = results;
+      console.log('community txn.....', results);
       // const resultObj = results.reduce(
       //   (acc, cur) => ({
       //     ...acc,
