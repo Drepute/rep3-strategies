@@ -8,9 +8,10 @@ const getAllHalloweenTransaction = async (
   endTIme: string
 ) => {
   const res = await fetch(
-    `https://api.bebop.xyz/history/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTIme}&size=${1000}`
+    `https://api.bebop.xyz/history/v2/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTIme}&size=${1000}`
   );
   const data = await res.json();
+  console.log('data', data);
   let status = false;
   for (let i = 0; i < data.results.length; i++) {
     if (Object.keys(data.results[i].sellTokens).length > 1) {
@@ -28,21 +29,22 @@ const getAllHalloweenTransaction = async (
 };
 
 export async function strategy({ eoa, options }: StrategyParamsType) {
+  const strategyOptions = options?.strategyOptions;
   const res = await getAllHalloweenTransaction(
     eoa[0],
-    options.startTime,
-    options.endTime
+    strategyOptions.startTime,
+    strategyOptions.endTime
   );
   if (!res) {
     const ethExecutionResult = await viewAdapter(eoa[0], false, {
-      contractAddress: options.ethAddress,
+      contractAddress: strategyOptions.ethAddress,
       type: 'view',
       contractType: 'erc1155',
       balanceThreshold: 0,
       chainId: 1,
       operator: '>',
       functionName: 'balanceOf',
-      functionParam: [options.ethTokenId],
+      functionParam: [strategyOptions.ethTokenId],
     });
     return ethExecutionResult;
   } else {

@@ -32,9 +32,9 @@ const strategies: Record<string, StrategyType> = {
   'across-strategy': acrossStrategy,
   'premia-strategy': premiaStrategy,
   'bebop-strategy': bebopStrategy,
+  'bebopHalloween-strategy': bebopHalloweenStrategy,
   'entangle-strategy': entangleStrategy,
   'rich peon, poor peon-strategy': traderJoeStrategy,
-  'bebopHalloween-strategy': bebopHalloweenStrategy,
   'notum-strategy': notumStrategy,
   'avalanche-strategy': avaxStrategy,
   'hover-strategy': hoverStrategy,
@@ -47,13 +47,14 @@ const multipleStrategies: Record<string, any> = {
   'csv-strategy': csvStrategy,
   'community-strategy': contractStrategy,
 };
-export const communityEnabledStrategy = [
+export const communityStrategy = [
   'entangle',
   'bebop',
   'rich peon, poor peon',
   'notum',
   'avalanche',
   'hover',
+  'bebopHalloween',
 ];
 Object.keys(strategies).forEach(function(strategyName) {
   let example = null;
