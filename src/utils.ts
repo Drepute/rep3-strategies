@@ -103,6 +103,39 @@ async function multipleCallStrategy<T extends AdapterNames>(
     } else {
       return {};
     }
+  } else if (
+    strategiesConfig?.[0]?.strategy === 'smart-contract-strategy' &&
+    strategiesConfig?.[0]?.options.variable.type === 'bebopHalloween'
+  ) {
+    const res = await _strategies[
+      `${strategiesConfig?.[0]?.options.variable.type}-strategy`
+    ].strategy({
+      contractAddress,
+      eoa,
+      options: strategiesConfig?.[0]?.options.variable.strategyOptions,
+    });
+    let results = [
+      {
+        executionResult: res,
+        tier: strategiesConfig?.[0]?.options.tier,
+        id: strategiesConfig?.[0]?.options.task_id,
+        strategy: strategiesConfig?.[0]?.strategy,
+      },
+    ];
+    results = results.filter(x => x.executionResult !== false);
+    const currentParams = await getCurrentParams(
+      contractAddress,
+      eoa[0],
+      network
+    );
+    const resultObj = results.reduce(
+      (acc, cur) => ({
+        ...acc,
+        [cur.tier]: [{ executionResult: cur.executionResult, task_id: cur.id }],
+      }),
+      {}
+    );
+    return { tierMatrix: resultObj, params: currentParams };
   } else {
     if (
       communityStrategy?.[0]?.strategy === 'community-strategy-strategy' &&
@@ -117,26 +150,44 @@ async function multipleCallStrategy<T extends AdapterNames>(
         eoa,
         options: strategiesConfig?.[0]?.options.variable,
       });
+      console.log('res', res);
 
-      let results = [
-        {
-          executionResult: true,
-          tier: res,
-          id: strategiesConfig?.filter(
-            x => x.options?.tier === parseInt(res)
-          )[0]?.options?.task_id,
-          strategy: strategiesConfig?.[0]?.strategy,
-        },
-      ];
-      results = results.filter(x => x.executionResult !== false);
-      communityExecutionResult = results.map(x => {
-        return {
-          executionResult: true,
-          tier: res,
-          id: x.id,
-          strategy: x.strategy,
-        };
-      });
+      if (
+        strategiesConfig?.[0]?.options.variable.strategyOptions?.questType ===
+        'struct'
+      ) {
+        for (let i = 1; i <= res; i++) {
+          console.log(strategiesConfig?.filter(x => x.options?.tier === i));
+          communityExecutionResult.push({
+            executionResult: true,
+            tier: i,
+            id: strategiesConfig?.filter(x => x.options?.tier === i)[0]?.options
+              ?.task_id,
+            strategy: strategiesConfig?.[0]?.strategy,
+          });
+        }
+      } else {
+        let results = [
+          {
+            executionResult: true,
+            tier: res,
+            id: strategiesConfig?.filter(
+              x => x.options?.tier === parseInt(res)
+            )[0]?.options?.task_id,
+            strategy: strategiesConfig?.[0]?.strategy,
+          },
+        ];
+        results = results.filter(x => x.executionResult !== false);
+        communityExecutionResult = results;
+      }
+      // communityExecutionResult = results.map(x => {
+      //   return {
+      //     executionResult: true,
+      //     tier: res,
+      //     id: x.id,
+      //     strategy: x.strategy,
+      //   };
+      // });
     }
     if (nonCommunityStrategy.length > 0) {
       console.log('here csv discord twitter smart contract.........');
@@ -204,7 +255,7 @@ async function multipleCallStrategy<T extends AdapterNames>(
         .reduce(
           (acc, cur) => ({
             ...acc,
-            [cur.tier]: communityExecutionResult
+            [cur.tier ?? 0]: communityExecutionResult
               .concat(nonCommunityExecutionResult)
               .filter(x => x.tier === cur.tier)
               .map(x => {
