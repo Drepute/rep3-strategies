@@ -5,30 +5,28 @@ import { StrategyParamsType } from '../../../../types';
 import fetch from 'cross-fetch';
 import { subgraph } from '../../../../utils';
 const structSwapCounts = async (userAddress: string, strategyOptions: any) => {
-  if (strategyOptions?.questTier === 1) {
-    const query = `query ($userAddress: String!) {
+  const query_1 = `query ($userAddress: String!) {
       depositeds(where:{userAddress: $userAddress}) {
         id
         depositAmount
         totalDeposited
       }
     }`;
-    const subgraphData = await subgraph.getSubgraphFetchCall(
-      'https://api.thegraph.com/subgraphs/name/hirako2000/struct-finance-factory',
-      query,
-      { userAddress }
-    );
-    if (subgraphData?.depositeds.length) {
-      return arithmeticOperand(
-        subgraphData?.depositeds.length,
-        strategyOptions.threshold,
-        strategyOptions.operator
-      )
-        ? strategyOptions?.questTier
-        : 0;
-    } else {
-      return 0;
-    }
+  const subgraphData = await subgraph.getSubgraphFetchCall(
+    'https://api.thegraph.com/subgraphs/name/hirako2000/struct-finance-factory',
+    query_1,
+    { userAddress }
+  );
+  if (subgraphData?.depositeds.length) {
+    return arithmeticOperand(
+      subgraphData?.depositeds.length,
+      strategyOptions.threshold,
+      strategyOptions.operator
+    )
+      ? 2
+      : 0;
+  } else {
+    return 0;
   }
 };
 const getWoofiEventTotalCount = async (eoa: string, strategyOptions?: any) => {

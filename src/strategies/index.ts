@@ -47,7 +47,7 @@ const multipleStrategies: Record<string, any> = {
   'csv-strategy': csvStrategy,
   'community-strategy': contractStrategy,
 };
-export const communityStrategy = [
+export const communityEnabledStrategy = [
   'entangle',
   'bebop',
   'rich peon, poor peon',

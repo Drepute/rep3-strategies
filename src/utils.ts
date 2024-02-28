@@ -1,6 +1,6 @@
 import utils from './utils/index';
 import _strategies, {
-  communityStrategy,
+  communityEnabledStrategy,
   multipleStrategies,
 } from './strategies';
 import {
@@ -55,6 +55,15 @@ async function multipleCallStrategy<T extends AdapterNames>(
     };
   }[]
 ) {
+  const communityStrategy = strategiesConfig.filter(
+    x => x.strategy === 'community-strategy-strategy'
+  );
+  const nonCommunityStrategy = strategiesConfig.filter(
+    x => x.strategy !== 'community-strategy-strategy'
+  );
+  let communityExecutionResult: any = [];
+  let nonCommunityExecutionResult: any = [];
+  console.log('community-strategy', nonCommunityStrategy, communityStrategy);
   if (
     strategiesConfig?.[0]?.strategy === 'smart-contract-strategy' &&
     strategiesConfig?.[0]?.options.variable.type === 'across'
@@ -96,8 +105,7 @@ async function multipleCallStrategy<T extends AdapterNames>(
     }
   } else if (
     strategiesConfig?.[0]?.strategy === 'smart-contract-strategy' &&
-    (strategiesConfig?.[0]?.options.variable.type === 'bebop' ||
-      strategiesConfig?.[0]?.options.variable.type === 'bebopHalloween')
+    strategiesConfig?.[0]?.options.variable.type === 'bebopHalloween'
   ) {
     const res = await _strategies[
       `${strategiesConfig?.[0]?.options.variable.type}-strategy`
@@ -128,185 +136,62 @@ async function multipleCallStrategy<T extends AdapterNames>(
       {}
     );
     return { tierMatrix: resultObj, params: currentParams };
-  } else if (
-    strategiesConfig?.[0]?.strategy === 'community-strategy-strategy' &&
-    communityStrategy.includes(strategiesConfig?.[0]?.options.variable.type) &&
-    strategiesConfig?.[0]?.options?.variable?.strategyOptions?.questType !==
-      'struct'
-  ) {
-    console.log(strategiesConfig);
-    const res = await _strategies[
-      `${strategiesConfig?.[0]?.options.variable.type}-strategy`
-    ].strategy({
-      contractAddress,
-      eoa,
-      options: strategiesConfig?.[0]?.options.variable,
-    });
-
-    let results = [
-      {
-        executionResult: true,
-        tier: res,
-        id: strategiesConfig?.filter(x => x.options?.tier === parseInt(res))[0]
-          ?.options?.task_id,
-        strategy: strategiesConfig?.[0]?.strategy,
-      },
-    ];
-    results = results.filter(x => x.executionResult !== false);
-    const currentParams = await getCurrentParams(
-      contractAddress,
-      eoa[0],
-      network
-    );
-    const resultObj = results.reduce(
-      (acc, cur) => ({
-        ...acc,
-        [res]: [{ executionResult: cur.executionResult, task_id: cur.id }],
-      }),
-      {}
-    );
-    return { tierMatrix: resultObj, params: currentParams };
-  } else if (
-    strategiesConfig?.[0]?.strategy === 'smart-contract-strategy' &&
-    strategiesConfig?.[0]?.options.variable.type === 'entangle'
-  ) {
-    const res = await _strategies[
-      `${strategiesConfig?.[0]?.options.variable.type}-strategy`
-    ].strategy({
-      contractAddress,
-      eoa,
-      options: strategiesConfig?.[0]?.options.variable.strategyOptions,
-    });
-
-    let results = [
-      {
-        executionResult: true,
-        tier: res,
-        id: strategiesConfig?.[0]?.options.task_id,
-        strategy: strategiesConfig?.[0]?.strategy,
-      },
-    ];
-    results = results.filter(x => x.executionResult !== false);
-    const currentParams = await getCurrentParams(
-      contractAddress,
-      eoa[0],
-      network
-    );
-    const resultObj = results.reduce(
-      (acc, cur) => ({
-        ...acc,
-        [res]: [{ executionResult: cur.executionResult, task_id: cur.id }],
-      }),
-      {}
-    );
-    return { tierMatrix: resultObj, params: currentParams };
-  } else if (
-    strategiesConfig?.[0]?.strategy === 'smart-contract-strategy' &&
-    strategiesConfig?.[0]?.options.variable.type === 'csv' &&
-    strategiesConfig?.[0]?.options.variable.strategyOptions?.subType !==
-      'trader-joe'
-  ) {
-    const res = await _strategies[
-      `${strategiesConfig?.[0]?.options.variable.type}-strategy`
-    ].strategy({
-      contractAddress,
-      eoa,
-      options: strategiesConfig?.[0]?.options.variable.strategyOptions,
-    });
-    let results = [
-      {
-        executionResult: res,
-        tier: strategiesConfig?.[0]?.options.tier,
-        id: strategiesConfig?.[0]?.options.task_id,
-        strategy: strategiesConfig?.[0]?.strategy,
-      },
-    ];
-    results = results.filter(x => x.executionResult !== false);
-    const currentParams = await getCurrentParams(
-      contractAddress,
-      eoa[0],
-      network
-    );
-    const resultObj = results.reduce(
-      (acc, cur) => ({
-        ...acc,
-        [cur.tier]: [{ executionResult: cur.executionResult, task_id: cur.id }],
-      }),
-      {}
-    );
-    return { tierMatrix: resultObj, params: currentParams };
-  } else if (
-    strategiesConfig?.[0]?.strategy === 'smart-contract-strategy' &&
-    strategiesConfig?.[0]?.options.variable.type === 'csv' &&
-    strategiesConfig?.[0]?.options.variable.strategyOptions?.subType ===
-      'trader-joe'
-  ) {
-    const res = await _strategies[
-      `${strategiesConfig?.[0]?.options.variable.type}-strategy`
-    ].strategy({
-      contractAddress,
-      eoa,
-      options: strategiesConfig?.[0]?.options.variable.strategyOptions,
-    });
-
-    if (res?.executionResult) {
-      let results = [
-        {
-          tier: res?.tier,
-          executionResult: res?.executionResult,
-          id: strategiesConfig.filter(x => x?.options.tier === res?.tier)[0]
-            ?.options?.task_id,
-          strategy: strategiesConfig?.[0]?.strategy,
-        },
-      ];
-      results = results.filter(x => x.executionResult !== false);
-      const currentParams = await getCurrentParams(
+  } else {
+    if (
+      communityStrategy?.[0]?.strategy === 'community-strategy-strategy' &&
+      communityEnabledStrategy.includes(
+        strategiesConfig?.[0]?.options.variable.type
+      )
+    ) {
+      const res = await _strategies[
+        `${strategiesConfig?.[0]?.options.variable.type}-strategy`
+      ].strategy({
         contractAddress,
-        eoa[0],
-        network
-      );
+        eoa,
+        options: strategiesConfig?.[0]?.options.variable,
+      });
+      console.log('res', res);
 
-      const resultObj = results.reduce(
-        (acc, cur) => ({
-          ...acc,
-          [cur.tier]: [
-            { executionResult: cur.executionResult, task_id: cur.id },
-          ],
-        }),
-        {}
-      );
-
-      return { tierMatrix: resultObj, params: currentParams };
-    } else {
-      return {};
+      if (
+        strategiesConfig?.[0]?.options.variable.strategyOptions?.questType ===
+        'struct'
+      ) {
+        for (let i = 1; i <= res; i++) {
+          console.log(strategiesConfig?.filter(x => x.options?.tier === i));
+          communityExecutionResult.push({
+            executionResult: true,
+            tier: i,
+            id: strategiesConfig?.filter(x => x.options?.tier === i)[0]?.options
+              ?.task_id,
+            strategy: strategiesConfig?.[0]?.strategy,
+          });
+        }
+      } else {
+        let results = [
+          {
+            executionResult: true,
+            tier: res,
+            id: strategiesConfig?.filter(
+              x => x.options?.tier === parseInt(res)
+            )[0]?.options?.task_id,
+            strategy: strategiesConfig?.[0]?.strategy,
+          },
+        ];
+        results = results.filter(x => x.executionResult !== false);
+        communityExecutionResult = results;
+      }
+      // communityExecutionResult = results.map(x => {
+      //   return {
+      //     executionResult: true,
+      //     tier: res,
+      //     id: x.id,
+      //     strategy: x.strategy,
+      //   };
+      // });
     }
-  } else if (
-    strategiesConfig?.[0]?.strategy === 'community-strategy-strategy' &&
-    strategiesConfig?.[1]?.strategy === 'discord-strategy' &&
-    strategiesConfig?.[0]?.options?.variable?.strategyOptions?.questType ===
-      'struct'
-  ) {
-    const res = await _strategies[
-      `${strategiesConfig?.[0]?.options.variable.type}-strategy`
-    ].strategy({
-      contractAddress,
-      eoa,
-      options: strategiesConfig?.[0]?.options.variable,
-    });
-
-    let results = [
-      {
-        executionResult: true,
-        tier: res,
-        id: strategiesConfig?.filter(x => x.options?.tier === parseInt(res))[0]
-          ?.options?.task_id,
-        strategy: strategiesConfig?.[0]?.strategy,
-      },
-    ];
-    results = results.filter(x => x.executionResult !== false);
-    const promiseResults = strategiesConfig
-      .filter(x => x.strategy !== 'community-strategy-strategy')
-      .map(
+    if (nonCommunityStrategy.length > 0) {
+      console.log('here csv discord twitter smart contract.........');
+      const promiseResults = nonCommunityStrategy.map(
         async (x: {
           strategy: string;
           options: {
@@ -331,80 +216,61 @@ async function multipleCallStrategy<T extends AdapterNames>(
           };
         }
       );
-    let discordResults = await Promise.all(promiseResults);
+      let results = await Promise.all(promiseResults);
 
-    discordResults = discordResults.filter(x => x.executionResult !== false);
-    const finalResult = discordResults.concat(results);
-    const resultObj = finalResult.reduce(
-      (acc, cur) => ({
-        ...acc,
-        [cur.tier]: finalResult
-          .filter(x => x.tier === cur.tier)
-          .map(x => {
-            return { executionResult: x.executionResult, task_id: x.id };
+      results = results.filter(x => x.executionResult !== false);
+      nonCommunityExecutionResult = results;
+      // const resultObj = results.reduce(
+      //   (acc, cur) => ({
+      //     ...acc,
+      //     [cur.tier]: results
+      //       .filter(x => x.tier === cur.tier)
+      //       .map(x => {
+      //         return { executionResult: x.executionResult, task_id: x.id };
+      //       }),
+      //   }),
+      //   {}
+      // );
+      // return {
+      //   tierMatrix: resultObj,
+      //   params: currentParams,
+      // };
+    }
+    console.log(
+      'execution results',
+      communityExecutionResult,
+      nonCommunityExecutionResult
+    );
+    if (
+      communityExecutionResult?.length > 0 ||
+      nonCommunityExecutionResult?.length > 0
+    ) {
+      const currentParams = await getCurrentParams(
+        contractAddress,
+        eoa[0],
+        network
+      );
+      const resultObj = communityExecutionResult
+        .concat(nonCommunityExecutionResult)
+        .reduce(
+          (acc, cur) => ({
+            ...acc,
+            [cur.tier ?? 0]: communityExecutionResult
+              .concat(nonCommunityExecutionResult)
+              .filter(x => x.tier === cur.tier)
+              .map(x => {
+                return { executionResult: x.executionResult, task_id: x.id };
+              }),
           }),
-      }),
-      {}
-    );
-    const currentParams = await getCurrentParams(
-      contractAddress,
-      eoa[0],
-      network
-    );
-    return {
-      tierMatrix: resultObj,
-      params: currentParams,
-    };
-  } else {
-    console.log('strategy length', strategiesConfig.length);
-    const promiseResults = strategiesConfig.map(
-      async (x: {
-        strategy: string;
-        options: {
-          variable: AdapterWithVariables[T];
-          tier: number;
-          task_id: number;
-        };
-      }) => {
-        const res: boolean = await multipleStrategies[x.strategy].strategy(
-          false,
-          {
-            contractAddress: contractAddress,
-            eoa: eoa,
-            options: x.options,
-          }
+          {}
         );
-        return {
-          executionResult: res,
-          tier: x.options.tier,
-          id: x.options.task_id,
-          strategy: x.strategy,
-        };
-      }
-    );
-    let results = await Promise.all(promiseResults);
-
-    results = results.filter(x => x.executionResult !== false);
-    const currentParams = await getCurrentParams(
-      contractAddress,
-      eoa[0],
-      network
-    );
-    const resultObj = results.reduce(
-      (acc, cur) => ({
-        ...acc,
-        [cur.tier]: results
-          .filter(x => x.tier === cur.tier)
-          .map(x => {
-            return { executionResult: x.executionResult, task_id: x.id };
-          }),
-      }),
-      {}
-    );
-    return {
-      tierMatrix: resultObj,
-      params: currentParams,
-    };
+      return {
+        tierMatrix: resultObj,
+        params: currentParams,
+      };
+    } else {
+      return {};
+    }
   }
 }
 const getKeyForConfig = (obj: any) => {
@@ -551,3 +417,4 @@ export default {
   multipleCallStrategy,
   multipleBatchCallStrategy,
 };
+// strategy should be such that only single options per quest should go and gets tier in return
