@@ -32,9 +32,9 @@ const strategies: Record<string, StrategyType> = {
   'across-strategy': acrossStrategy,
   'premia-strategy': premiaStrategy,
   'bebop-strategy': bebopStrategy,
+  'bebopHalloween-strategy': bebopHalloweenStrategy,
   'entangle-strategy': entangleStrategy,
   'rich peon, poor peon-strategy': traderJoeStrategy,
-  'bebopHalloween-strategy': bebopHalloweenStrategy,
   'notum-strategy': notumStrategy,
   'avalanche-strategy': avaxStrategy,
   'hover-strategy': hoverStrategy,
@@ -54,6 +54,7 @@ export const communityEnabledStrategy = [
   'notum',
   'avalanche',
   'hover',
+  'bebopHalloween',
 ];
 Object.keys(strategies).forEach(function(strategyName) {
   let example = null;
