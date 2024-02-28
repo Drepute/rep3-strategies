@@ -29,7 +29,7 @@ const getAllHalloweenTransaction = async (
 };
 
 export async function strategy({ eoa, options }: StrategyParamsType) {
-  const strategyOptions = options?.strategyOptions;
+  const strategyOptions = options;
   const res = await getAllHalloweenTransaction(
     eoa[0],
     strategyOptions.startTime,
