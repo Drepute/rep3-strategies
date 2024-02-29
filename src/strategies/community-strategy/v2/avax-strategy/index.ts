@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { arithmeticOperand } from '../../../../adapters/contract';
+import { arithmeticOperand, viewAdapter } from '../../../../adapters/contract';
 import { StrategyParamsType } from '../../../../types';
 // import { arithmeticOperand, viewAdapter } from '../../../../adapters/contract';
 import fetch from 'cross-fetch';
@@ -62,18 +62,64 @@ const getWoofiEventTotalCount = async (eoa: string, strategyOptions?: any) => {
   console.log(url);
   const response2 = await fetch(url);
   const res2 = await response2.json();
-  // if (res?.data?.result) {
-  // return res?.data?.result;
+
   console.log('Count..........', res2?.data, res?.data);
   const totalCount = (res2?.data?.result || 0) + (res?.data?.result || 0);
-  return arithmeticOperand(
+  const tier1 = arithmeticOperand(
     parseInt(totalCount),
     strategyOptions.threshold,
     strategyOptions.operator
   )
     ? 1
     : 0;
-  // }
+  if (tier1) {
+    const WooTokenBalance = await viewAdapter(eoa, false, {
+      contractAddress: '0xcd1B9810872aeC66d450c761E93638FB9FE09DB0',
+      type: 'view',
+      contractType: 'erc20',
+      balanceThreshold: 0,
+      chainId: 43114,
+      operator: '>',
+      functionName: 'balanceOf',
+      functionParam: [],
+    });
+    console.log(WooTokenBalance);
+    const newWooTokenBalance = await viewAdapter(eoa, false, {
+      contractAddress: '0x3Bd96847C40De8b0F20dA32568BD15462C1386E3',
+      type: 'view',
+      contractType: 'custom',
+      balanceThreshold: 0,
+      chainId: 43114,
+      operator: '>',
+      functionName: 'balances',
+      functionParam: ['<USER_ADDRESS>'],
+      abi: [
+        {
+          inputs: [
+            {
+              internalType: 'address',
+              name: '',
+              type: 'address',
+            },
+          ],
+          name: 'balances',
+          outputs: [
+            {
+              internalType: 'uint256',
+              name: '',
+              type: 'uint256',
+            },
+          ],
+          stateMutability: 'view',
+          type: 'function',
+        },
+      ],
+    });
+    console.log('Token balances', WooTokenBalance, newWooTokenBalance);
+    return WooTokenBalance || newWooTokenBalance ? 2 : 1;
+  } else {
+    return 0;
+  }
 };
 
 const actionOnQuestType = async (
