@@ -52,6 +52,7 @@ async function multipleCallStrategy<T extends AdapterNames>(
       variable: AdapterWithVariables[T];
       tier: number;
       task_id: number;
+      task_uuid: string;
     };
   }[]
 ) {
@@ -85,6 +86,9 @@ async function multipleCallStrategy<T extends AdapterNames>(
               task_id: strategiesConfig.filter(
                 x => x.options.tier === cur.params.upgradeTier.tier
               )?.[0]?.options?.task_id,
+              task_uuid: strategiesConfig.filter(
+                x => x.options.tier === cur.params.upgradeTier.tier
+              )?.[0]?.options?.task_uuid,
             },
           ],
         }),
@@ -119,6 +123,7 @@ async function multipleCallStrategy<T extends AdapterNames>(
         executionResult: res,
         tier: strategiesConfig?.[0]?.options.tier,
         id: strategiesConfig?.[0]?.options.task_id,
+        uuid: strategiesConfig?.[0]?.options.task_uuid,
         strategy: strategiesConfig?.[0]?.strategy,
       },
     ];
@@ -131,7 +136,13 @@ async function multipleCallStrategy<T extends AdapterNames>(
     const resultObj = results.reduce(
       (acc, cur) => ({
         ...acc,
-        [cur.tier]: [{ executionResult: cur.executionResult, task_id: cur.id }],
+        [cur.tier]: [
+          {
+            executionResult: cur.executionResult,
+            task_id: cur.id,
+            task_uuid: cur.uuid,
+          },
+        ],
       }),
       {}
     );
@@ -176,6 +187,9 @@ async function multipleCallStrategy<T extends AdapterNames>(
             id: strategiesConfig?.filter(x => x.options?.tier === i)[
               flatStrategy?.indexOf('community-strategy-strategy')
             ]?.options?.task_id,
+            uuid: strategiesConfig?.filter(x => x.options?.tier === i)[
+              flatStrategy?.indexOf('community-strategy-strategy')
+            ]?.options?.task_uuid,
             strategy:
               strategiesConfig?.[
                 flatStrategy?.indexOf('community-strategy-strategy')
@@ -190,6 +204,9 @@ async function multipleCallStrategy<T extends AdapterNames>(
             id: strategiesConfig?.filter(
               x => x.options?.tier === parseInt(res)
             )[0]?.options?.task_id,
+            uuid: strategiesConfig?.filter(
+              x => x.options?.tier === parseInt(res)
+            )[0]?.options?.task_uuid,
             strategy: strategiesConfig?.[0]?.strategy,
           },
         ];
@@ -214,6 +231,7 @@ async function multipleCallStrategy<T extends AdapterNames>(
             variable: AdapterWithVariables[T];
             tier: number;
             task_id: number;
+            task_uuid: string;
           };
         }) => {
           const res: boolean = await multipleStrategies[x.strategy].strategy(
@@ -228,6 +246,7 @@ async function multipleCallStrategy<T extends AdapterNames>(
             executionResult: res,
             tier: x.options.tier,
             id: x.options.task_id,
+            uuid: x.options.task_uuid,
             strategy: x.strategy,
           };
         }
@@ -275,7 +294,11 @@ async function multipleCallStrategy<T extends AdapterNames>(
               .concat(nonCommunityExecutionResult)
               .filter(x => x.tier === cur.tier)
               .map(x => {
-                return { executionResult: x.executionResult, task_id: x.id };
+                return {
+                  executionResult: x.executionResult,
+                  task_id: x.id,
+                  task_uuid: x.uuid,
+                };
               }),
           }),
           {}
@@ -369,6 +392,8 @@ async function multipleBatchCallStrategy(batchObj: any) {
           tier: i,
           id: communityStrategy.filter(x => x.options.tier === i)?.[0]?.options
             ?.task_id,
+          uuid: communityStrategy.filter(x => x.options.tier === i)?.[0]
+            ?.options?.task_uuid,
           strategy: 'community-strategy-strategy',
         });
       }
@@ -385,6 +410,7 @@ async function multipleBatchCallStrategy(batchObj: any) {
           executionResult: res,
           tier: x.options.tier,
           id: x.options.task_id,
+          uuid: x.options.task_uuid,
           strategy: x.strategy,
         };
       });
@@ -414,6 +440,7 @@ async function multipleBatchCallStrategy(batchObj: any) {
             executionResult: getOperandValueOnStrategy(x, strategyCompareValue),
             tier: x?.options?.tier,
             id: x?.options?.task_id,
+            uuid: x?.options?.task_uuid,
             strategy: x?.strategy,
           };
         });
