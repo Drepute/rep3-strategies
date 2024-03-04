@@ -154,16 +154,32 @@ async function multipleCallStrategy<T extends AdapterNames>(
 
       if (
         strategiesConfig?.[0]?.options.variable.strategyOptions?.questType ===
-        'struct'
+          'struct' ||
+        strategiesConfig?.[0]?.options.variable.strategyOptions?.questType ===
+          'woofi'
       ) {
         for (let i = 1; i <= res; i++) {
-          console.log(strategiesConfig?.filter(x => x.options?.tier === i));
+          console.log(
+            'here........',
+            strategiesConfig?.filter(x => x.options?.tier === i),
+            strategiesConfig
+              ?.filter(x => x.options?.tier === i)
+              ?.map(x => x.strategy)
+          );
+          const flatStrategy = strategiesConfig
+            ?.filter(x => x.options?.tier === i)
+            ?.map(x => x.strategy);
+
           communityExecutionResult.push({
             executionResult: true,
             tier: i,
-            id: strategiesConfig?.filter(x => x.options?.tier === i)[0]?.options
-              ?.task_id,
-            strategy: strategiesConfig?.[0]?.strategy,
+            id: strategiesConfig?.filter(x => x.options?.tier === i)[
+              flatStrategy?.indexOf('community-strategy-strategy')
+            ]?.options?.task_id,
+            strategy:
+              strategiesConfig?.[
+                flatStrategy?.indexOf('community-strategy-strategy')
+              ]?.strategy,
           });
         }
       } else {

@@ -216,6 +216,7 @@ const getBlockchainTransactionCount = async (
   let currentValidLength = currentLength;
 
   data.results.forEach(element => {
+    console.log(element.chain_id, chainId);
     if (element.volumeUsd >= 22.5 && element.chain_id === chainId) {
       currentValidLength = currentValidLength + 1;
     }
