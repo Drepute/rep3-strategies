@@ -156,7 +156,9 @@ async function multipleCallStrategy<T extends AdapterNames>(
         strategiesConfig?.[0]?.options.variable.strategyOptions?.questType ===
           'struct' ||
         strategiesConfig?.[0]?.options.variable.strategyOptions?.questType ===
-          'woofi'
+          'woofi' ||
+        strategiesConfig?.[0]?.options.variable.strategyOptions?.questType ===
+          'matchSwapper'
       ) {
         for (let i = 1; i <= res; i++) {
           console.log(
