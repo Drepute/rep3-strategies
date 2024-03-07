@@ -121,7 +121,167 @@ const getWoofiEventTotalCount = async (eoa: string, strategyOptions?: any) => {
     return 0;
   }
 };
-
+const traderJoeSwapCounts = async (sender: string, strategyOptions: any) => {
+  const query_1 = `query ($sender: String!) {
+    swaps(where:{sender: $sender}) {
+      amountUSD
+      id
+      sender
+      activeId
+      amountXIn
+      amountXOut
+      amountYIn
+      amountYOut
+      feesTokenX
+      feesTokenY
+      feesUSD
+      }
+    }`;
+  const subgraphData = await subgraph.getSubgraphFetchCall(
+    'https://api.thegraph.com/subgraphs/name/traderjoe-xyz/joe-v2',
+    query_1,
+    { sender }
+  );
+  if (subgraphData?.swaps.length) {
+    return arithmeticOperand(
+      subgraphData?.swaps.length,
+      strategyOptions.threshold,
+      strategyOptions.operator
+    )
+      ? 2
+      : 0;
+  } else {
+    return 0;
+  }
+};
+const geBetSwirlsTierCount = async (eoa: string, strategyOptions?: any) => {
+  console.log(strategyOptions);
+  const betSwirlsBets = await viewAdapter(eoa, true, {
+    contractAddress: '0x272b4dD8E842BE1012C9CCBB89B636996f9BAe98',
+    type: 'view',
+    contractType: 'custom',
+    balanceThreshold: 0,
+    chainId: 43114,
+    operator: '>',
+    functionName: 'getLastUserBets',
+    functionParam: ['<USER_ADDRESS>', 1],
+    abi: [
+      {
+        inputs: [
+          {
+            internalType: 'address',
+            name: 'user',
+            type: 'address',
+          },
+          {
+            internalType: 'uint256',
+            name: 'dataLength',
+            type: 'uint256',
+          },
+        ],
+        name: 'getLastUserBets',
+        outputs: [
+          {
+            components: [
+              {
+                components: [
+                  {
+                    internalType: 'bool',
+                    name: 'resolved',
+                    type: 'bool',
+                  },
+                  {
+                    internalType: 'address payable',
+                    name: 'user',
+                    type: 'address',
+                  },
+                  {
+                    internalType: 'address',
+                    name: 'token',
+                    type: 'address',
+                  },
+                  {
+                    internalType: 'uint256',
+                    name: 'id',
+                    type: 'uint256',
+                  },
+                  {
+                    internalType: 'uint256',
+                    name: 'amount',
+                    type: 'uint256',
+                  },
+                  {
+                    internalType: 'uint256',
+                    name: 'blockNumber',
+                    type: 'uint256',
+                  },
+                  {
+                    internalType: 'uint256',
+                    name: 'payout',
+                    type: 'uint256',
+                  },
+                  {
+                    internalType: 'uint256',
+                    name: 'vrfCost',
+                    type: 'uint256',
+                  },
+                ],
+                internalType: 'struct Game.Bet',
+                name: 'bet',
+                type: 'tuple',
+              },
+              {
+                components: [
+                  {
+                    internalType: 'bool',
+                    name: 'face',
+                    type: 'bool',
+                  },
+                  {
+                    internalType: 'bool',
+                    name: 'rolled',
+                    type: 'bool',
+                  },
+                ],
+                internalType: 'struct CoinToss.CoinTossBet',
+                name: 'coinTossBet',
+                type: 'tuple',
+              },
+            ],
+            internalType: 'struct CoinToss.FullCoinTossBet[]',
+            name: '',
+            type: 'tuple[]',
+          },
+        ],
+        stateMutability: 'view',
+        type: 'function',
+      },
+    ],
+  });
+  console.log('Token balances', betSwirlsBets);
+  return betSwirlsBets.length > 0 ? 2 : 0;
+};
+const geMuxTierCount = async (eoa: string, strategyOptions?: any) => {
+  const collectionName = `${strategyOptions.contractAddress}-${strategyOptions.chainId}-${strategyOptions.topic}`;
+  const filterParameter = JSON.stringify({
+    'args.trader': ethers.utils.getAddress(eoa), // only from
+  });
+  const sortOptions = JSON.stringify({ blockNumber: 1 });
+  const transform_options = JSON.stringify({}); //empty obj
+  const key = '_'; //from
+  const aggregator = 'mux_v1'; // count
+  const url = `${strategyOptions.baseUrl}/contract_service/event/aggregate?collection_name=${collectionName}&key=${key}&aggregator=${aggregator}&filter_options=${filterParameter}&sort_options=${sortOptions}&transform_options=${transform_options}`;
+  console.log(url);
+  const response = await fetch(url);
+  const res = await response.json();
+  return arithmeticOperand(
+    parseInt(res?.data?.result),
+    strategyOptions.threshold,
+    strategyOptions.operator
+  )
+    ? 2
+    : 0;
+};
 const actionOnQuestType = async (
   type: string,
   eoa: string,
@@ -137,10 +297,23 @@ const actionOnQuestType = async (
       const txCount = await getWoofiEventTotalCount(eoa, strategyOptions);
       return txCount;
     }
+    case 'trader-joe': {
+      const tierCount = await traderJoeSwapCounts(eoa, strategyOptions);
+      return tierCount;
+    }
+    case 'bet-swirl': {
+      const tierCount = await geBetSwirlsTierCount(eoa, strategyOptions);
+      return tierCount;
+    }
+    case 'mux': {
+      const tierCount = await geMuxTierCount(eoa, strategyOptions);
+      return tierCount;
+    }
     default:
       return 0;
   }
 };
+
 export async function strategy({ eoa, options }: StrategyParamsType) {
   const strategyOptions = options?.strategyOptions;
   console.log(strategyOptions);
