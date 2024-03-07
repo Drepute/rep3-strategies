@@ -12,8 +12,7 @@ const getSwapperEligibility = async (walletAddr: string, tier: number) => {
   );
   const data = await res.json();
   console.log('data return.....', walletAddr, currentThreshold, data);
-  // if (data.is_ok) {
-  if (currentThreshold < 5000) {
+  if (data.is_ok) {
     currentEligibleTier = currentEligibleTier + 1;
     return await getSwapperEligibility(walletAddr, currentEligibleTier);
   } else {
