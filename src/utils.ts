@@ -238,21 +238,6 @@ async function multipleCallStrategy<T extends AdapterNames>(
 
       results = results.filter(x => x.executionResult !== false);
       nonCommunityExecutionResult = results;
-      // const resultObj = results.reduce(
-      //   (acc, cur) => ({
-      //     ...acc,
-      //     [cur.tier]: results
-      //       .filter(x => x.tier === cur.tier)
-      //       .map(x => {
-      //         return { executionResult: x.executionResult, task_id: x.id };
-      //       }),
-      //   }),
-      //   {}
-      // );
-      // return {
-      //   tierMatrix: resultObj,
-      //   params: currentParams,
-      // };
     }
     console.log(
       'execution results',
