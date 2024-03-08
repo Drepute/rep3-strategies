@@ -7,7 +7,7 @@ const getSwapperEligibility = async (walletAddr: string, tier: number) => {
   const currentThreshold = tierToValue[currentEligibleTier];
   console.log('current tier threshold', currentEligibleTier, currentThreshold);
   const res = await fetch(
-    `https://galxe-endpoints.vercel.app/check?address=${walletAddr}&chain=base&chain=arbitrum&chain=ethereum&chain=polygon&eligibleAmount=${currentThreshold}&campaignStart=2024-02-18T00:00:00-05:00`,
+    `https://galxe-endpoints.vercel.app/check?address=${walletAddr}&chain=base&chain=arbitrum&chain=ethereum&chain=polygon&eligibleAmount=${currentThreshold}&campaignStart=2024-01-01T00:00:00-05:00`,
     { method: 'GET', headers: { secret: 'decentralization' } }
   );
   const data = await res.json();
@@ -35,6 +35,6 @@ export async function strategy({ eoa, options }: StrategyParamsType) {
   const strategyOptions = options?.strategyOptions;
 
   const tierCount = await actionOnQuestType(strategyOptions.questType, eoa[0]);
-
+  console.log(tierCount);
   return tierCount;
 }
