@@ -156,110 +156,24 @@ const traderJoeSwapCounts = async (sender: string, strategyOptions: any) => {
 };
 const geBetSwirlsTierCount = async (eoa: string, strategyOptions?: any) => {
   console.log(strategyOptions);
-  const betSwirlsBets = await viewAdapter(eoa, true, {
-    contractAddress: '0x272b4dD8E842BE1012C9CCBB89B636996f9BAe98',
-    type: 'view',
-    contractType: 'custom',
-    balanceThreshold: 0,
-    chainId: 43114,
-    operator: '>',
-    functionName: 'getLastUserBets',
-    functionParam: ['<USER_ADDRESS>', 1],
-    abi: [
-      {
-        inputs: [
-          {
-            internalType: 'address',
-            name: 'user',
-            type: 'address',
-          },
-          {
-            internalType: 'uint256',
-            name: 'dataLength',
-            type: 'uint256',
-          },
-        ],
-        name: 'getLastUserBets',
-        outputs: [
-          {
-            components: [
-              {
-                components: [
-                  {
-                    internalType: 'bool',
-                    name: 'resolved',
-                    type: 'bool',
-                  },
-                  {
-                    internalType: 'address payable',
-                    name: 'user',
-                    type: 'address',
-                  },
-                  {
-                    internalType: 'address',
-                    name: 'token',
-                    type: 'address',
-                  },
-                  {
-                    internalType: 'uint256',
-                    name: 'id',
-                    type: 'uint256',
-                  },
-                  {
-                    internalType: 'uint256',
-                    name: 'amount',
-                    type: 'uint256',
-                  },
-                  {
-                    internalType: 'uint256',
-                    name: 'blockNumber',
-                    type: 'uint256',
-                  },
-                  {
-                    internalType: 'uint256',
-                    name: 'payout',
-                    type: 'uint256',
-                  },
-                  {
-                    internalType: 'uint256',
-                    name: 'vrfCost',
-                    type: 'uint256',
-                  },
-                ],
-                internalType: 'struct Game.Bet',
-                name: 'bet',
-                type: 'tuple',
-              },
-              {
-                components: [
-                  {
-                    internalType: 'bool',
-                    name: 'face',
-                    type: 'bool',
-                  },
-                  {
-                    internalType: 'bool',
-                    name: 'rolled',
-                    type: 'bool',
-                  },
-                ],
-                internalType: 'struct CoinToss.CoinTossBet',
-                name: 'coinTossBet',
-                type: 'tuple',
-              },
-            ],
-            internalType: 'struct CoinToss.FullCoinTossBet[]',
-            name: '',
-            type: 'tuple[]',
-          },
-        ],
-        stateMutability: 'view',
-        type: 'function',
-      },
-    ],
-  });
-  console.log('Token balances', betSwirlsBets);
-  return betSwirlsBets.length > 0 ? 2 : 0;
+  const query_1 = `query ($id: String!) {
+    userTokens(where:{id: $id,amount_gte: 1000000000000000000}) {
+      amount
+      }
+    }`;
+  const subgraphData = await subgraph.getSubgraphFetchCall(
+    'https://gateway-arbitrum.network.thegraph.com/api/05de357c14a89c89945223b7024738db/subgraphs/id/4nQJ4T5TXvTxgECqQ6ox6Nwf57d5BNt6SCn7CzzxjDZN',
+    query_1,
+    {
+      id: `${eoa}-0x0000000000000000000000000000000000000000`,
+    }
+  );
+  console.log(subgraphData?.userTokens?.length);
+  if (subgraphData?.userTokens.length) {
+    return 2;
+  } else {
+    return 0;
+  }
 };
 const geMuxTierCount = async (eoa: string, strategyOptions?: any) => {
   const collectionName = `${strategyOptions.contractAddress}-${strategyOptions.chainId}-${strategyOptions.topic}`;
