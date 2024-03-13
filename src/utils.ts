@@ -167,7 +167,9 @@ async function multipleCallStrategy<T extends AdapterNames>(
         strategiesConfig?.[0]?.options.variable.strategyOptions?.questType ===
           'struct' ||
         strategiesConfig?.[0]?.options.variable.strategyOptions?.questType ===
-          'woofi'
+          'woofi' ||
+        strategiesConfig?.[0]?.options.variable.strategyOptions?.questType ===
+          'matchSwapper'
       ) {
         for (let i = 1; i <= res; i++) {
           console.log(
@@ -255,21 +257,6 @@ async function multipleCallStrategy<T extends AdapterNames>(
 
       results = results.filter(x => x.executionResult !== false);
       nonCommunityExecutionResult = results;
-      // const resultObj = results.reduce(
-      //   (acc, cur) => ({
-      //     ...acc,
-      //     [cur.tier]: results
-      //       .filter(x => x.tier === cur.tier)
-      //       .map(x => {
-      //         return { executionResult: x.executionResult, task_id: x.id };
-      //       }),
-      //   }),
-      //   {}
-      // );
-      // return {
-      //   tierMatrix: resultObj,
-      //   params: currentParams,
-      // };
     }
     console.log(
       'execution results',

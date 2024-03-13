@@ -17,6 +17,7 @@ import * as premiaStrategy from './community-strategy/v1/premia-strategy';
 import * as notumStrategy from './community-strategy/v2/notum-strategy';
 import * as avaxStrategy from './community-strategy/v2/avax-strategy';
 import * as hoverStrategy from './community-strategy/v2/hover-strategy';
+import * as matchStrategy from './community-strategy/v2/matcha-strategy';
 import * as contractStrategy from './contract-strategy';
 import * as discordStrategy from './discord-strategy';
 import * as twitterStrategy from './twitter-strategy';
@@ -38,6 +39,7 @@ const strategies: Record<string, StrategyType> = {
   'notum-strategy': notumStrategy,
   'avalanche-strategy': avaxStrategy,
   'hover-strategy': hoverStrategy,
+  'matcha-strategy': matchStrategy,
 };
 
 const multipleStrategies: Record<string, any> = {
@@ -55,6 +57,7 @@ export const communityEnabledStrategy = [
   'avalanche',
   'hover',
   'bebopHalloween',
+  'matcha',
 ];
 Object.keys(strategies).forEach(function(strategyName) {
   let example = null;

@@ -121,7 +121,81 @@ const getWoofiEventTotalCount = async (eoa: string, strategyOptions?: any) => {
     return 0;
   }
 };
-
+const traderJoeSwapCounts = async (sender: string, strategyOptions: any) => {
+  const query_1 = `query ($sender: String!) {
+    swaps(where:{sender: $sender}) {
+      amountUSD
+      id
+      sender
+      activeId
+      amountXIn
+      amountXOut
+      amountYIn
+      amountYOut
+      feesTokenX
+      feesTokenY
+      feesUSD
+      }
+    }`;
+  const subgraphData = await subgraph.getSubgraphFetchCall(
+    'https://api.thegraph.com/subgraphs/name/traderjoe-xyz/joe-v2',
+    query_1,
+    { sender }
+  );
+  if (subgraphData?.swaps.length) {
+    return arithmeticOperand(
+      subgraphData?.swaps.length,
+      strategyOptions.threshold,
+      strategyOptions.operator
+    )
+      ? 2
+      : 0;
+  } else {
+    return 0;
+  }
+};
+const geBetSwirlsTierCount = async (eoa: string, strategyOptions?: any) => {
+  console.log(strategyOptions);
+  const query_1 = `query ($id: String!) {
+    userTokens(where:{id: $id,amount_gte: 1000000000000000000}) {
+      amount
+      }
+    }`;
+  const subgraphData = await subgraph.getSubgraphFetchCall(
+    'https://gateway-arbitrum.network.thegraph.com/api/05de357c14a89c89945223b7024738db/subgraphs/id/4nQJ4T5TXvTxgECqQ6ox6Nwf57d5BNt6SCn7CzzxjDZN',
+    query_1,
+    {
+      id: `${eoa}-0x0000000000000000000000000000000000000000`,
+    }
+  );
+  console.log(subgraphData?.userTokens?.length);
+  if (subgraphData?.userTokens.length) {
+    return 2;
+  } else {
+    return 0;
+  }
+};
+const geMuxTierCount = async (eoa: string, strategyOptions?: any) => {
+  const collectionName = `${strategyOptions.contractAddress}-${strategyOptions.chainId}-${strategyOptions.topic}`;
+  const filterParameter = JSON.stringify({
+    'args.trader': ethers.utils.getAddress(eoa), // only from
+  });
+  const sortOptions = JSON.stringify({ blockNumber: 1 });
+  const transform_options = JSON.stringify({}); //empty obj
+  const key = '_'; //from
+  const aggregator = 'mux_v1'; // count
+  const url = `${strategyOptions.baseUrl}/contract_service/event/aggregate?collection_name=${collectionName}&key=${key}&aggregator=${aggregator}&filter_options=${filterParameter}&sort_options=${sortOptions}&transform_options=${transform_options}`;
+  console.log(url);
+  const response = await fetch(url);
+  const res = await response.json();
+  return arithmeticOperand(
+    parseInt(res?.data?.result),
+    strategyOptions.threshold,
+    strategyOptions.operator
+  )
+    ? 2
+    : 0;
+};
 const actionOnQuestType = async (
   type: string,
   eoa: string,
@@ -137,10 +211,23 @@ const actionOnQuestType = async (
       const txCount = await getWoofiEventTotalCount(eoa, strategyOptions);
       return txCount;
     }
+    case 'trader-joe': {
+      const tierCount = await traderJoeSwapCounts(eoa, strategyOptions);
+      return tierCount;
+    }
+    case 'bet-swirl': {
+      const tierCount = await geBetSwirlsTierCount(eoa, strategyOptions);
+      return tierCount;
+    }
+    case 'mux': {
+      const tierCount = await geMuxTierCount(eoa, strategyOptions);
+      return tierCount;
+    }
     default:
       return 0;
   }
 };
+
 export async function strategy({ eoa, options }: StrategyParamsType) {
   const strategyOptions = options?.strategyOptions;
   console.log(strategyOptions);
