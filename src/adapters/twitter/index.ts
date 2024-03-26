@@ -1,6 +1,11 @@
 import fetch from 'cross-fetch';
 const getFetchRouteWithType = (
-  type: 'likeCount' | 'mentionCount' | 'retweetCount' | 'repliesCount'
+  type:
+    | 'likeCount'
+    | 'mentionCount'
+    | 'retweetCount'
+    | 'repliesCount'
+    | 'impressionCount'
 ) => {
   switch (type) {
     case 'likeCount':
@@ -11,6 +16,8 @@ const getFetchRouteWithType = (
       return 'twitter_service/account/retweets';
     case 'repliesCount':
       return 'twitter_service/account/replies';
+    case 'impressionCount':
+      return 'twitter_service/account/impressions';
     default:
       return false;
   }
@@ -20,7 +27,12 @@ export const getTwitterMetrics = async (
     url: string;
     authToken: string;
   },
-  type: 'likeCount' | 'mentionCount' | 'retweetCount' | 'repliesCount',
+  type:
+    | 'likeCount'
+    | 'mentionCount'
+    | 'retweetCount'
+    | 'repliesCount'
+    | 'impressionCount',
   accountId: string,
   dateInfo: { from: number; to?: number },
   followingAccountId?: string
@@ -30,7 +42,6 @@ export const getTwitterMetrics = async (
   )}/${accountId}/${followingAccountId}?from_timestamp=${dateInfo?.from}${
     dateInfo?.to ? `&to_timestamp=${dateInfo?.to}` : ''
   }`;
-
   console.log('url....', url);
   try {
     const response = await fetch(url);
@@ -38,6 +49,8 @@ export const getTwitterMetrics = async (
     //change to generic function
     if (type === 'likeCount') {
       return res.data?.likes_count;
+    } else if (type === 'impressionCount') {
+      return res.data?.impressions_count;
     } else {
       return res.data?.mentions_count;
     }

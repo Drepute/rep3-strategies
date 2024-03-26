@@ -11,7 +11,8 @@ const getFunctionOnType = async (
     type === 'likeCount' ||
     type === 'mentionCount' ||
     type === 'retweetCount' ||
-    type === 'repliesCount'
+    type === 'repliesCount' ||
+    type === 'impressionCount'
   ) {
     try {
       const count = await getTwitterMetrics(
