@@ -40,7 +40,7 @@ const strategies: Record<string, StrategyType> = {
   'notum-strategy': notumStrategy,
   'avalanche-strategy': avaxStrategy,
   'hover-strategy': hoverStrategy,
-  'coinBeats-strategy': coinBeatsStrategy,
+  'coinbeats-strategy': coinBeatsStrategy,
   'matcha-strategy': matchStrategy,
 };
 
@@ -51,6 +51,7 @@ const multipleStrategies: Record<string, any> = {
   'csv-strategy': csvStrategy,
   'community-strategy': contractStrategy,
 };
+//lower-case
 export const communityEnabledStrategy = [
   'entangle',
   'bebop',
@@ -60,7 +61,7 @@ export const communityEnabledStrategy = [
   'hover',
   'bebopHalloween',
   'matcha',
-  'coinBeats',
+  'coinbeats',
 ];
 Object.keys(strategies).forEach(function(strategyName) {
   let example = null;
