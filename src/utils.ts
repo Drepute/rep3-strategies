@@ -172,13 +172,6 @@ async function multipleCallStrategy<T extends AdapterNames>(
           'matchSwapper'
       ) {
         for (let i = 1; i <= res; i++) {
-          console.log(
-            'here........',
-            strategiesConfig?.filter(x => x.options?.tier === i),
-            strategiesConfig
-              ?.filter(x => x.options?.tier === i)
-              ?.map(x => x.strategy)
-          );
           const flatStrategy = strategiesConfig
             ?.filter(x => x.options?.tier === i)
             ?.map(x => x.strategy);
@@ -215,17 +208,8 @@ async function multipleCallStrategy<T extends AdapterNames>(
         results = results.filter(x => x.executionResult !== false);
         communityExecutionResult = results;
       }
-      // communityExecutionResult = results.map(x => {
-      //   return {
-      //     executionResult: true,
-      //     tier: res,
-      //     id: x.id,
-      //     strategy: x.strategy,
-      //   };
-      // });
     }
     if (nonCommunityStrategy.length > 0) {
-      console.log('here csv discord twitter smart contract.........');
       const promiseResults = nonCommunityStrategy.map(
         async (x: {
           strategy: string;
@@ -258,11 +242,6 @@ async function multipleCallStrategy<T extends AdapterNames>(
       results = results.filter(x => x.executionResult !== false);
       nonCommunityExecutionResult = results;
     }
-    console.log(
-      'execution results',
-      communityExecutionResult,
-      nonCommunityExecutionResult
-    );
     if (
       communityExecutionResult?.length > 0 ||
       nonCommunityExecutionResult?.length > 0
@@ -361,7 +340,7 @@ async function multipleBatchCallStrategy(batchObj: any) {
     const csvStrategy = value.filter(
       x => x.strategy === 'csv-strategy' || x.strategy === 'discord-strategy'
     );
-
+    console.log(csvStrategy);
     if (communityStrategy.length > 0) {
       console.log('started !!!');
       const res = await _strategies[
@@ -387,11 +366,14 @@ async function multipleBatchCallStrategy(batchObj: any) {
     }
     if (csvStrategy.length > 0) {
       const promiseResults = csvStrategy.map(async (x: any) => {
-        const res: boolean = await multipleStrategies[x.strategy].strategy({
-          contractAddress: 'contractAddress',
-          eoa: [key],
-          options: x.options,
-        });
+        const res: boolean = await multipleStrategies[x.strategy].strategy(
+          true,
+          {
+            contractAddress: 'contractAddress',
+            eoa: [key],
+            options: x.options,
+          }
+        );
 
         return {
           executionResult: res,
