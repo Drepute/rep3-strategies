@@ -210,6 +210,7 @@ async function multipleCallStrategy<T extends AdapterNames>(
       }
     }
     if (nonCommunityStrategy.length > 0) {
+      console.log(nonCommunityStrategy);
       const promiseResults = nonCommunityStrategy.map(
         async (x: {
           strategy: string;
@@ -387,6 +388,7 @@ async function multipleBatchCallStrategy(batchObj: any) {
       executionArrayResult = executionArrayResult.concat(result);
     }
     if (templateStrategy.length > 0) {
+      console.log('template-strategy', templateStrategy);
       const resultObject = templateStrategy.reduce((acc, obj) => {
         const key = getKeyForConfig(obj);
         acc[key] = acc[key] || [];

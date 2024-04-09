@@ -14,6 +14,7 @@ const getFunctionOnType = async (
     type === 'repliesCount' ||
     type === 'impressionCount'
   ) {
+    console.log('type...', type);
     try {
       const count = await getTwitterMetrics(
         options.serviceConfig,
@@ -32,6 +33,7 @@ const getFunctionOnType = async (
         );
       }
     } catch (error) {
+      console.log('Error', error);
       return false;
     }
   } else {
@@ -43,7 +45,7 @@ export async function strategy(
   onlyValue: boolean,
   { contractAddress, eoa, options }: twitterStrategy
 ) {
-  console.log(contractAddress, eoa);
+  console.log('twitter....', contractAddress, eoa);
   const executionResult = await getFunctionOnType(
     onlyValue,
     options.variable.type,

@@ -50,6 +50,7 @@ export const getTwitterMetrics = async (
     if (type === 'likeCount') {
       return res.data?.likes_count;
     } else if (type === 'impressionCount') {
+      console.log(res.data);
       return res.data?.impressions_count;
     } else {
       return res.data?.mentions_count;

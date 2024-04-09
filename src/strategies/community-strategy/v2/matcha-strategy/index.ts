@@ -7,7 +7,7 @@ const getSwapperEligibility = async (walletAddr: string, tier: number) => {
   const currentThreshold = tierToValue[currentEligibleTier];
   console.log('current tier threshold', currentEligibleTier, currentThreshold);
   const res = await fetch(
-    `https://galxe-endpoints.vercel.app/check?address=${walletAddr}&chain=base&chain=arbitrum&chain=ethereum&chain=polygon&eligibleAmount=${currentThreshold}&campaignStart=2023-01-01T00:00:00-05:00`,
+    `https://galxe-endpoints.vercel.app/check?address=${walletAddr}&chain=Base&chain=Optimism&chain=Polygon&chain=Arbitrum&chain=Ethereum&chain=Avalanche&chain=BSC&chain=Fantom&chain=Celo&eligibleAmount=${currentThreshold}&campaignStart=2023-01-01T00:00:00-05:00`,
     { method: 'GET', headers: { secret: 'decentralization' } }
   );
   const data = await res.json();
@@ -23,9 +23,8 @@ const getSwapperEligibility = async (walletAddr: string, tier: number) => {
 const getMemeManiaEligibility = async (walletAddr: string, tier: number) => {
   const tierToValue = { 3: 5 };
   const currentThreshold = tierToValue[tier];
-  console.log('current tier threshold', tier, currentThreshold);
   const res = await fetch(
-    `https://galxe-endpoints.vercel.app/check?address=${walletAddr}&chain=base&chain=arbitrum&chain=ethereum&chain=polygon&eligibleAmount=${currentThreshold}&campaignStart=2023-01-01T00:00:00-05:00`,
+    `https://galxe-endpoints.vercel.app/check?address=${walletAddr}&chain=Base&chain=Optimism&chain=Polygon&chain=Arbitrum&chain=Ethereum&chain=Avalanche&chain=BSC&chain=Fantom&chain=Celo&eligibleAmount=5&campaignStart=2024-04-2T00:00:00-05:00`,
     { method: 'GET', headers: { secret: 'decentralization' } }
   );
   const data = await res.json();
