@@ -12,15 +12,23 @@ const genericViewCall = async (
   params: any[],
   chainId: number
 ) => {
-  const provider = new ethers.providers.JsonRpcProvider(network[chainId].rpc);
-  const nftContract = new ethers.Contract(address, abi, provider);
-  if (params.length > 0) {
-    const res = await nftContract[functionName](...params);
-    return res;
+  if (address.toLowerCase() === '0x0000000000000000000000000000000000000000') {
+    const provider = new ethers.providers.JsonRpcProvider(network[chainId].rpc);
+    const balance = await provider.getBalance(params[0]);
+    const formatBalance = ethers.utils.formatEther(balance);
+    console.log('balance here.....', formatBalance);
+    return formatBalance;
   } else {
-    const res = await nftContract[functionName]();
+    const provider = new ethers.providers.JsonRpcProvider(network[chainId].rpc);
+    const nftContract = new ethers.Contract(address, abi, provider);
+    if (params.length > 0) {
+      const res = await nftContract[functionName](...params);
+      return res;
+    } else {
+      const res = await nftContract[functionName]();
 
-    return res;
+      return res;
+    }
   }
 };
 
@@ -77,7 +85,6 @@ export const viewAdapter = async (
         functionParams.chainId ?? 1
       );
     } else {
-      console.log('hereeeeee', functionParams.abi);
       response = await genericViewCall(
         functionParams.contractAddress,
         functionParams.abi,
@@ -101,11 +108,10 @@ export const viewAdapter = async (
         : [holder],
       functionParams.chainId ?? 1
     );
-    console.log('here started!!!!', parseInt(response.toString()));
   }
   if (!onlyValue) {
     return arithmeticOperand(
-      parseInt(response.toString()),
+      parseFloat(response.toString()),
       functionParams.balanceThreshold ??
         eval(functionParams.thresholdEval ?? ''),
       functionParams.operator ?? '=='

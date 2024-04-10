@@ -24,7 +24,7 @@ export async function strategy(
   onlyValue: boolean,
   { contractAddress, eoa, options }: contractAdapterStrategy
 ) {
-  console.log('contract address', contractAddress);
+  console.log('contract address', onlyValue, contractAddress);
   const executionResult = await getFunctionOnType(
     eoa[0],
     onlyValue,

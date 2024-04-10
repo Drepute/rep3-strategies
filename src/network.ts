@@ -141,4 +141,15 @@ export const network: NetworkObj = {
     subgraphV2:
       'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-v2-mumbai',
   },
+  '56': {
+    name: 'BNB Smart Chain',
+    chainId: 1101,
+    network: 'homestead',
+    rpc:
+      'https://bsc-mainnet.core.chainstack.com/871f8506e2ebb23ad081359c4e76fa9d',
+    // ,
+    subgraph: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-mumbai',
+    subgraphV2:
+      'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-v2-mumbai',
+  },
 };

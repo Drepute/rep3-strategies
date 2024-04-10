@@ -42,7 +42,7 @@ const actionOnQuestType = async (type: string, eoa: string) => {
       return txCount;
     }
     case 'memeMania': {
-      const txCount = await getMemeManiaEligibility(eoa, 3);
+      const txCount = await getMemeManiaEligibility(eoa, 1);
       return txCount;
     }
     default:
