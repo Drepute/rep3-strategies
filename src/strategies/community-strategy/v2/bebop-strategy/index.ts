@@ -297,6 +297,9 @@ const actionOnQuestType = async (
       );
       return txCount;
     }
+    case 'ogCollection': {
+      return 0;
+    }
     default:
       return 0;
   }
