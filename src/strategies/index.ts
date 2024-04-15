@@ -19,6 +19,7 @@ import * as avaxStrategy from './community-strategy/v2/avax-strategy';
 import * as hoverStrategy from './community-strategy/v2/hover-strategy';
 import * as coinBeatsStrategy from './community-strategy/v2/coinBeats-strategy';
 import * as matchStrategy from './community-strategy/v2/matcha-strategy';
+import * as cookieStrategy from './community-strategy/v2/cookie3-strategy';
 import * as contractStrategy from './contract-strategy';
 import * as discordStrategy from './discord-strategy';
 import * as twitterStrategy from './twitter-strategy';
@@ -42,6 +43,7 @@ const strategies: Record<string, StrategyType> = {
   'hover-strategy': hoverStrategy,
   'coinbeats-strategy': coinBeatsStrategy,
   'matcha-strategy': matchStrategy,
+  'Cookie Bakery-strategy': cookieStrategy,
 };
 
 const multipleStrategies: Record<string, any> = {
@@ -62,6 +64,7 @@ export const communityEnabledStrategy = [
   'bebopHalloween',
   'matcha',
   'coinbeats',
+  'Cookie Bakery',
 ];
 Object.keys(strategies).forEach(function(strategyName) {
   let example = null;
