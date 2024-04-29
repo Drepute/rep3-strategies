@@ -49,23 +49,6 @@ const calculateTraderJoeEpochTier = (epoches: number) => {
     return 0;
   }
 };
-// const calculateTraderJoePercentileTier = (percentile: number) => {
-//   if (percentile >= 11) {
-//     return 6;
-//   } else if (percentile >= 9) {
-//     return 5;
-//   } else if (percentile >= 7) {
-//     return 4;
-//   } else if (percentile >= 5) {
-//     return 3;
-//   } else if (percentile >= 3) {
-//     return 2;
-//   } else if (percentile >= 20) {
-//     return 1;
-//   } else {
-//     return 0;
-//   }
-// };
 const calculateTraderJoePercentileTier = (percentile: number) => {
   if (percentile < 20) {
     return 1;
@@ -146,10 +129,22 @@ const computeDataOnType = async (
     case 'traderJoe': {
       const results = traderJoeCSVProcessing(csvRes);
       const executionResult = traderJoeTierCompute(eoa, results);
-      console.log('trader joe', tier);
       return tier
         ? arithmeticOperand(executionResult?.tier, tier, '===') || false
         : false;
+    }
+    case 'whitelist': {
+      // const eoaList = await getAndLogCsvFile(
+      //   options?.csvBucketName,
+      //   options?.csvKey
+      // );
+
+      if (csvRes) {
+        const formattedList = csvRes?.map(x => x?.split(',')[0]?.toLowerCase());
+        return formattedList?.includes(eoa?.toLowerCase()) ? true : false;
+      } else {
+        return false;
+      }
     }
     default:
       return false;
@@ -159,18 +154,18 @@ export async function strategy(
   onlyValue: boolean,
   { contractAddress, eoa, options }: StrategyParamsType
 ) {
-  console.log('csv', contractAddress, onlyValue, options);
   const res = await getAndLogCsvFile(
     options?.variable?.strategyOptions?.csvBucketName,
     options?.variable?.strategyOptions?.csvKey
   );
 
   const result = await computeDataOnType(
-    options?.variable?.strategyOptions?.subType,
+    options?.variable?.strategyOptions?.subType ?? options?.variable?.type,
     eoa[0],
     res,
     options?.variable?.strategyOptions,
     options?.tier
   );
+  console.log('csv', contractAddress, onlyValue, result);
   return result;
 }

@@ -341,7 +341,6 @@ async function multipleBatchCallStrategy(batchObj: any) {
     const csvStrategy = value.filter(
       x => x.strategy === 'csv-strategy' || x.strategy === 'discord-strategy'
     );
-    console.log(csvStrategy);
     if (communityStrategy.length > 0) {
       console.log('started !!!');
       const res = await _strategies[

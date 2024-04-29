@@ -4,8 +4,10 @@ import { getAndLogCsvFile } from '../../../whitelister-strategy';
 const actionOnQuestType = async (
   type: string,
   options: any,
-  strategyOptions: any
+  strategyOptions: any,
+  eoa: string
 ) => {
+  console.log('here.....', type);
   switch (type) {
     case 'whitelist': {
       const dataList = await getAndLogCsvFile(
@@ -29,6 +31,25 @@ const actionOnQuestType = async (
         return 0;
       }
     }
+    case 'whitelist_address': {
+      const eoaList = await getAndLogCsvFile(
+        strategyOptions?.csvBucketName,
+        strategyOptions?.csvKey
+      );
+      if (eoaList) {
+        const formattedList = eoaList?.map(
+          x =>
+            x
+              ?.split(',')[0]
+              ?.toLowerCase()
+              ?.split('\r')[0]
+        );
+        console.log(formattedList);
+        return formattedList?.includes(eoa?.toLowerCase()) ? 1 : 0;
+      } else {
+        return 0;
+      }
+    }
     default:
       return 0;
   }
@@ -36,11 +57,12 @@ const actionOnQuestType = async (
 export async function strategy({ eoa, options }: StrategyParamsType) {
   const strategyOptions = options?.strategyOptions;
   // const tier = options;
-  console.log(eoa);
+  console.log(strategyOptions.questType);
   const thresholdCount = await actionOnQuestType(
     strategyOptions.questType,
     options,
-    strategyOptions
+    strategyOptions,
+    eoa[0]
   );
   return thresholdCount;
 }

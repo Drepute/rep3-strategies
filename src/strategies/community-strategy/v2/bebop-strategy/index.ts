@@ -212,7 +212,10 @@ const getBlockchainTransactionCount = async (
     `https://api.bebop.xyz/history/v2/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTime}&size=${300}`
   );
   const data = await res.json();
-
+  console.log(
+    'data....',
+    `https://api.bebop.xyz/history/v2/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTime}&size=${300}`
+  );
   let currentValidLength = currentLength;
 
   data.results.forEach(element => {
