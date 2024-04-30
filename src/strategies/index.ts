@@ -43,7 +43,7 @@ const strategies: Record<string, StrategyType> = {
   'hover-strategy': hoverStrategy,
   'coinbeats-strategy': coinBeatsStrategy,
   'matcha-strategy': matchStrategy,
-  'Cookie Bakery-strategy': cookieStrategy,
+  'cookie bakery-strategy': cookieStrategy,
 };
 
 const multipleStrategies: Record<string, any> = {
