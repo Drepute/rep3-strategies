@@ -392,7 +392,7 @@ export async function strategy({ eoa, options }: StrategyParamsType) {
   let maticExecutionResult = false;
   if (!ethExecutionResult) {
     for (const element of strategyOptions.maticTokenId) {
-      console.log(element, strategyOptions);
+      console.log('polygon here.......', element, strategyOptions);
       maticExecutionResult = await viewAdapter(eoa[0], false, {
         contractAddress: strategyOptions.maticAddress,
         type: 'view',
@@ -421,8 +421,12 @@ export async function strategy({ eoa, options }: StrategyParamsType) {
       return thresholdCount;
     } else if (strategyOptions.questType === 'pizzaDay') {
       const latestTx = thresholdCount?.allTxs[0];
-      const range = getRange(latestTx?.txHash);
-      return range === strategyOptions.range ? 1 : 0;
+      if (latestTx?.txHash) {
+        const range = getRange(latestTx?.txHash);
+        return range === strategyOptions.range ? 1 : 0;
+      } else {
+        return 0;
+      }
     } else {
       return arithmeticOperand(
         thresholdCount,
