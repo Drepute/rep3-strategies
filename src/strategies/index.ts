@@ -64,7 +64,7 @@ export const communityEnabledStrategy = [
   'bebopHalloween',
   'matcha',
   'coinbeats',
-  'Cookie Bakery',
+  'cookie bakery',
 ];
 Object.keys(strategies).forEach(function(strategyName) {
   let example = null;

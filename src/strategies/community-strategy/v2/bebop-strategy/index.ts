@@ -249,7 +249,8 @@ const actionOnQuestType = async (
         eoa,
         strategyOptions?.startTime,
         strategyOptions?.threshold,
-        0
+        0,
+        strategyOptions?.endTime ?? null
       );
       return txCount;
     }
@@ -268,7 +269,8 @@ const actionOnQuestType = async (
         eoa,
         strategyOptions?.startTime,
         strategyOptions?.threshold,
-        0
+        0,
+        strategyOptions?.endTime ?? null
       );
       return txCount;
     }
