@@ -238,6 +238,41 @@ const getBlockchainTransactionCount = async (
     return currentValidLength;
   }
 };
+const getBitcoinPizzaCount = async (
+  walletAddr: string,
+  startTime: string,
+  threshold: number,
+  currentLength: number,
+  allTxInfo: any[],
+  endTimeStamp?: number
+) => {
+  const endTime = endTimeStamp ?? Math.floor(new Date().getTime() / 1000) * 1e9;
+  const allTxs = allTxInfo;
+  const res = await fetch(
+    `https://api.bebop.xyz/history/v2/trades?wallet_address=${walletAddr}&start=${startTime}&end=${endTime}&size=${300}`
+  );
+  const data = await res.json();
+  console.log('data.....', data);
+  let currentValidLength = currentLength;
+  data.results.forEach(element => {
+    if (element.volumeUsd >= 36) {
+      currentValidLength = currentValidLength + 1;
+      allTxs.push(element);
+    }
+  });
+  if (data.nextAvailableTimestamp && currentValidLength < threshold) {
+    return await getBitcoinPizzaCount(
+      walletAddr,
+      startTime,
+      threshold,
+      currentValidLength,
+      allTxs,
+      data.nextAvailableTimestamp
+    );
+  } else {
+    return { allTxs, currentValidLength };
+  }
+};
 const actionOnQuestType = async (
   type: string,
   eoa: string,
@@ -302,11 +337,38 @@ const actionOnQuestType = async (
       );
       return txCount;
     }
+    case 'pizzaDay': {
+      const txCount = await getBitcoinPizzaCount(
+        eoa,
+        strategyOptions?.startTime,
+        strategyOptions?.threshold,
+        0,
+        [],
+        strategyOptions?.endTime ?? null
+      );
+      return txCount;
+    }
     case 'ogCollection': {
       return 0;
     }
     default:
       return 0;
+  }
+};
+const getRange = (str: string) => {
+  const lastChar = str.charAt(str.length - 1);
+  const charCode = lastChar.charCodeAt(0);
+
+  if (charCode >= 48 && charCode <= 50) {
+    return '0-2';
+  } else if (charCode >= 51 && charCode <= 53) {
+    return '3-5';
+  } else if (charCode >= 54 && charCode <= 56) {
+    return '6-8';
+  } else if (charCode >= 57 && charCode <= 98) {
+    return '9-b';
+  } else {
+    return 'Invalid input';
   }
 };
 export async function strategy({ eoa, options }: StrategyParamsType) {
@@ -357,6 +419,10 @@ export async function strategy({ eoa, options }: StrategyParamsType) {
     );
     if (strategyOptions.questType === 'flyingDragon') {
       return thresholdCount;
+    } else if (strategyOptions.questType === 'pizzaDay') {
+      const latestTx = thresholdCount?.allTxs[0];
+      const range = getRange(latestTx?.txHash);
+      return range === strategyOptions.range ? 1 : 0;
     } else {
       return arithmeticOperand(
         thresholdCount,
