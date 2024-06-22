@@ -5,7 +5,8 @@ export const network: NetworkObj = {
     name: 'Ethereum Mainnet',
     chainId: 1,
     network: 'homestead',
-    rpc: 'https://eth-mainnet.g.alchemy.com/v2/ppadjzXPF3e1iqEu3YZaBOqW-WaXGIH1',
+    rpc:
+      'https://eth-mainnet.g.alchemy.com/v2/ppadjzXPF3e1iqEu3YZaBOqW-WaXGIH1',
     subgraph: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-matic',
     subgraphV2:
       'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-v2-mumbai',
@@ -14,7 +15,8 @@ export const network: NetworkObj = {
     name: 'Matic Mainnet',
     chainId: 137,
     network: 'homestead',
-    rpc: 'https://polygon-mainnet.g.alchemy.com/v2/cI1PchyLH0nUYm_Io2uMjZ0BgofUVIWx',
+    rpc:
+      'https://polygon-mainnet.g.alchemy.com/v2/cI1PchyLH0nUYm_Io2uMjZ0BgofUVIWx',
     subgraph: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-matic',
     subgraphV2:
       'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-v2-matic',
@@ -23,7 +25,8 @@ export const network: NetworkObj = {
     name: 'Mumbai Testnet',
     chainId: 80001,
     network: 'homestead',
-    rpc: 'https://polygon-mumbai.g.alchemy.com/v2/8zhyGM-aq1wJ4TFspyVp-dOAQ27TWozK',
+    rpc:
+      'https://polygon-mumbai.g.alchemy.com/v2/8zhyGM-aq1wJ4TFspyVp-dOAQ27TWozK',
     subgraph: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-mumbai',
     subgraphV2:
       'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-v2-mumbai',
@@ -32,7 +35,8 @@ export const network: NetworkObj = {
     name: 'Avalanche C-Chain',
     chainId: 43114,
     network: 'homestead',
-    rpc: 'https://avalanche-mainnet.infura.io/v3/ae505d933166471ba6ad5e92d7f71b00',
+    rpc:
+      'https://avalanche-mainnet.infura.io/v3/ae505d933166471ba6ad5e92d7f71b00',
     // ,
     subgraph: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-mumbai',
     subgraphV2:
@@ -42,7 +46,8 @@ export const network: NetworkObj = {
     name: 'Base',
     chainId: 8453,
     network: 'homestead',
-    rpc: 'https://base-mainnet.g.alchemy.com/v2/1yytYM_nUZmrCZtF41mAsF_IEZ14XlWB',
+    rpc:
+      'https://base-mainnet.g.alchemy.com/v2/1yytYM_nUZmrCZtF41mAsF_IEZ14XlWB',
     // ,
     subgraph: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-mumbai',
     subgraphV2:
@@ -52,7 +57,8 @@ export const network: NetworkObj = {
     name: 'Base Sepolia',
     chainId: 84532,
     network: 'homestead',
-    rpc: 'https://base-sepolia.g.alchemy.com/v2/z0SgXdIelcQZILk9nKzV2YBO8Cx-ySxu',
+    rpc:
+      'https://base-sepolia.g.alchemy.com/v2/z0SgXdIelcQZILk9nKzV2YBO8Cx-ySxu',
     // ,
     subgraph: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-mumbai',
     subgraphV2:
@@ -62,7 +68,8 @@ export const network: NetworkObj = {
     name: 'Arbitrum Sepolia',
     chainId: 421614,
     network: 'homestead',
-    rpc: 'https://arb-sepolia.g.alchemy.com/v2/6Rj5aMHQ2P_6hA8dPx4ww7fkIz4ezwPw',
+    rpc:
+      'https://arb-sepolia.g.alchemy.com/v2/6Rj5aMHQ2P_6hA8dPx4ww7fkIz4ezwPw',
     // ,
     subgraph: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-mumbai',
     subgraphV2:
@@ -72,7 +79,8 @@ export const network: NetworkObj = {
     name: 'Arbitrum',
     chainId: 42161,
     network: 'homestead',
-    rpc: 'https://arb-mainnet.g.alchemy.com/v2/951K2Ei5ZQEAwp4zIm3Y293TXVHHQ2uO',
+    rpc:
+      'https://arb-mainnet.g.alchemy.com/v2/951K2Ei5ZQEAwp4zIm3Y293TXVHHQ2uO',
     // ,
     subgraph: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-mumbai',
     subgraphV2:
@@ -82,7 +90,8 @@ export const network: NetworkObj = {
     name: 'OP Sepolia',
     chainId: 11155420,
     network: 'homestead',
-    rpc: 'https://opt-sepolia.g.alchemy.com/v2/K8UmbgYgJ3UxdsEzbAZBHMICiY2Eey2P',
+    rpc:
+      'https://opt-sepolia.g.alchemy.com/v2/K8UmbgYgJ3UxdsEzbAZBHMICiY2Eey2P',
     // ,
     subgraph: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-mumbai',
     subgraphV2:
@@ -92,7 +101,8 @@ export const network: NetworkObj = {
     name: 'OP',
     chainId: 10,
     network: 'homestead',
-    rpc: 'https://opt-mainnet.g.alchemy.com/v2/Q7PrLR-b0kqb70AhFIVqEtmPDaYFX-KV',
+    rpc:
+      'https://opt-mainnet.g.alchemy.com/v2/Q7PrLR-b0kqb70AhFIVqEtmPDaYFX-KV',
     // ,
     subgraph: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-mumbai',
     subgraphV2:
@@ -102,7 +112,8 @@ export const network: NetworkObj = {
     name: 'Sepolia',
     chainId: 11155111,
     network: 'homestead',
-    rpc: 'https://eth-sepolia.g.alchemy.com/v2/FJG5-gtZMg3gEM_s53uIhiiXpqY5-mXF',
+    rpc:
+      'https://eth-sepolia.g.alchemy.com/v2/FJG5-gtZMg3gEM_s53uIhiiXpqY5-mXF',
     // ,
     subgraph: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-mumbai',
     subgraphV2:
@@ -112,7 +123,8 @@ export const network: NetworkObj = {
     name: 'Polygon zkEVM Testnet',
     chainId: 1442,
     network: 'homestead',
-    rpc: 'https://polygonzkevm-testnet.g.alchemy.com/v2/6a02FldHuZy8ttIe9XKVWGF22__P8GC5',
+    rpc:
+      'https://polygonzkevm-testnet.g.alchemy.com/v2/6a02FldHuZy8ttIe9XKVWGF22__P8GC5',
     // ,
     subgraph: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-mumbai',
     subgraphV2:
@@ -122,7 +134,8 @@ export const network: NetworkObj = {
     name: 'Polygon zkEvm',
     chainId: 1101,
     network: 'homestead',
-    rpc: 'https://polygonzkevm-mainnet.g.alchemy.com/v2/CKAFo_PRO7Ae0jbrayQRdF9-6r4JEXIG',
+    rpc:
+      'https://polygonzkevm-mainnet.g.alchemy.com/v2/CKAFo_PRO7Ae0jbrayQRdF9-6r4JEXIG',
     // ,
     subgraph: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-mumbai',
     subgraphV2:
@@ -132,7 +145,8 @@ export const network: NetworkObj = {
     name: 'BNB Smart Chain',
     chainId: 1101,
     network: 'homestead',
-    rpc: 'https://bsc-mainnet.core.chainstack.com/871f8506e2ebb23ad081359c4e76fa9d',
+    rpc:
+      'https://bsc-mainnet.core.chainstack.com/871f8506e2ebb23ad081359c4e76fa9d',
     // ,
     subgraph: 'https://api.thegraph.com/subgraphs/name/eth-jashan/rep3-mumbai',
     subgraphV2:
@@ -140,7 +154,7 @@ export const network: NetworkObj = {
   },
   '1225': {
     name: 'Hybrid Testnet',
-    chainId: 1101,
+    chainId: 1225,
     network: 'homestead',
     rpc: 'https://hybrid-testnet.rpc.caldera.xyz/http',
     // ,
