@@ -64,7 +64,6 @@ async function multipleCallStrategy<T extends AdapterNames>(
   );
   let communityExecutionResult: any = [];
   let nonCommunityExecutionResult: any = [];
-  console.log('community-strategy', nonCommunityStrategy, communityStrategy);
   if (
     strategiesConfig?.[0]?.strategy === 'smart-contract-strategy' &&
     strategiesConfig?.[0]?.options.variable.type === 'across'
@@ -76,7 +75,7 @@ async function multipleCallStrategy<T extends AdapterNames>(
       eoa,
       options: { network: network },
     });
-    if (res.length > 0 && res[0]?.action) {
+    if (res?.length > 0 && res[0]?.action) {
       const resultObj = res.reduce(
         (acc, cur) => ({
           ...acc,
@@ -209,8 +208,7 @@ async function multipleCallStrategy<T extends AdapterNames>(
         communityExecutionResult = results;
       }
     }
-    if (nonCommunityStrategy.length > 0) {
-      console.log(nonCommunityStrategy);
+    if (nonCommunityStrategy?.length > 0) {
       const promiseResults = nonCommunityStrategy.map(
         async (x: {
           strategy: string;
@@ -247,11 +245,6 @@ async function multipleCallStrategy<T extends AdapterNames>(
       communityExecutionResult?.length > 0 ||
       nonCommunityExecutionResult?.length > 0
     ) {
-      const currentParams = await getCurrentParams(
-        contractAddress,
-        eoa[0],
-        network
-      );
       const resultObj = communityExecutionResult
         .concat(nonCommunityExecutionResult)
         .reduce(
@@ -272,7 +265,11 @@ async function multipleCallStrategy<T extends AdapterNames>(
         );
       return {
         tierMatrix: resultObj,
-        params: currentParams,
+        params: {
+          params: {},
+          action: 'mint',
+          eoa: eoa[0],
+        },
       };
     } else {
       return {};
@@ -341,8 +338,7 @@ async function multipleBatchCallStrategy(batchObj: any) {
     const csvStrategy = value.filter(
       x => x.strategy === 'csv-strategy' || x.strategy === 'discord-strategy'
     );
-    if (communityStrategy.length > 0) {
-      console.log('started !!!');
+    if (communityStrategy?.length > 0) {
       const res = await _strategies[
         `${communityStrategy?.[0]?.options.variable.type}-strategy`
       ].strategy({
@@ -364,7 +360,8 @@ async function multipleBatchCallStrategy(batchObj: any) {
         });
       }
     }
-    if (csvStrategy.length > 0) {
+    if (csvStrategy?.length > 0) {
+      console.log('csv started:::::::');
       const promiseResults = csvStrategy.map(async (x: any) => {
         const res: boolean = await multipleStrategies[x.strategy].strategy(
           true,
@@ -386,7 +383,7 @@ async function multipleBatchCallStrategy(batchObj: any) {
       const result = await Promise.all(promiseResults);
       executionArrayResult = executionArrayResult.concat(result);
     }
-    if (templateStrategy.length > 0) {
+    if (templateStrategy?.length > 0) {
       console.log('template-strategy', templateStrategy);
       const resultObject = templateStrategy.reduce((acc, obj) => {
         const key = getKeyForConfig(obj);

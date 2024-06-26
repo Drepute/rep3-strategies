@@ -7,7 +7,6 @@ const actionOnQuestType = async (
   strategyOptions: any,
   eoa: string
 ) => {
-  console.log('here.....', type);
   switch (type) {
     case 'whitelist': {
       const dataList = await getAndLogCsvFile(

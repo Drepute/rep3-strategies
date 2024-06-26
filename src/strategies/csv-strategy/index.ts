@@ -134,14 +134,22 @@ const computeDataOnType = async (
         : false;
     }
     case 'whitelist': {
-      // const eoaList = await getAndLogCsvFile(
-      //   options?.csvBucketName,
-      //   options?.csvKey
-      // );
-
       if (csvRes) {
-        const formattedList = csvRes?.map(x => x?.split(',')[0]?.toLowerCase());
-        return formattedList?.includes(eoa?.toLowerCase()) ? true : false;
+        const formattedList = csvRes?.map(x => {
+          const currentEdit = x?.split(',')[0]?.toLowerCase();
+          if (currentEdit?.includes('\r')) {
+            return currentEdit
+              ?.split(',')[0]
+              ?.toLowerCase()
+              ?.split('\r')[0];
+          } else {
+            return currentEdit;
+          }
+        });
+        const eligibleAddress = formattedList.filter(
+          x => x?.toString()?.toLowerCase() === eoa?.toLowerCase()
+        );
+        return eligibleAddress?.length > 0 ? true : false;
       } else {
         return false;
       }
