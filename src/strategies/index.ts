@@ -68,8 +68,9 @@ export const communityEnabledStrategy = [
   'matcha',
   'coinbeats',
   'cookie bakery',
+  'molecule',
 ];
-Object.keys(strategies).forEach(function (strategyName) {
+Object.keys(strategies).forEach(function(strategyName) {
   let example = null;
   let about = '';
 
