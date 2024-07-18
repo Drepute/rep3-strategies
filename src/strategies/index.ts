@@ -24,6 +24,8 @@ import * as contractStrategy from './contract-strategy';
 import * as discordStrategy from './discord-strategy';
 import * as twitterStrategy from './twitter-strategy';
 import * as csvStrategy from './csv-strategy';
+import * as moleculeStrategy from './community-strategy/v2/molecule-strategy';
+
 //convert it to uuid mapping;
 const strategies: Record<string, StrategyType> = {
   'rep3-is-member': rep3IsMember,
@@ -44,6 +46,7 @@ const strategies: Record<string, StrategyType> = {
   'coinbeats-strategy': coinBeatsStrategy,
   'matcha-strategy': matchStrategy,
   'cookie bakery-strategy': cookieStrategy,
+  'molecule-strategy': moleculeStrategy,
 };
 
 const multipleStrategies: Record<string, any> = {
@@ -66,7 +69,7 @@ export const communityEnabledStrategy = [
   'coinbeats',
   'cookie bakery',
 ];
-Object.keys(strategies).forEach(function(strategyName) {
+Object.keys(strategies).forEach(function (strategyName) {
   let example = null;
   let about = '';
 
