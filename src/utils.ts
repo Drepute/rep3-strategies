@@ -27,6 +27,10 @@ const getCurrentParams = async (
   return await action.calculateActionParams();
 };
 
+export const delay = delayInms => {
+  return new Promise(resolve => setTimeout(resolve, delayInms));
+};
+
 // STRATEGY CALLERS //
 async function callStrategy({
   strategy,
