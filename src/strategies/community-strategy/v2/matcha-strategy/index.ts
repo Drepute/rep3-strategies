@@ -35,6 +35,27 @@ const getMemeManiaEligibility = async (walletAddr: string, tier: number) => {
     return 0;
   }
 };
+
+const getMatchaOxEligibility = async (walletAddr: string, tier: number) => {
+  const tierToValue = { 1: 20, 2: 50, 3: 100 };
+  let currentEligibleTier = tier;
+  const currentThreshold = tierToValue[currentEligibleTier];
+  console.log('current tier threshold', currentEligibleTier, currentThreshold);
+  const res = await fetch(
+    `https://galxe-endpoints.vercel.app/check?address=${walletAddr}&chain=Base&chain=Optimism&chain=Polygon&chain=Arbitrum&chain=Ethereum&chain=Avalanche&chain=BSC&chain=Fantom&chain=Celo&eligibleAmount=${currentThreshold}&campaignStart=2023-01-01T00:00:00-05:00`,
+    { method: 'GET', headers: { secret: 'decentralization' } }
+  );
+  const data = await res.json();
+  console.log('data return.....', walletAddr, currentThreshold, data);
+  if (data.is_ok) {
+    currentEligibleTier = currentEligibleTier + 1;
+    return await getSwapperEligibility(walletAddr, currentEligibleTier);
+  } else {
+    console.log('data return fail.....', currentEligibleTier);
+    return currentEligibleTier;
+  }
+};
+
 const actionOnQuestType = async (type: string, eoa: string) => {
   switch (type) {
     case 'matchSwapper': {
@@ -43,6 +64,10 @@ const actionOnQuestType = async (type: string, eoa: string) => {
     }
     case 'memeMania': {
       const txCount = await getMemeManiaEligibility(eoa, 1);
+      return txCount;
+    }
+    case 'matchaOxV2': {
+      const txCount = await getMatchaOxEligibility(eoa, 1);
       return txCount;
     }
     default:
